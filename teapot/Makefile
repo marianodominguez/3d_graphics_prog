@@ -17,7 +17,7 @@ $(EXEC): $(OBJS)
 main.o: src/cube.c
 	$(CXX) -c $(COMPILER_FLAGS) -o $@ $< $(INCLUDE)
 
-polar: src/polar_curves.c
+cube: src/cube.c
 	$(CXX) $(COMPILER_FLAGS) -o bin/$@ $< $(INCLUDE) $(LIBS)
 
 teapot: src/teapot.c
@@ -30,9 +30,6 @@ teapot_02: src/teapot_02.c
 	$(CXX) $(COMPILER_FLAGS) -o bin/$@ $< $(INCLUDE) $(LIBS)
 
 teapot_03: src/teapot_03.c
-	$(CXX) $(COMPILER_FLAGS) -o bin/$@ $< $(INCLUDE) $(LIBS)
-
-test_bezier: src/test_bezier.c
 	$(CXX) $(COMPILER_FLAGS) -o bin/$@ $< $(INCLUDE) $(LIBS)
 
 clean:
