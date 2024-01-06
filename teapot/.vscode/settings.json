@@ -1,0 +1,28 @@
+{
+    "files.associations": {
+        "allegro_primitives.h": "c",
+        "allegro5.h": "c",
+        "functional": "c",
+        "cmath": "c",
+        "complex": "c",
+        "random": "c"
+    },
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/home/mariano/samples/cprog/allegro_pi/bin",
+            "binaryPath": "/home/mariano/samples/cprog/allegro_pi/bin/teapot",
+            "binaryArgs": []
+        },
+        {
+            "cwd": "/home/mariano/samples/cprog/allegro_pi/bin",
+            "binaryPath": "/home/mariano/samples/cprog/allegro_pi/bin/test_bezier",
+            "binaryArgs": []
+        },
+        ,
+        {
+            "cwd": "/home/mariano/samples/cprog/allegro_pi/bin",
+            "binaryPath": "/home/mariano/samples/cprog/allegro_pi/bin/teapot_01",
+            "binaryArgs": []
+        }
+    ]
+}
