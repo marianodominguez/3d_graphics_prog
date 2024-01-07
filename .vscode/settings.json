@@ -15,14 +15,13 @@
         },
         {
             "cwd": "/home/mariano/samples/cprog/allegro_pi/bin",
-            "binaryPath": "/home/mariano/samples/cprog/allegro_pi/bin/test_bezier",
-            "binaryArgs": []
-        },
-        ,
-        {
-            "cwd": "/home/mariano/samples/cprog/allegro_pi/bin",
             "binaryPath": "/home/mariano/samples/cprog/allegro_pi/bin/teapot_01",
             "binaryArgs": []
         }
-    ]
+    ],
+    "C_Cpp.vcFormat.newLine.beforeOpenBrace.block": "sameLine",
+    "C_Cpp.vcFormat.newLine.beforeOpenBrace.function": "sameLine",
+    "C_Cpp.vcFormat.newLine.beforeOpenBrace.lambda": "sameLine",
+    "C_Cpp.vcFormat.newLine.beforeOpenBrace.namespace": "sameLine",
+    "C_Cpp.vcFormat.newLine.beforeOpenBrace.type": "sameLine"
 }
