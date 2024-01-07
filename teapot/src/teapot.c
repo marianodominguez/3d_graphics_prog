@@ -7,231 +7,252 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-#define N_VERTICES 32*16
+#define N_VERTICES 32 * 16
 
-const int nvert=4;
-const int nfaces=6;
-const float sqrt2=1.414;
-const float sqrt6=2.449;
+const int nvert = 4;
+const int nfaces = 6;
+const float sqrt2 = 1.414;
+const float sqrt6 = 2.449;
 
 unsigned int idx;
-unsigned int screen,row,col;
+unsigned int screen, row, col;
 
-float th=M_PI;
-int X_MAX=800,Y_MAX=600;
+float th = M_PI;
+int X_MAX = 800, Y_MAX = 600;
 
-typedef struct {
+typedef struct
+{
     float x, y, z;
 } Point;
 
 Point M[N_VERTICES];
-Point VIEWPOINT={3.5,-4.0,6.0};
+Point VIEWPOINT = {3.5, -4.0, 6.0};
 ALLEGRO_COLOR color;
 
-Point normalize(Point v) {
+Point normalize(Point v)
+{
     Point r;
-    float length = sqrt( v.x*v.x + v.y*v.y + v.z*v.z );
+    float length = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
 
-    r.x=v.x/length;
-    r.y=v.y/length;
-    r.z=v.z/length;
+    r.x = v.x / length;
+    r.y = v.y / length;
+    r.z = v.z / length;
 
     return r;
 }
 
-Point cross(Point a, Point b) {
+Point cross(Point a, Point b)
+{
     Point r;
-    r.x=  (a.y*b.z - a.z*b.y);
-    r.y= -(a.x*b.z - a.z*b.x);
-    r.z=  (a.x*b.y - a.y*b.x);
+    r.x = (a.y * b.z - a.z * b.y);
+    r.y = -(a.x * b.z - a.z * b.x);
+    r.z = (a.x * b.y - a.y * b.x);
     return r;
 }
 
-float dot(Point a, Point b) {
-    return a.x*b.x+a.y*b.y+a.z*b.z;
+float dot(Point a, Point b)
+{
+    return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
-
-void split(int a[], char *s) {
+void split(int a[], char *s)
+{
     char *token;
-    const char delim[2]=",";
+    const char delim[2] = ",";
 
-    token=strtok(s,delim);
-    int i=0;
-    while (token !=NULL)
+    token = strtok(s, delim);
+    int i = 0;
+    while (token != NULL)
     {
-        a[i]=atoi(token);
+        a[i] = atoi(token);
         i++;
-        token=strtok(NULL, delim);
+        token = strtok(NULL, delim);
     }
-
 }
 
-void read_model(char *fn) {
-    char tmpx[12],tmpy[12],tmpz[12];
+void read_model(char *fn)
+{
+    char tmpx[12], tmpy[12], tmpz[12];
     char *dummy;
     char nv[5], line[255];
     int patch[16][32], points[16];
     Point P[306];
 
-    FILE* f=fopen(fn, "r");
-    if (f==NULL) {
+    FILE *f = fopen(fn, "r");
+    if (f == NULL)
+    {
         printf("Unable to read model");
         exit(1);
     }
-    dummy=fgets(nv, sizeof(nv),f );
-    if (atoi(nv)*16 != N_VERTICES) {
+    dummy = fgets(nv, sizeof(nv), f);
+    if (atoi(nv) * 16 != N_VERTICES)
+    {
         printf("Invalid model, wrong number of vertices");
         exit(1);
     }
 
-    //read patch vertices
-    for(int i=0;i<32; i++) {
-        dummy=fgets(line,sizeof(line),f);
-        split(points,line);
-        for(int j=0;j<16;j++) {
-            patch[j][i]=points[j];
-        }
-
-        //reverse backward patches
-        if (i==34 || i==35) {
-            for(int j=0;j<16;j++) {
-                patch[j][i]=points[15-j];
-                printf("%d,",patch[j][i]);
-            }
-            printf("\n");
+    // read patch vertices
+    for (int i = 0; i < 32; i++)
+    {
+        dummy = fgets(line, sizeof(line), f);
+        split(points, line);
+        for (int j = 0; j < 16; j++)
+        {
+            patch[j][i] = points[j];
         }
     }
 
-    //Read points
+    // Read points
 
-    dummy=fgets(line,sizeof(line),f);
-    if (atoi(line) != 306) {
+    dummy = fgets(line, sizeof(line), f);
+    if (atoi(line) != 306)
+    {
         printf("Invalid model, wrong number of points");
         exit(1);
     }
 
-    for(int i=0;i<306; i++) {
-        dummy=fgets(line,sizeof(line),f);
+    for (int i = 0; i < 306; i++)
+    {
+        dummy = fgets(line, sizeof(line), f);
         if (strlen(line) < 5)
-            dummy=fgets(line,sizeof(line),f);
-        sscanf(line,"%f,%f,%f",&P[i].x,&P[i].y,&P[i].z);
-        //printf("%f %f %f\n",P[i].x,P[i].y,P[i].z);
+            dummy = fgets(line, sizeof(line), f);
+        sscanf(line, "%f,%f,%f", &P[i].x, &P[i].y, &P[i].z);
+        // printf("%f %f %f\n",P[i].x,P[i].y,P[i].z);
     }
-    int idx=0;
+    int idx = 0;
     int v;
-    for(int j=0; j<32; j++) {
-        for(int i=0;i<16; i++) {
-            v=patch[i][j]-1;
-            //printf("%d :",v);
-            M[idx].x=P[v].x;
-            M[idx].y=P[v].y;
-            M[idx].z=P[v].z;
-            //printf("%f %f %f\n",M[idx].x,M[idx].y,M[idx].z);
+    for (int j = 0; j < 32; j++)
+    {
+        for (int i = 0; i < 16; i++)
+        {
+            v = patch[i][j] - 1;
+            // printf("%d :",v);
+            M[idx].x = P[v].x;
+            M[idx].y = P[v].y;
+            M[idx].z = P[v].z;
+            // printf("%f %f %f\n",M[idx].x,M[idx].y,M[idx].z);
             idx++;
         }
     }
 }
 
-void put_pixel(int x,int y ,  ALLEGRO_COLOR color) {
-   al_draw_pixel(x, y, color) ;
+void put_pixel(int x, int y, ALLEGRO_COLOR color)
+{
+    al_draw_pixel(x, y, color);
 }
 
-void line(int x, int y, int x1, int y1,  ALLEGRO_COLOR color) {
-    if (x > X_MAX || y > Y_MAX || x<0 || y<0 ) return;
-    if (x1 > X_MAX || y1 > Y_MAX || x1<0 || y1<0) return;
+void line(int x, int y, int x1, int y1, ALLEGRO_COLOR color)
+{
+    if (x > X_MAX || y > Y_MAX || x < 0 || y < 0)
+        return;
+    if (x1 > X_MAX || y1 > Y_MAX || x1 < 0 || y1 < 0)
+        return;
 
-    int x0=x;
-    int y0=y;
-    int dx=abs(x1-x0);
-    int dy=abs(y1-y0);
+    int x0 = x;
+    int y0 = y;
+    int dx = abs(x1 - x0);
+    int dy = abs(y1 - y0);
     int sx = -1;
     int sy = -1;
-    int e2,error;
+    int e2, error;
 
-    if (x0<x1) {
-        sx=1;
+    if (x0 < x1)
+    {
+        sx = 1;
     }
-    if (y0<y1) {
-        sy=1;
+    if (y0 < y1)
+    {
+        sy = 1;
     }
     error = dx - dy;
-    while(x0!=x1 || y0!=y1) {
-        put_pixel(x0,y0,color);
-        e2=2*error;
-        if(e2 > -dy) {
-            error-= dy;
+    while (x0 != x1 || y0 != y1)
+    {
+        put_pixel(x0, y0, color);
+        e2 = 2 * error;
+        if (e2 > -dy)
+        {
+            error -= dy;
             x0 += sx;
         }
-        if(e2 < dx) {
-            error+= dx;
+        if (e2 < dx)
+        {
+            error += dx;
             y0 += sy;
         }
     }
 }
 
-Point isometric_projection(float x, float y, float z) {
+Point isometric_projection(float x, float y, float z)
+{
     Point result;
-    result.x = (x-z)/sqrt2;
-    result.y = (x+2*y+z)/sqrt6;
+    result.x = (x - z) / sqrt2;
+    result.y = (x + 2 * y + z) / sqrt6;
     result.z = 0;
     return result;
 }
 
-Point camera_projection(float x, float y, float z, float d) {
+Point camera_projection(float x, float y, float z, float d)
+{
     Point r;
 
-    r.x = x*d/z;
-    r.y = y*d/z;
+    r.x = x * d / z;
+    r.y = y * d / z;
     r.z = 0;
 
-    //printf("(%f,%f)",r.x,r.y);
+    // printf("(%f,%f)",r.x,r.y);
     return r;
 }
 
-Point translate(float x, float y, float z, Point d) {
+Point translate(float x, float y, float z, Point d)
+{
     Point result;
-    result.x = x+d.x;
-    result.y = y+d.y;
-    result.z = z+d.z;
+    result.x = x + d.x;
+    result.y = y + d.y;
+    result.z = z + d.z;
     return result;
 }
 
-Point rotate_x(float x, float y, float z, float th) {
+Point rotate_x(float x, float y, float z, float th)
+{
     Point result;
     result.x = x;
-    result.y = y*cos(th) - z*sin(th);
-    result.z = y*sin(th) + z*cos(th);
+    result.y = y * cos(th) - z * sin(th);
+    result.z = y * sin(th) + z * cos(th);
     return result;
 }
 
-Point rotate_y(float x, float y, float z, float th) {
+Point rotate_y(float x, float y, float z, float th)
+{
     Point result;
-    result.x =  x*cos(th) + z*sin(th);
+    result.x = x * cos(th) + z * sin(th);
     result.y = y;
-    result.z = - x*sin(th) + z*cos(th);
+    result.z = -x * sin(th) + z * cos(th);
     return result;
 }
 
-Point rotate_z(float x, float y, float z, float th) {
+Point rotate_z(float x, float y, float z, float th)
+{
     Point result;
-    result.x = x*cos(th) - y*sin(th);
-    result.y = x*sin(th) + y*cos(th);
+    result.x = x * cos(th) - y * sin(th);
+    result.y = x * sin(th) + y * cos(th);
     result.z = z;
     return result;
 }
 
-void draw_polygon(Point t[], int n) {
+void draw_polygon(Point t[], int n)
+{
 
-    for(int i=0; i<n-1; i++) {
-        line(t[i].x,t[i].y,t[i+1].x,t[i+1].y,color);
+    for (int i = 0; i < n - 1; i++)
+    {
+        line(t[i].x, t[i].y, t[i + 1].x, t[i + 1].y, color);
     }
-    line(t[n-1].x,t[n-1].y,t[0].x,t[0].y,color);
+    line(t[n - 1].x, t[n - 1].y, t[0].x, t[0].y, color);
 }
 
-Point bezier(Point C[4][4],float t, float s) {
-    Point p = {0,0,0};
-    float b[4],c[4];
+Point bezier(Point C[4][4], float t, float s)
+{
+    Point p = {0, 0, 0};
+    float b[4], c[4];
     b[0] = (1 - t) * (1 - t) * (1 - t);
     b[1] = 3 * t * (1 - t) * (1 - t);
     b[2] = 3 * t * t * (1 - t);
@@ -242,132 +263,145 @@ Point bezier(Point C[4][4],float t, float s) {
     c[2] = 3 * s * s * (1 - s);
     c[3] = s * s * s;
 
-    for(int i=0; i<4; i++) {
-        for(int j=0; j<4; j++)
-            {
-                p.x=p.x+b[i]*c[j]*C[i][j].x;
-                p.y=p.y+b[i]*c[j]*C[i][j].y;
-                p.z=p.z+b[i]*c[j]*C[i][j].z;
-            }
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            p.x = p.x + b[i] * c[j] * C[i][j].x;
+            p.y = p.y + b[i] * c[j] * C[i][j].y;
+            p.z = p.z + b[i] * c[j] * C[i][j].z;
+        }
     }
     return p;
 }
 
-int visible(Point p[]) {
-    Point c,v0,v1,n;
+int visible(Point p[])
+{
+    Point c, v0, v1, n;
 
-    v0.x=p[1].x-p[0].x;
-    v0.y=p[1].y-p[0].y;
-    v0.z=p[1].z-p[0].z;
+    v0.x = p[1].x - p[0].x;
+    v0.y = p[1].y - p[0].y;
+    v0.z = p[1].z - p[0].z;
 
-    v1.x=p[2].x-p[0].x;
-    v1.y=p[2].y-p[0].y;
-    v1.z=p[2].z-p[0].z;
+    v1.x = p[2].x - p[0].x;
+    v1.y = p[2].y - p[0].y;
+    v1.z = p[2].z - p[0].z;
 
-    n=normalize(cross(v0,v1));
-    //c.x=-p[0].x+VIEWPOINT.x;
-    //c.y=-p[0].y+VIEWPOINT.y;
-    //c.z=-p[0].z+VIEWPOINT.z;
+    n = normalize(cross(v0, v1));
 
-    c.x=-p[0].x;
-    c.y=-p[0].y;
-    c.z=-p[0].z;
+    c.x = -p[0].x;
+    c.y = -p[0].y;
+    c.z = -p[0].z;
 
-    if (dot(c,n) >= 0) return 0;
+    if (dot(c, n) >= 0)
+        return 0;
 
     return 1;
 }
 
-Point bezier_curve(Point B[],float t, float s) {
+Point bezier_curve(Point B[], float t, float s)
+{
     static Point p;
     Point C[4][4];
-    for(int j=0; j<4 ; j++) {
-        for(int i=0; i<4 ; i++)
-            C[i][j]=B[4*j+i];
+    for (int j = 0; j < 4; j++)
+    {
+        for (int i = 0; i < 4; i++)
+            C[i][j] = B[4 * j + i];
     }
     p = bezier(C, t, s);
     return p;
 }
 
-Point* projection (Point p[]){
+Point *projection(Point p[])
+{
     static Point poly[4];
-    float xs,ys,x,y;
+    float xs, ys, x, y;
     Point pp;
-    for(int i=0; i<4 ; i++) {
-        //pp=camera_projection(p[i].x,p[i].y,p[i].z, -7.0);
-        pp=isometric_projection(p[i].x,p[i].y,p[i].z);
+    for (int i = 0; i < 4; i++)
+    {
+        // pp=camera_projection(p[i].x,p[i].y,p[i].z, -7.0);
+        pp = isometric_projection(p[i].x, p[i].y, p[i].z);
         x = pp.x;
         y = pp.y;
-        xs = 80*x + X_MAX/2;
-        ys = 80*y + Y_MAX/2;
-        poly[i].x=xs;
-        poly[i].y=ys;
-        //printf("%f,%f ",xs,ys);
-        }
+        xs = 80 * x + X_MAX / 2;
+        ys = 80 * y + Y_MAX / 2;
+        poly[i].x = xs;
+        poly[i].y = ys;
+        // printf("%f,%f ",xs,ys);
+    }
     return poly;
 }
 
-void interpolate_mesh(Point C[], float n) {
-    float t=0,s=0;
+void interpolate_mesh(Point C[], float n)
+{
+    float t = 0, s = 0;
     Point *poly;
     Point patch[4];
 
-    for(s=0; s<1.0; s+=1/n) {
-        for(t=0; t<1.0; t+=1/n) {
-            patch[0]=bezier_curve(C,t,s);
-            patch[1]=bezier_curve(C,t+(1/n),s);
-            patch[2]=bezier_curve(C,t+(1/n),s+(1/n));
+    for (s = 0; s < 1.0; s += 1 / n)
+    {
+        for (t = 0; t < 1.0; t += 1 / n)
+        {
+            patch[0] = bezier_curve(C, t, s);
+            patch[1] = bezier_curve(C, t + (1 / n), s);
+            patch[2] = bezier_curve(C, t + (1 / n), s + (1 / n));
 
-            if(visible(patch)) {
-                poly=projection(patch);
+            if (visible(patch))
+            {
+                poly = projection(patch);
                 draw_polygon(poly, 3);
             }
-            patch[0]=bezier_curve(C,t,s);
-            patch[1]=bezier_curve(C,t+(1/n),s+(1/n));
-            patch[2]=bezier_curve(C,t,s+(1/n));
+            patch[0] = bezier_curve(C, t, s);
+            patch[1] = bezier_curve(C, t + (1 / n), s + (1 / n));
+            patch[2] = bezier_curve(C, t, s + (1 / n));
 
-            if(visible(patch)) {
-                poly=projection(patch);
+            if (visible(patch))
+            {
+                poly = projection(patch);
                 draw_polygon(poly, 3);
             }
         }
     }
 }
-int draw(void) {
-    float x,y,z;
-    unsigned int i,j;
+int draw(void)
+{
+    float x, y, z;
+    unsigned int i, j;
     Point pp;
     Point patch[16];
-    Point trv={-VIEWPOINT.x,-VIEWPOINT.y,-VIEWPOINT.z};
+    Point trv = {-VIEWPOINT.x, -VIEWPOINT.y, -VIEWPOINT.z};
 
-	idx=0;
-	al_clear_to_color(al_map_rgb(0, 0, 0));
+    idx = 0;
+    al_clear_to_color(al_map_rgb(0, 0, 0));
     // N_VERTICES
     color = al_map_rgb(32, 32, 32);
-	for(i=0;i< N_VERTICES/16 ;i++) {
-		for(j=0; j<16; j++) {
+    for (i = 0; i < N_VERTICES / 16; i++)
+    {
+        for (j = 0; j < 16; j++)
+        {
             color = al_map_rgb(132, 132, 132);
-            if (i==4) color = al_map_rgb(64, 64, 255);
-            if (i==5) color = al_map_rgb(255, 255, 255);
-			pp.x=M[idx].x;
-			pp.y=M[idx].y;
-			pp.z=M[idx].z;
+            if (i == 4)
+                color = al_map_rgb(64, 64, 255);
+            if (i == 5)
+                color = al_map_rgb(255, 255, 255);
+            pp.x = M[idx].x;
+            pp.y = M[idx].y;
+            pp.z = M[idx].z;
             idx++;
 
-			//rotation
-            pp=rotate_x(pp.x,pp.y,pp.z,th);
-            pp=rotate_z(pp.x,pp.y,pp.z,th/5.0);
-            //translate to center
+            // rotation
+            pp = rotate_x(pp.x, pp.y, pp.z, th);
+            pp = rotate_z(pp.x, pp.y, pp.z, th / 5.0);
+            // translate to center
 
-            pp=translate(pp.x,pp.y,pp.z,trv);
-            patch[j].x=pp.x;
-            patch[j].y=pp.y;
-            patch[j].z=pp.z;
-		}
+            pp = translate(pp.x, pp.y, pp.z, trv);
+            patch[j].x = pp.x;
+            patch[j].y = pp.y;
+            patch[j].z = pp.z;
+        }
 
-        interpolate_mesh(patch,8);
-
-     }
+        interpolate_mesh(patch, 8);
+    }
     return EXIT_SUCCESS;
 }
 
@@ -378,10 +412,10 @@ int main()
     al_init_primitives_addon();
     read_model("models/teapot");
 
-    ALLEGRO_TIMER* timer = al_create_timer(1.0);
-    ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();
-    ALLEGRO_DISPLAY* disp = al_create_display(X_MAX, Y_MAX);
-    ALLEGRO_FONT* font = al_create_builtin_font();
+    ALLEGRO_TIMER *timer = al_create_timer(1.0);
+    ALLEGRO_EVENT_QUEUE *queue = al_create_event_queue();
+    ALLEGRO_DISPLAY *disp = al_create_display(X_MAX, Y_MAX);
+    ALLEGRO_FONT *font = al_create_builtin_font();
 
     al_register_event_source(queue, al_get_keyboard_event_source());
     al_register_event_source(queue, al_get_display_event_source(disp));
@@ -391,18 +425,18 @@ int main()
     ALLEGRO_EVENT event;
 
     al_start_timer(timer);
-    while(1)
+    while (1)
     {
-		th= th + M_PI/20;
-		//if(th>=2*M_PI) th=-2*M_PI;
+        th = th + M_PI / 20;
+        // if(th>=2*M_PI) th=-2*M_PI;
 
         al_wait_for_event(queue, &event);
-        if(event.type == ALLEGRO_EVENT_TIMER)
+        if (event.type == ALLEGRO_EVENT_TIMER)
             redraw = true;
-        else if( (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE))
+        else if ((event.type == ALLEGRO_EVENT_DISPLAY_CLOSE))
             break;
 
-        if(redraw && al_is_event_queue_empty(queue))
+        if (redraw && al_is_event_queue_empty(queue))
         {
             al_clear_to_color(al_map_rgb(0, 0, 0));
             al_draw_text(font, al_map_rgb(255, 255, 255), 0, 0, 0, "I'm a teapot");
