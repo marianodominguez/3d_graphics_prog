@@ -25,7 +25,6 @@ Point M[N_VERTICES];
 Point VIEWPOINT = {3.5, -4.0, 6.0};
 ALLEGRO_COLOR color;
 
-
 Point isometric_projection(float x, float y, float z)
 {
     Point result;
