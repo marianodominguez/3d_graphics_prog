@@ -41,6 +41,45 @@ void split(int a[], char *s)
     }
 }
 
+Point bezier(Point C[4][4], float t, float s)
+{
+    Point p = {0, 0, 0};
+    float b[4], c[4];
+    b[0] = (1 - t) * (1 - t) * (1 - t);
+    b[1] = 3 * t * (1 - t) * (1 - t);
+    b[2] = 3 * t * t * (1 - t);
+    b[3] = t * t * t;
+
+    c[0] = (1 - s) * (1 - s) * (1 - s);
+    c[1] = 3 * s * (1 - s) * (1 - s);
+    c[2] = 3 * s * s * (1 - s);
+    c[3] = s * s * s;
+
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            p.x = p.x + b[i] * c[j] * C[i][j].x;
+            p.y = p.y + b[i] * c[j] * C[i][j].y;
+            p.z = p.z + b[i] * c[j] * C[i][j].z;
+        }
+    }
+    return p;
+}
+
+Point bezier_curve(Point B[], float t, float s)
+{
+    static Point p;
+    Point C[4][4];
+    for (int j = 0; j < 4; j++)
+    {
+        for (int i = 0; i < 4; i++)
+            C[i][j] = B[4 * j + i];
+    }
+    p = bezier(C, t, s);
+    return p;
+}
+
 void read_model(char *fn)
 {
     char tmpx[12], tmpy[12], tmpz[12];
