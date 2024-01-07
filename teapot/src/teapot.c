@@ -1,12 +1,12 @@
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_primitives.h>
+#include <math.h>
 #include <stdbool.h>
-
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 #include <string.h>
+
 #include "auxiliar.h"
 
 const int nvert = 4;
@@ -25,8 +25,7 @@ Point M[N_VERTICES];
 Point VIEWPOINT = {3.5, -4.0, 6.0};
 ALLEGRO_COLOR color;
 
-Point isometric_projection(float x, float y, float z)
-{
+Point isometric_projection(float x, float y, float z) {
     Point result;
     result.x = (x - z) / sqrt2;
     result.y = (x + 2 * y + z) / sqrt6;
@@ -34,8 +33,7 @@ Point isometric_projection(float x, float y, float z)
     return result;
 }
 
-Point camera_projection(float x, float y, float z, float d)
-{
+Point camera_projection(float x, float y, float z, float d) {
     Point r;
 
     r.x = x * d / z;
@@ -46,8 +44,7 @@ Point camera_projection(float x, float y, float z, float d)
     return r;
 }
 
-Point translate(float x, float y, float z, Point d)
-{
+Point translate(float x, float y, float z, Point d) {
     Point result;
     result.x = x + d.x;
     result.y = y + d.y;
@@ -55,8 +52,7 @@ Point translate(float x, float y, float z, Point d)
     return result;
 }
 
-Point rotate_x(float x, float y, float z, float th)
-{
+Point rotate_x(float x, float y, float z, float th) {
     Point result;
     result.x = x;
     result.y = y * cos(th) - z * sin(th);
@@ -64,8 +60,7 @@ Point rotate_x(float x, float y, float z, float th)
     return result;
 }
 
-Point rotate_y(float x, float y, float z, float th)
-{
+Point rotate_y(float x, float y, float z, float th) {
     Point result;
     result.x = x * cos(th) + z * sin(th);
     result.y = y;
@@ -73,8 +68,7 @@ Point rotate_y(float x, float y, float z, float th)
     return result;
 }
 
-Point rotate_z(float x, float y, float z, float th)
-{
+Point rotate_z(float x, float y, float z, float th) {
     Point result;
     result.x = x * cos(th) - y * sin(th);
     result.y = x * sin(th) + y * cos(th);
@@ -82,19 +76,76 @@ Point rotate_z(float x, float y, float z, float th)
     return result;
 }
 
-void draw_polygon(Point t[], int n)
-{
+void fill_bottom(Point p[]) {
+    float m1 = (p[1].x - p[0].x) / (p[1].y - p[0].y);
+    float m2 = (p[2].x - p[0].x) / (p[2].y - p[0].y);
+    // float m3=(p[2].x-p[1].y)/(p[2].y-p[1].y);
 
-    for (int i = 0; i < n - 1; i++)
-    {
-        line(t[i].x, t[i].y, t[i + 1].x, t[i + 1].y, color);
+    float cx1 = p[0].x;
+    float cx2 = p[0].x;
+
+    for (int y = p[0].y; y <= p[2].y; y++) {
+        line(cx1, y, cx2, y, color);
+        cx1 += m1;
+        cx2 += m2;
     }
-    line(t[n - 1].x, t[n - 1].y, t[0].x, t[0].y, color);
 }
 
+void fill_top(Point p[]) {
+    float m1 = (p[2].x - p[0].x) / (p[2].y - p[0].y);
+    float m2 = (p[2].x - p[1].x) / (p[2].y - p[1].y);
+    // float m3=(p[2].x-p[1].y)/(p[2].y-p[1].y);
 
-int visible(Point p[])
-{
+    float cx1 = p[2].x;
+    float cx2 = p[2].x;
+
+    for (int y = p[2].y; y > p[0].y; y--) {
+        line(cx1, y, cx2, y, color);
+        cx1 -= m1;
+        cx2 -= m2;
+    }
+}
+
+void draw_triangle(Point t[]) {
+    Point *p;
+    p = copy_t(t);
+
+    if (t[1].y < t[0].y) {
+        p[0].x = t[1].x;
+        p[0].y = t[1].y;
+        p[1].x = t[0].x;
+        p[1].y = t[0].y;
+    }
+    if (t[2].y < t[0].y) {
+        p[0].x = t[2].x;
+        p[0].y = t[2].y;
+        p[2].x = t[0].x;
+        p[2].y = t[0].y;
+    }
+    if (t[2].y < t[1].y) {
+        p[0].x = t[1].x;
+        p[1].y = t[0].y;
+        p[0].x = t[1].x;
+        p[1].y = t[0].y;
+    }
+    if (p[1].y == p[2].y) {
+        fill_bottom(p);
+    } else if (p[0].y == p[1].y) {
+        fill_top(p);
+    } else {
+        Point v3;
+        v3.x =
+            p[0].x + (p[1].y - p[0].y) / (p[2].y - p[0].y) * (p[2].x - p[1].x);
+        v3.y = p[2].y;
+        Point t1[3] = {p[0], p[1], v3};
+        Point t2[3] = {p[1], v3, p[2]};
+
+        fill_bottom(t1);
+        fill_top(t2);
+    }
+}
+
+int visible(Point p[]) {
     Point c, v0, v1, n;
 
     v0.x = p[1].x - p[0].x;
@@ -111,20 +162,16 @@ int visible(Point p[])
     c.y = -p[0].y;
     c.z = -p[0].z;
 
-    if (dot(c, n) >= 0)
-        return 0;
+    if (dot(c, n) >= 0) return 0;
 
     return 1;
 }
 
-
-Point *projection(Point p[])
-{
+Point *projection(Point p[]) {
     static Point poly[4];
     float xs, ys, x, y;
     Point pp;
-    for (int i = 0; i < 4; i++)
-    {
+    for (int i = 0; i < 4; i++) {
         // pp=camera_projection(p[i].x,p[i].y,p[i].z, -7.0);
         pp = isometric_projection(p[i].x, p[i].y, p[i].z);
         x = pp.x;
@@ -138,39 +185,34 @@ Point *projection(Point p[])
     return poly;
 }
 
-void interpolate_mesh(Point C[], float n)
-{
+void interpolate_mesh(Point C[], float n) {
     float t = 0, s = 0;
     Point *poly;
     Point patch[4];
 
-    for (s = 0; s < 1.0; s += 1 / n)
-    {
-        for (t = 0; t < 1.0; t += 1 / n)
-        {
+    for (s = 0; s < 1.0; s += 1 / n) {
+        for (t = 0; t < 1.0; t += 1 / n) {
             patch[0] = bezier_curve(C, t, s);
             patch[1] = bezier_curve(C, t + (1 / n), s);
             patch[2] = bezier_curve(C, t + (1 / n), s + (1 / n));
 
-            if (visible(patch))
-            {
+            if (visible(patch)) {
                 poly = projection(patch);
-                draw_polygon(poly, 3);
+                draw_triangle(poly);
             }
             patch[0] = bezier_curve(C, t, s);
             patch[1] = bezier_curve(C, t + (1 / n), s + (1 / n));
             patch[2] = bezier_curve(C, t, s + (1 / n));
 
-            if (visible(patch))
-            {
+            if (visible(patch)) {
                 poly = projection(patch);
-                draw_polygon(poly, 3);
+                draw_triangle(poly);
             }
         }
     }
 }
-int draw(void)
-{
+
+int draw(void) {
     float x, y, z;
     unsigned int i, j;
     Point pp;
@@ -181,15 +223,11 @@ int draw(void)
     al_clear_to_color(al_map_rgb(0, 0, 0));
     // N_VERTICES
     color = al_map_rgb(32, 32, 32);
-    for (i = 0; i < N_VERTICES / 16; i++)
-    {
-        for (j = 0; j < 16; j++)
-        {
+    for (i = 0; i < N_VERTICES / 16; i++) {
+        for (j = 0; j < 16; j++) {
             color = al_map_rgb(132, 132, 132);
-            if (i == 4)
-                color = al_map_rgb(64, 64, 255);
-            if (i == 5)
-                color = al_map_rgb(255, 255, 255);
+            if (i == 4) color = al_map_rgb(64, 64, 255);
+            if (i == 5) color = al_map_rgb(255, 255, 255);
             pp.x = M[idx].x;
             pp.y = M[idx].y;
             pp.z = M[idx].z;
@@ -211,8 +249,7 @@ int draw(void)
     return EXIT_SUCCESS;
 }
 
-int main()
-{
+int main() {
     al_init();
     al_install_keyboard();
     al_init_primitives_addon();
@@ -231,8 +268,7 @@ int main()
     ALLEGRO_EVENT event;
 
     al_start_timer(timer);
-    while (1)
-    {
+    while (1) {
         th = th + M_PI / 20;
         // if(th>=2*M_PI) th=-2*M_PI;
 
@@ -242,10 +278,10 @@ int main()
         else if ((event.type == ALLEGRO_EVENT_DISPLAY_CLOSE))
             break;
 
-        if (redraw && al_is_event_queue_empty(queue))
-        {
+        if (redraw && al_is_event_queue_empty(queue)) {
             al_clear_to_color(al_map_rgb(0, 0, 0));
-            al_draw_text(font, al_map_rgb(255, 255, 255), 0, 0, 0, "I'm a teapot");
+            al_draw_text(font, al_map_rgb(255, 255, 255), 0, 0, 0,
+                         "I'm a teapot");
 
             draw();
             al_flip_display();

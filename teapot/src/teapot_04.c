@@ -1,16 +1,15 @@
 /**
  * Back face culling, remove triangles facing away from camera
  *
-*/
+ */
 
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_primitives.h>
+#include <math.h>
 #include <stdbool.h>
-
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 #include <string.h>
 #define N_VERTICES 32 * 16
 
@@ -25,8 +24,7 @@ unsigned int screen, row, col;
 float th = M_PI;
 int X_MAX = 800, Y_MAX = 600;
 
-typedef struct
-{
+typedef struct {
     float x, y, z;
 } Point;
 
@@ -34,8 +32,7 @@ Point M[N_VERTICES];
 Point VIEWPOINT = {3.5, -4.0, 6.0};
 ALLEGRO_COLOR color;
 
-Point normalize(Point v)
-{
+Point normalize(Point v) {
     Point r;
     float length = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
 
@@ -46,8 +43,7 @@ Point normalize(Point v)
     return r;
 }
 
-Point cross(Point a, Point b)
-{
+Point cross(Point a, Point b) {
     Point r;
     r.x = (a.y * b.z - a.z * b.y);
     r.y = -(a.x * b.z - a.z * b.x);
@@ -55,28 +51,22 @@ Point cross(Point a, Point b)
     return r;
 }
 
-float dot(Point a, Point b)
-{
-    return a.x * b.x + a.y * b.y + a.z * b.z;
-}
+float dot(Point a, Point b) { return a.x * b.x + a.y * b.y + a.z * b.z; }
 
-void split(int a[], char *s)
-{
+void split(int a[], char *s) {
     char *token;
     const char delim[2] = ",";
 
     token = strtok(s, delim);
     int i = 0;
-    while (token != NULL)
-    {
+    while (token != NULL) {
         a[i] = atoi(token);
         i++;
         token = strtok(NULL, delim);
     }
 }
 
-void read_model(char *fn)
-{
+void read_model(char *fn) {
     char tmpx[12], tmpy[12], tmpz[12];
     char *dummy;
     char nv[5], line[255];
@@ -84,25 +74,21 @@ void read_model(char *fn)
     Point P[306];
 
     FILE *f = fopen(fn, "r");
-    if (f == NULL)
-    {
+    if (f == NULL) {
         printf("Unable to read model");
         exit(1);
     }
     dummy = fgets(nv, sizeof(nv), f);
-    if (atoi(nv) * 16 != N_VERTICES)
-    {
+    if (atoi(nv) * 16 != N_VERTICES) {
         printf("Invalid model, wrong number of vertices");
         exit(1);
     }
 
     // read patch vertices
-    for (int i = 0; i < 32; i++)
-    {
+    for (int i = 0; i < 32; i++) {
         dummy = fgets(line, sizeof(line), f);
         split(points, line);
-        for (int j = 0; j < 16; j++)
-        {
+        for (int j = 0; j < 16; j++) {
             patch[j][i] = points[j];
         }
     }
@@ -110,26 +96,21 @@ void read_model(char *fn)
     // Read points
 
     dummy = fgets(line, sizeof(line), f);
-    if (atoi(line) != 306)
-    {
+    if (atoi(line) != 306) {
         printf("Invalid model, wrong number of points");
         exit(1);
     }
 
-    for (int i = 0; i < 306; i++)
-    {
+    for (int i = 0; i < 306; i++) {
         dummy = fgets(line, sizeof(line), f);
-        if (strlen(line) < 5)
-            dummy = fgets(line, sizeof(line), f);
+        if (strlen(line) < 5) dummy = fgets(line, sizeof(line), f);
         sscanf(line, "%f,%f,%f", &P[i].x, &P[i].y, &P[i].z);
         // printf("%f %f %f\n",P[i].x,P[i].y,P[i].z);
     }
     int idx = 0;
     int v;
-    for (int j = 0; j < 32; j++)
-    {
-        for (int i = 0; i < 16; i++)
-        {
+    for (int j = 0; j < 32; j++) {
+        for (int i = 0; i < 16; i++) {
             v = patch[i][j] - 1;
             // printf("%d :",v);
             M[idx].x = P[v].x;
@@ -141,17 +122,13 @@ void read_model(char *fn)
     }
 }
 
-void put_pixel(int x, int y, ALLEGRO_COLOR color)
-{
+void put_pixel(int x, int y, ALLEGRO_COLOR color) {
     al_draw_pixel(x, y, color);
 }
 
-void line(int x, int y, int x1, int y1, ALLEGRO_COLOR color)
-{
-    if (x > X_MAX || y > Y_MAX || x < 0 || y < 0)
-        return;
-    if (x1 > X_MAX || y1 > Y_MAX || x1 < 0 || y1 < 0)
-        return;
+void line(int x, int y, int x1, int y1, ALLEGRO_COLOR color) {
+    if (x > X_MAX || y > Y_MAX || x < 0 || y < 0) return;
+    if (x1 > X_MAX || y1 > Y_MAX || x1 < 0 || y1 < 0) return;
 
     int x0 = x;
     int y0 = y;
@@ -161,34 +138,28 @@ void line(int x, int y, int x1, int y1, ALLEGRO_COLOR color)
     int sy = -1;
     int e2, error;
 
-    if (x0 < x1)
-    {
+    if (x0 < x1) {
         sx = 1;
     }
-    if (y0 < y1)
-    {
+    if (y0 < y1) {
         sy = 1;
     }
     error = dx - dy;
-    while (x0 != x1 || y0 != y1)
-    {
+    while (x0 != x1 || y0 != y1) {
         put_pixel(x0, y0, color);
         e2 = 2 * error;
-        if (e2 > -dy)
-        {
+        if (e2 > -dy) {
             error -= dy;
             x0 += sx;
         }
-        if (e2 < dx)
-        {
+        if (e2 < dx) {
             error += dx;
             y0 += sy;
         }
     }
 }
 
-Point isometric_projection(float x, float y, float z)
-{
+Point isometric_projection(float x, float y, float z) {
     Point result;
     result.x = (x - z) / sqrt2;
     result.y = (x + 2 * y + z) / sqrt6;
@@ -196,8 +167,7 @@ Point isometric_projection(float x, float y, float z)
     return result;
 }
 
-Point camera_projection(float x, float y, float z, float d)
-{
+Point camera_projection(float x, float y, float z, float d) {
     Point r;
 
     r.x = x * d / z;
@@ -208,8 +178,7 @@ Point camera_projection(float x, float y, float z, float d)
     return r;
 }
 
-Point translate(float x, float y, float z, Point d)
-{
+Point translate(float x, float y, float z, Point d) {
     Point result;
     result.x = x + d.x;
     result.y = y + d.y;
@@ -217,8 +186,7 @@ Point translate(float x, float y, float z, Point d)
     return result;
 }
 
-Point rotate_x(float x, float y, float z, float th)
-{
+Point rotate_x(float x, float y, float z, float th) {
     Point result;
     result.x = x;
     result.y = y * cos(th) - z * sin(th);
@@ -226,8 +194,7 @@ Point rotate_x(float x, float y, float z, float th)
     return result;
 }
 
-Point rotate_y(float x, float y, float z, float th)
-{
+Point rotate_y(float x, float y, float z, float th) {
     Point result;
     result.x = x * cos(th) + z * sin(th);
     result.y = y;
@@ -235,8 +202,7 @@ Point rotate_y(float x, float y, float z, float th)
     return result;
 }
 
-Point rotate_z(float x, float y, float z, float th)
-{
+Point rotate_z(float x, float y, float z, float th) {
     Point result;
     result.x = x * cos(th) - y * sin(th);
     result.y = x * sin(th) + y * cos(th);
@@ -244,18 +210,14 @@ Point rotate_z(float x, float y, float z, float th)
     return result;
 }
 
-void draw_polygon(Point t[], int n)
-{
-
-    for (int i = 0; i < n - 1; i++)
-    {
+void draw_polygon(Point t[], int n) {
+    for (int i = 0; i < n - 1; i++) {
         line(t[i].x, t[i].y, t[i + 1].x, t[i + 1].y, color);
     }
     line(t[n - 1].x, t[n - 1].y, t[0].x, t[0].y, color);
 }
 
-Point bezier(Point C[4][4], float t, float s)
-{
+Point bezier(Point C[4][4], float t, float s) {
     Point p = {0, 0, 0};
     float b[4], c[4];
     b[0] = (1 - t) * (1 - t) * (1 - t);
@@ -268,10 +230,8 @@ Point bezier(Point C[4][4], float t, float s)
     c[2] = 3 * s * s * (1 - s);
     c[3] = s * s * s;
 
-    for (int i = 0; i < 4; i++)
-    {
-        for (int j = 0; j < 4; j++)
-        {
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
             p.x = p.x + b[i] * c[j] * C[i][j].x;
             p.y = p.y + b[i] * c[j] * C[i][j].y;
             p.z = p.z + b[i] * c[j] * C[i][j].z;
@@ -280,8 +240,7 @@ Point bezier(Point C[4][4], float t, float s)
     return p;
 }
 
-int visible(Point p[])
-{
+int visible(Point p[]) {
     Point c, v0, v1, n;
 
     v0.x = p[1].x - p[0].x;
@@ -298,32 +257,26 @@ int visible(Point p[])
     c.y = -p[0].y;
     c.z = -p[0].z;
 
-    if (dot(c, n) >= 0)
-        return 0;
+    if (dot(c, n) >= 0) return 0;
 
     return 1;
 }
 
-Point bezier_curve(Point B[], float t, float s)
-{
+Point bezier_curve(Point B[], float t, float s) {
     static Point p;
     Point C[4][4];
-    for (int j = 0; j < 4; j++)
-    {
-        for (int i = 0; i < 4; i++)
-            C[i][j] = B[4 * j + i];
+    for (int j = 0; j < 4; j++) {
+        for (int i = 0; i < 4; i++) C[i][j] = B[4 * j + i];
     }
     p = bezier(C, t, s);
     return p;
 }
 
-Point *projection(Point p[])
-{
+Point *projection(Point p[]) {
     static Point poly[4];
     float xs, ys, x, y;
     Point pp;
-    for (int i = 0; i < 4; i++)
-    {
+    for (int i = 0; i < 4; i++) {
         // pp=camera_projection(p[i].x,p[i].y,p[i].z, -7.0);
         pp = isometric_projection(p[i].x, p[i].y, p[i].z);
         x = pp.x;
@@ -337,22 +290,18 @@ Point *projection(Point p[])
     return poly;
 }
 
-void interpolate_mesh(Point C[], float n)
-{
+void interpolate_mesh(Point C[], float n) {
     float t = 0, s = 0;
     Point *poly;
     Point patch[4];
 
-    for (s = 0; s < 1.0; s += 1 / n)
-    {
-        for (t = 0; t < 1.0; t += 1 / n)
-        {
+    for (s = 0; s < 1.0; s += 1 / n) {
+        for (t = 0; t < 1.0; t += 1 / n) {
             patch[0] = bezier_curve(C, t, s);
             patch[1] = bezier_curve(C, t + (1 / n), s);
             patch[2] = bezier_curve(C, t + (1 / n), s + (1 / n));
 
-            if (visible(patch))
-            {
+            if (visible(patch)) {
                 poly = projection(patch);
                 draw_polygon(poly, 3);
             }
@@ -360,16 +309,14 @@ void interpolate_mesh(Point C[], float n)
             patch[1] = bezier_curve(C, t + (1 / n), s + (1 / n));
             patch[2] = bezier_curve(C, t, s + (1 / n));
 
-            if (visible(patch))
-            {
+            if (visible(patch)) {
                 poly = projection(patch);
                 draw_polygon(poly, 3);
             }
         }
     }
 }
-int draw(void)
-{
+int draw(void) {
     float x, y, z;
     unsigned int i, j;
     Point pp;
@@ -380,15 +327,11 @@ int draw(void)
     al_clear_to_color(al_map_rgb(0, 0, 0));
     // N_VERTICES
     color = al_map_rgb(32, 32, 32);
-    for (i = 0; i < N_VERTICES / 16; i++)
-    {
-        for (j = 0; j < 16; j++)
-        {
+    for (i = 0; i < N_VERTICES / 16; i++) {
+        for (j = 0; j < 16; j++) {
             color = al_map_rgb(132, 132, 132);
-            if (i == 4)
-                color = al_map_rgb(64, 64, 255);
-            if (i == 5)
-                color = al_map_rgb(255, 255, 255);
+            if (i == 4) color = al_map_rgb(64, 64, 255);
+            if (i == 5) color = al_map_rgb(255, 255, 255);
             pp.x = M[idx].x;
             pp.y = M[idx].y;
             pp.z = M[idx].z;
@@ -410,8 +353,7 @@ int draw(void)
     return EXIT_SUCCESS;
 }
 
-int main()
-{
+int main() {
     al_init();
     al_install_keyboard();
     al_init_primitives_addon();
@@ -430,8 +372,7 @@ int main()
     ALLEGRO_EVENT event;
 
     al_start_timer(timer);
-    while (1)
-    {
+    while (1) {
         th = th + M_PI / 20;
         // if(th>=2*M_PI) th=-2*M_PI;
 
@@ -441,10 +382,10 @@ int main()
         else if ((event.type == ALLEGRO_EVENT_DISPLAY_CLOSE))
             break;
 
-        if (redraw && al_is_event_queue_empty(queue))
-        {
+        if (redraw && al_is_event_queue_empty(queue)) {
             al_clear_to_color(al_map_rgb(0, 0, 0));
-            al_draw_text(font, al_map_rgb(255, 255, 255), 0, 0, 0, "I'm a teapot");
+            al_draw_text(font, al_map_rgb(255, 255, 255), 0, 0, 0,
+                         "I'm a teapot");
 
             draw();
             al_flip_display();
