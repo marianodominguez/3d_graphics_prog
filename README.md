@@ -2,9 +2,9 @@
 
 ## (Almost) from scratch
 
-Although the only external implementation required is put_pixel, I'm using allegro for creating windows and taking care of double buffering. this can be replaced by any other implamentation.
+Although the only external library required is put_pixel, I'm using allegro for creating windows and taking care of double buffering. this can be replaced by any other implementation.
 
-This is a progression of implementing a basic rendering pipeline, it should work in a PC or raspberry PI
+This is a progression of writing a basic rendering pipeline, it should work in a PC or raspberry PI
 
 ## Installing libraries and requirements
 
@@ -46,5 +46,5 @@ Minimal 3D example, a rotating wireframe cube
 
 -/teapot/teapot_01 ..
 
-Succesive implementation of rendering (WIP)
+Succesive steps of rendering (WIP)
 
