@@ -6,7 +6,7 @@ OBJS= main.o
 CXX=gcc
 COMPILER_FLAGS= -g -O -W
 #INCLUDE= -I/usr/include/aarch64-linux-gnu
-INCLUDE=
+INCLUDE=-I include
 LIBS= -lallegro_font -lallegro -lm -lallegro_primitives
 
 EXEC= bin/cube
@@ -20,8 +20,8 @@ main.o: src/cube.c
 cube: src/cube.c
 	$(CXX) $(COMPILER_FLAGS) -o bin/$@ $< $(INCLUDE) $(LIBS)
 
-teapot: src/teapot.c
-	$(CXX) $(COMPILER_FLAGS) -o bin/$@ $< $(INCLUDE) $(LIBS)
+teapot: src/teapot.c src/auxiliar.c
+	$(CXX) $(COMPILER_FLAGS) -o bin/$@ $^ $(INCLUDE) $(LIBS)
 
 teapot_01: src/teapot_01.c
 	$(CXX) $(COMPILER_FLAGS) -o bin/$@ $< $(INCLUDE) $(LIBS)
