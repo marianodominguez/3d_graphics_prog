@@ -77,14 +77,12 @@ Point rotate_z(float x, float y, float z, float th) {
 }
 
 void fill_bottom(Point p[]) {
-    if ((p[1].y - p[0].y)==0 || (p[2].y - p[0].y)==0) return;
-
     float m1 = (p[1].x - p[0].x) / (p[1].y - p[0].y);
     float m2 = (p[2].x - p[0].x) / (p[2].y - p[0].y);
     // float m3=(p[2].x-p[1].y)/(p[2].y-p[1].y);
 
     float cx1 = p[0].x;
-    float cx2 = p[0].x;
+    float cx2 = p[0].x+0.5f;
 
     for (int y = p[0].y; y <= p[2].y; y++) {
         line(cx1, y, cx2, y, color);
@@ -94,16 +92,14 @@ void fill_bottom(Point p[]) {
 }
 
 void fill_top(Point p[]) {
-    if ((p[2].y - p[0].y)==0 || (p[2].y - p[1].y)==0) return;
-
     float m1 = (p[2].x - p[0].x) / (p[2].y - p[0].y);
     float m2 = (p[2].x - p[1].x) / (p[2].y - p[1].y);
     // float m3=(p[2].x-p[1].y)/(p[2].y-p[1].y);
 
     float cx1 = p[2].x;
-    float cx2 = p[2].x;
+    float cx2 = p[2].x+0.5f;
 
-    for (int y = p[2].y; y >= p[0].y; y--) {
+    for (int y = p[2].y; y > p[0].y; y--) {
         line(cx1, y, cx2, y, color);
         cx1 -= m1;
         cx2 -= m2;
@@ -189,8 +185,8 @@ Point *projection(Point p[]) {
         pp = isometric_projection(p[i].x, p[i].y, p[i].z);
         x = pp.x;
         y = pp.y;
-        xs = 80 * x + X_MAX / 2;
-        ys = 80 * y + Y_MAX / 2;
+        xs = 90 * x + X_MAX / 2;
+        ys = 90 * y + Y_MAX / 2;
         poly[i].x = xs;
         poly[i].y = ys;
         // printf("%f,%f ",xs,ys);
@@ -257,7 +253,7 @@ int draw(void) {
             patch[j].z = pp.z;
         }
 
-        interpolate_mesh(patch, 8);
+        interpolate_mesh(patch, 20);
     }
     return EXIT_SUCCESS;
 }
