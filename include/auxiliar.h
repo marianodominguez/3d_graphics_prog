@@ -14,7 +14,7 @@ typedef struct
 
 extern Point M[N_VERTICES];
 
-Point* copy_t(Point src[]);
+void copy_t(Point src[], Point dest[]);
 Point normalize(Point v);
 Point cross(Point a, Point b);
 float dot(Point a, Point b);

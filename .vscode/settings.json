@@ -7,21 +7,31 @@
         "complex": "c",
         "random": "c"
     },
-    "makefile.launchConfigurations": [
+    "makefile.configurations": [
         {
-            "cwd": "/home/mariano/samples/cprog/allegro_pi/bin",
-            "binaryPath": "/home/mariano/samples/cprog/allegro_pi/bin/teapot",
+            "name": "teapot",
+            "cwd": "${workspaceFolder}",
+            "binaryPath": "${workspaceFolder}/bin/teapot",
             "binaryArgs": []
         },
         {
-            "cwd": "/home/mariano/samples/cprog/allegro_pi/bin",
-            "binaryPath": "/home/mariano/samples/cprog/allegro_pi/bin/teapot_01",
-            "binaryArgs": []
+            "name": "teapot01",
+            "cwd": "${workspaceFolder}",
+            "binaryPath": "${workspaceFolder}/bin/teapot_01",
+            "binaryArgs": [],
         }
     ],
     "C_Cpp.vcFormat.newLine.beforeOpenBrace.block": "sameLine",
     "C_Cpp.vcFormat.newLine.beforeOpenBrace.function": "sameLine",
     "C_Cpp.vcFormat.newLine.beforeOpenBrace.lambda": "sameLine",
     "C_Cpp.vcFormat.newLine.beforeOpenBrace.namespace": "sameLine",
-    "C_Cpp.vcFormat.newLine.beforeOpenBrace.type": "sameLine"
+    "C_Cpp.vcFormat.newLine.beforeOpenBrace.type": "sameLine",
+    "makefile.makefilePath": "${workspaceFolder}",
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/home/mariano/3d_graphics_prog",
+            "binaryPath": "/home/mariano/3d_graphics_prog/bin/teapot",
+            "binaryArgs": []
+        }
+    ],
 }

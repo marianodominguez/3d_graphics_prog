@@ -77,6 +77,8 @@ Point rotate_z(float x, float y, float z, float th) {
 }
 
 void fill_bottom(Point p[]) {
+    if ((p[1].y - p[0].y)==0 || (p[2].y - p[0].y)==0) return;
+
     float m1 = (p[1].x - p[0].x) / (p[1].y - p[0].y);
     float m2 = (p[2].x - p[0].x) / (p[2].y - p[0].y);
     // float m3=(p[2].x-p[1].y)/(p[2].y-p[1].y);
@@ -92,6 +94,8 @@ void fill_bottom(Point p[]) {
 }
 
 void fill_top(Point p[]) {
+    if ((p[2].y - p[0].y)==0 || (p[2].y - p[1].y)==0) return;
+
     float m1 = (p[2].x - p[0].x) / (p[2].y - p[0].y);
     float m2 = (p[2].x - p[1].x) / (p[2].y - p[1].y);
     // float m3=(p[2].x-p[1].y)/(p[2].y-p[1].y);
@@ -99,7 +103,7 @@ void fill_top(Point p[]) {
     float cx1 = p[2].x;
     float cx2 = p[2].x;
 
-    for (int y = p[2].y; y > p[0].y; y--) {
+    for (int y = p[2].y; y >= p[0].y; y--) {
         line(cx1, y, cx2, y, color);
         cx1 -= m1;
         cx2 -= m2;
@@ -107,36 +111,45 @@ void fill_top(Point p[]) {
 }
 
 void draw_triangle(Point t[]) {
-    Point *p;
-    p = copy_t(t);
+    Point p[3];
+    copy_t(t,p);
+    Point tmp;
+    Point v3;
 
-    if (t[1].y < t[0].y) {
-        p[0].x = t[1].x;
-        p[0].y = t[1].y;
-        p[1].x = t[0].x;
-        p[1].y = t[0].y;
+    if (p[1].y < p[0].y) {
+        tmp.x  = p[0].x;
+        tmp.y  = p[0].y;
+        p[0].x = p[1].x;
+        p[0].y = p[1].y;
+        p[1].x = tmp.x;
+        p[1].y = tmp.y;
     }
-    if (t[2].y < t[0].y) {
-        p[0].x = t[2].x;
-        p[0].y = t[2].y;
-        p[2].x = t[0].x;
-        p[2].y = t[0].y;
+    if (p[2].y < p[0].y) {
+        tmp.x  = p[0].x;
+        tmp.y  = p[0].y;
+        p[0].x = p[2].x;
+        p[0].y = p[2].y;
+        p[2].x = tmp.x;
+        p[2].y = tmp.y;
     }
-    if (t[2].y < t[1].y) {
-        p[0].x = t[1].x;
-        p[1].y = t[0].y;
-        p[0].x = t[1].x;
-        p[1].y = t[0].y;
+    if (p[2].y < p[1].y) {
+        tmp.x  = p[1].x;
+        tmp.y  = p[1].y;
+        p[1].x = p[2].x;
+        p[1].y = p[2].y;
+        p[2].x = tmp.x;
+        p[2].y = tmp.y;
     }
     if (p[1].y == p[2].y) {
         fill_bottom(p);
     } else if (p[0].y == p[1].y) {
         fill_top(p);
-    } else {
-        Point v3;
+    }
+    else {
+
         v3.x =
-            p[0].x + (p[1].y - p[0].y) / (p[2].y - p[0].y) * (p[2].x - p[1].x);
-        v3.y = p[2].y;
+            p[0].x + ((p[1].y - p[0].y) / (p[2].y - p[0].y)) * (p[2].x - p[0].x);
+        v3.y = p[1].y;
         Point t1[3] = {p[0], p[1], v3};
         Point t2[3] = {p[1], v3, p[2]};
 
@@ -253,7 +266,7 @@ int main() {
     al_init();
     al_install_keyboard();
     al_init_primitives_addon();
-    read_model("models/teapot");
+    read_model("teapot/models/teapot");
 
     ALLEGRO_TIMER *timer = al_create_timer(1.0);
     ALLEGRO_EVENT_QUEUE *queue = al_create_event_queue();

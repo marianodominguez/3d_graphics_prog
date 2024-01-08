@@ -1,12 +1,10 @@
 #include "auxiliar.h"
 
-Point* copy_t(Point src[]){
-    static Point d[3];
+void copy_t(Point src[],Point d[]){
     for(int i=0; i<3; i++) {
         d[i].x=src[i].x;
         d[i].y=src[i].y;
     }
-    return d;
 }
 
 Point normalize(Point v)
