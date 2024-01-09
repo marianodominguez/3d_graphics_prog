@@ -22,7 +22,7 @@ int X_MAX = 800, Y_MAX = 600;
 
 Point M[N_VERTICES];
 
-Point VIEWPOINT = {3.5, -4.0, 6.0};
+Point VIEWPOINT = {5.5, -5.0, 6.0};
 ALLEGRO_COLOR color;
 
 Point isometric_projection(float x, float y, float z) {
@@ -76,84 +76,6 @@ Point rotate_z(float x, float y, float z, float th) {
     return result;
 }
 
-void fill_bottom(Point p[]) {
-    float m1 = (p[1].x - p[0].x) / (p[1].y - p[0].y);
-    float m2 = (p[2].x - p[0].x) / (p[2].y - p[0].y);
-    // float m3=(p[2].x-p[1].y)/(p[2].y-p[1].y);
-
-    float cx1 = p[0].x;
-    float cx2 = p[0].x+0.5f;
-
-    for (int y = p[0].y; y <= p[2].y; y++) {
-        line(cx1, y, cx2, y, color);
-        cx1 += m1;
-        cx2 += m2;
-    }
-}
-
-void fill_top(Point p[]) {
-    float m1 = (p[2].x - p[0].x) / (p[2].y - p[0].y);
-    float m2 = (p[2].x - p[1].x) / (p[2].y - p[1].y);
-    // float m3=(p[2].x-p[1].y)/(p[2].y-p[1].y);
-
-    float cx1 = p[2].x;
-    float cx2 = p[2].x+0.5f;
-
-    for (int y = p[2].y; y > p[0].y; y--) {
-        line(cx1, y, cx2, y, color);
-        cx1 -= m1;
-        cx2 -= m2;
-    }
-}
-
-void draw_triangle(Point t[]) {
-    Point p[3];
-    copy_t(t,p);
-    Point tmp;
-    Point v3;
-
-    if (p[1].y < p[0].y) {
-        tmp.x  = p[0].x;
-        tmp.y  = p[0].y;
-        p[0].x = p[1].x;
-        p[0].y = p[1].y;
-        p[1].x = tmp.x;
-        p[1].y = tmp.y;
-    }
-    if (p[2].y < p[0].y) {
-        tmp.x  = p[0].x;
-        tmp.y  = p[0].y;
-        p[0].x = p[2].x;
-        p[0].y = p[2].y;
-        p[2].x = tmp.x;
-        p[2].y = tmp.y;
-    }
-    if (p[2].y < p[1].y) {
-        tmp.x  = p[1].x;
-        tmp.y  = p[1].y;
-        p[1].x = p[2].x;
-        p[1].y = p[2].y;
-        p[2].x = tmp.x;
-        p[2].y = tmp.y;
-    }
-    if (p[1].y == p[2].y) {
-        fill_bottom(p);
-    } else if (p[0].y == p[1].y) {
-        fill_top(p);
-    }
-    else {
-
-        v3.x =
-            p[0].x + ((p[1].y - p[0].y) / (p[2].y - p[0].y)) * (p[2].x - p[0].x);
-        v3.y = p[1].y;
-        Point t1[3] = {p[0], p[1], v3};
-        Point t2[3] = {p[1], v3, p[2]};
-
-        fill_bottom(t1);
-        fill_top(t2);
-    }
-}
-
 int visible(Point p[]) {
     Point c, v0, v1, n;
 
@@ -185,8 +107,8 @@ Point *projection(Point p[]) {
         pp = isometric_projection(p[i].x, p[i].y, p[i].z);
         x = pp.x;
         y = pp.y;
-        xs = 90 * x + X_MAX / 2;
-        ys = 90 * y + Y_MAX / 2;
+        xs = 80 * x + X_MAX / 2;
+        ys = 80 * y + Y_MAX / 2;
         poly[i].x = xs;
         poly[i].y = ys;
         // printf("%f,%f ",xs,ys);

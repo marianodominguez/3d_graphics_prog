@@ -13,6 +13,7 @@ typedef struct
 } Point;
 
 extern Point M[N_VERTICES];
+extern ALLEGRO_COLOR color;
 
 void copy_t(Point src[], Point dest[]);
 Point normalize(Point v);
@@ -24,3 +25,4 @@ void put_pixel(int x, int y, ALLEGRO_COLOR color);
 void line(int x, int y, int x1, int y1, ALLEGRO_COLOR color);
 Point bezier(Point C[4][4], float t, float s);
 Point bezier_curve(Point B[], float t, float s);
+void draw_triangle(Point t[]);

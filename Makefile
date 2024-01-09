@@ -27,9 +27,10 @@ teapot_03:
 teapot_04:
 	$(CXX) $(COMPILER_FLAGS) -o bin/$@ teapot/src/teapot_04.c $(INCLUDE) $(LIBS)
 
-clean:
-	rm -rf bin/*
-
-all:
+all: clean
 	$(CXX) $(COMPILER_FLAGS) -o bin/polar_curves basic/src/polar_curves.c $(INCLUDE) $(LIBS)
 	$(CXX) $(COMPILER_FLAGS) -o bin/test_bezier basic/src/test_bezier.c $(INCLUDE) $(LIBS)
+	$(CXX) $(COMPILER_FLAGS) -o bin/test_triangle basic/src/test_triangle.c teapot/src/auxiliar.c $(INCLUDE) $(LIBS)
+
+clean:
+	rm -rf bin/*
