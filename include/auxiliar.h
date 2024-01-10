@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 #define N_VERTICES 32 * 16
 
 extern int Y_MAX,X_MAX;

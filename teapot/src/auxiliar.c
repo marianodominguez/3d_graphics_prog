@@ -165,6 +165,11 @@ void line(int x, int y, int x1, int y1, ALLEGRO_COLOR color)
     if (x1 > X_MAX || y1 > Y_MAX || x1 < 0 || y1 < 0)
         return;
 
+    if (x==x1 && y==y1) {
+        put_pixel(x,y,color);
+        return;
+    }
+
     int x0 = x;
     int y0 = y;
     int dx = abs(x1 - x0);
