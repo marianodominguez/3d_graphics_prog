@@ -207,13 +207,12 @@ void line(int x, int y, int x1, int y1, ALLEGRO_COLOR color)
 void fill_bottom(Point p[]) {
     float m1 = (p[1].x - p[0].x) / (p[1].y - p[0].y);
     float m2 = (p[2].x - p[0].x) / (p[2].y - p[0].y);
-    // float m3=(p[2].x-p[1].y)/(p[2].y-p[1].y);
 
     float cx1 = p[0].x;
     float cx2 = p[0].x;
 
     for (int y = p[0].y; y <= p[2].y; y++) {
-        line(cx1, y, cx2, y, color);
+        line(cx1, y, ceil(cx2), y, color);
         cx1 += m1;
         cx2 += m2;
     }
@@ -222,13 +221,12 @@ void fill_bottom(Point p[]) {
 void fill_top(Point p[]) {
     float m1 = (p[2].x - p[0].x) / (p[2].y - p[0].y);
     float m2 = (p[2].x - p[1].x) / (p[2].y - p[1].y);
-    // float m3=(p[2].x-p[1].y)/(p[2].y-p[1].y);
 
     float cx1 = p[2].x;
     float cx2 = p[2].x;
 
     for (int y = p[2].y; y > p[0].y; y--) {
-        line(cx1, y, cx2, y, color);
+        line(cx1, y, ceil(cx2), y, color);
         cx1 -= m1;
         cx2 -= m2;
     }
@@ -248,14 +246,6 @@ void draw_triangle(Point t[]) {
         p[1].x = tmp.x;
         p[1].y = tmp.y;
     }
-    if (p[2].y < p[0].y) {
-        tmp.x  = p[0].x;
-        tmp.y  = p[0].y;
-        p[0].x = p[2].x;
-        p[0].y = p[2].y;
-        p[2].x = tmp.x;
-        p[2].y = tmp.y;
-    }
     if (p[2].y < p[1].y) {
         tmp.x  = p[1].x;
         tmp.y  = p[1].y;
@@ -264,15 +254,26 @@ void draw_triangle(Point t[]) {
         p[2].x = tmp.x;
         p[2].y = tmp.y;
     }
+    if (p[2].y < p[0].y) {
+        tmp.x  = p[0].x;
+        tmp.y  = p[0].y;
+        p[0].x = p[2].x;
+        p[0].y = p[2].y;
+        p[2].x = tmp.x;
+        p[2].y = tmp.y;
+    }
+
     if (p[1].y == p[2].y) {
         fill_bottom(p);
     } else if (p[0].y == p[1].y) {
         fill_top(p);
     }
-    else {
 
+    else {
         v3.x =
-            p[0].x + ((p[1].y - p[0].y) / (p[2].y - p[0].y)) * (p[2].x - p[0].x);
+            p[0].x + 
+            ((float)(p[1].y - p[0].y) / (p[2].y - p[0].y)) 
+            * (p[2].x - p[0].x);
         v3.y = p[1].y;
         Point t1[3] = {p[0], p[1], v3};
         Point t2[3] = {p[1], v3, p[2]};

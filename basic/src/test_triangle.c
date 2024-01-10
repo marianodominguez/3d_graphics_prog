@@ -51,7 +51,7 @@ int main() {
 
         if(event.type == ALLEGRO_EVENT_TIMER)
             redraw = true;
-        else if( (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE))
+        else if( event.type == ALLEGRO_EVENT_DISPLAY_CLOSE )
             break;
 
         T[1].y-=5;

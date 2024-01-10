@@ -7,7 +7,7 @@ CXX=gcc
 COMPILER_FLAGS= -g -O -W
 #INCLUDE= -I/usr/include/aarch64-linux-gnu
 INCLUDE=-I include
-LIBS= -lallegro_font -lallegro -lm -lallegro_primitives
+LIBS= -lallegro_font -lallegro -lm -lallegro_primitives -lallegro_main
 
 cube: clean
 	$(CXX) $(COMPILER_FLAGS) -o bin/$@ teapot/src/cube.c $(INCLUDE) $(LIBS)
