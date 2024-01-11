@@ -1,14 +1,13 @@
 #include "auxiliar.h"
 
-void copy_t(Point src[],Point d[]){
+void copy_t(Point src[],Point d[]) {
     for(int i=0; i<3; i++) {
         d[i].x=src[i].x;
         d[i].y=src[i].y;
     }
 }
 
-Point normalize(Point v)
-{
+Point normalize(Point v) {
     Point r;
     float length = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
 
@@ -19,8 +18,7 @@ Point normalize(Point v)
     return r;
 }
 
-Point cross(Point a, Point b)
-{
+Point cross(Point a, Point b) {
     Point r;
     r.x = (a.y * b.z - a.z * b.y);
     r.y = -(a.x * b.z - a.z * b.x);
@@ -28,13 +26,11 @@ Point cross(Point a, Point b)
     return r;
 }
 
-float dot(Point a, Point b)
-{
+float dot(Point a, Point b) {
     return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
-void split(int a[], char *s)
-{
+void split(int a[], char *s) {
     char *token;
     const char delim[2] = ",";
 
@@ -48,8 +44,7 @@ void split(int a[], char *s)
     }
 }
 
-Point bezier(Point C[4][4], float t, float s)
-{
+Point bezier(Point C[4][4], float t, float s) {
     Point p = {0, 0, 0};
     float b[4], c[4];
     b[0] = (1 - t) * (1 - t) * (1 - t);
@@ -62,10 +57,8 @@ Point bezier(Point C[4][4], float t, float s)
     c[2] = 3 * s * s * (1 - s);
     c[3] = s * s * s;
 
-    for (int i = 0; i < 4; i++)
-    {
-        for (int j = 0; j < 4; j++)
-        {
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
             p.x = p.x + b[i] * c[j] * C[i][j].x;
             p.y = p.y + b[i] * c[j] * C[i][j].y;
             p.z = p.z + b[i] * c[j] * C[i][j].z;
@@ -74,12 +67,10 @@ Point bezier(Point C[4][4], float t, float s)
     return p;
 }
 
-Point bezier_curve(Point B[], float t, float s)
-{
+Point bezier_curve(Point B[], float t, float s) {
     static Point p;
     Point C[4][4];
-    for (int j = 0; j < 4; j++)
-    {
+    for (int j = 0; j < 4; j++) {
         for (int i = 0; i < 4; i++)
             C[i][j] = B[4 * j + i];
     }
@@ -87,8 +78,7 @@ Point bezier_curve(Point B[], float t, float s)
     return p;
 }
 
-void read_model(char *fn)
-{
+void read_model(char *fn) {
     char tmpx[12], tmpy[12], tmpz[12];
     char *dummy;
     char nv[5], line[255];
@@ -96,21 +86,18 @@ void read_model(char *fn)
     Point P[306];
 
     FILE *f = fopen(fn, "r");
-    if (f == NULL)
-    {
+    if (f == NULL) {
         printf("Unable to read model");
         exit(1);
     }
     dummy = fgets(nv, sizeof(nv), f);
-    if (atoi(nv) * 16 != N_VERTICES)
-    {
+    if (atoi(nv) * 16 != N_VERTICES) {
         printf("Invalid model, wrong number of vertices");
         exit(1);
     }
 
     // read patch vertices
-    for (int i = 0; i < 32; i++)
-    {
+    for (int i = 0; i < 32; i++) {
         dummy = fgets(line, sizeof(line), f);
         split(points, line);
         for (int j = 0; j < 16; j++)
@@ -122,14 +109,12 @@ void read_model(char *fn)
     // Read points
 
     dummy = fgets(line, sizeof(line), f);
-    if (atoi(line) != 306)
-    {
+    if (atoi(line) != 306) {
         printf("Invalid model, wrong number of points");
         exit(1);
     }
 
-    for (int i = 0; i < 306; i++)
-    {
+    for (int i = 0; i < 306; i++) {
         dummy = fgets(line, sizeof(line), f);
         if (strlen(line) < 5)
             dummy = fgets(line, sizeof(line), f);
@@ -138,10 +123,8 @@ void read_model(char *fn)
     }
     int idx = 0;
     int v;
-    for (int j = 0; j < 32; j++)
-    {
-        for (int i = 0; i < 16; i++)
-        {
+    for (int j = 0; j < 32; j++) {
+        for (int i = 0; i < 16; i++) {
             v = patch[i][j] - 1;
             // printf("%d :",v);
             M[idx].x = P[v].x;
@@ -153,13 +136,11 @@ void read_model(char *fn)
     }
 }
 
-void put_pixel(int x, int y, ALLEGRO_COLOR color)
-{
+void put_pixel(int x, int y, ALLEGRO_COLOR color) {
     al_draw_pixel(x, y, color);
 }
 
-void line(int x, int y, int x1, int y1, ALLEGRO_COLOR color)
-{
+void line(int x, int y, int x1, int y1, ALLEGRO_COLOR color) {
     if (x > X_MAX || y > Y_MAX || x < 0 || y < 0)
         return;
     if (x1 > X_MAX || y1 > Y_MAX || x1 < 0 || y1 < 0)
@@ -181,8 +162,9 @@ void line(int x, int y, int x1, int y1, ALLEGRO_COLOR color)
     sy = y0 < y1 ? 1 : -1;
     error = dx + dy;
 
-    while (x0 != x1 || y0 != y1) {
+    while ( x0 != x1 || y0 != y1 ) {
         put_pixel(x0, y0, color);
+        
         e2 = 2 * error;
         if (e2 >= dy) {
             error += dy;
@@ -258,9 +240,7 @@ void draw_triangle(Point t[]) {
         fill_bottom(p);
     } else if (p[0].y == p[1].y) {
         fill_top(p);
-    }
-
-    else {
+    } else {
         v3.x =
             p[0].x + 
             ((float)(p[1].y - p[0].y) / (p[2].y - p[0].y)) 

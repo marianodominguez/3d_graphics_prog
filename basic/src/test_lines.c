@@ -11,13 +11,22 @@
 ALLEGRO_COLOR color;
 int X_MAX = 800, Y_MAX = 600;
 Point M[N_VERTICES];
+ALLEGRO_DISPLAY* disp;
 
 void draw() {
-    ALLEGRO_COLOR lc = al_map_rgb(255, 255, 255);
-    for(int x=0; x<X_MAX; x+=5) {
-        line(x,0,X_MAX-x,Y_MAX, lc);
-        //al_draw_line(x,0,X_MAX-x,Y_MAX, lc, 1.0);
+    ALLEGRO_COLOR lc = al_map_rgb(128, 128, 255);
+    // for(int x=0; x<X_MAX; x+=1) {
+    //     line(x,0,x,Y_MAX-1, lc);
+    //     //al_draw_line(x,0,X_MAX-x,Y_MAX, lc, 1.0);
+    // }
+    // al_clear_to_color(al_map_rgb(0, 0, 0));
+    al_lock_bitmap(al_get_backbuffer(disp), ALLEGRO_PIXEL_FORMAT_ANY, 0);
+    for(int x=100; x<X_MAX-10; x+=1) {
+        for(int y=100; y<Y_MAX-10; y+=1) {
+            put_pixel(x,y,lc);
+        }
     }
+    al_unlock_bitmap(al_get_backbuffer(disp));
 }
 
 int main() {
@@ -28,7 +37,7 @@ int main() {
 
     ALLEGRO_TIMER* timer = al_create_timer(1.0 / 3.0);
     ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();
-    ALLEGRO_DISPLAY* disp = al_create_display(800, 600);
+    disp = al_create_display(X_MAX, Y_MAX);
     ALLEGRO_FONT* font = al_create_builtin_font();
 
     al_register_event_source(queue, al_get_keyboard_event_source());

@@ -12,13 +12,16 @@ ALLEGRO_COLOR color;
 int X_MAX = 800, Y_MAX = 600;
 Point T[3];
 Point M[N_VERTICES];
+ALLEGRO_DISPLAY* disp;
 
 void draw() {
+    al_lock_bitmap(al_get_backbuffer(disp), ALLEGRO_PIXEL_FORMAT_ANY, 0);
     ALLEGRO_COLOR lc = al_map_rgb(255, 255, 255);
     line(T[0].x, T[0].y, T[1].x, T[1].y, lc);
     line(T[0].x, T[0].y, T[2].x, T[2].y, lc);
     line(T[1].x, T[1].y, T[2].x, T[2].y, lc);
     draw_triangle(T);
+    al_unlock_bitmap(al_get_backbuffer(disp));
 }
 
 int main() {
@@ -29,7 +32,7 @@ int main() {
 
     ALLEGRO_TIMER* timer = al_create_timer(1.0 / 3.0);
     ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();
-    ALLEGRO_DISPLAY* disp = al_create_display(800, 600);
+    disp = al_create_display(800, 600);
     ALLEGRO_FONT* font = al_create_builtin_font();
 
     al_register_event_source(queue, al_get_keyboard_event_source());

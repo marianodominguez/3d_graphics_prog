@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include "auxiliar.h"
 
 const int nvert = 4;
@@ -24,6 +23,7 @@ Point M[N_VERTICES];
 
 Point VIEWPOINT = {5.5, -5.0, 6.0};
 ALLEGRO_COLOR color;
+ALLEGRO_DISPLAY *disp;
 
 Point isometric_projection(float x, float y, float z) {
     Point result;
@@ -188,7 +188,7 @@ int main() {
 
     ALLEGRO_TIMER *timer = al_create_timer(1.0);
     ALLEGRO_EVENT_QUEUE *queue = al_create_event_queue();
-    ALLEGRO_DISPLAY *disp = al_create_display(X_MAX, Y_MAX);
+    disp = al_create_display(X_MAX, Y_MAX);
     ALLEGRO_FONT *font = al_create_builtin_font();
 
     al_register_event_source(queue, al_get_keyboard_event_source());
@@ -206,7 +206,7 @@ int main() {
         al_wait_for_event(queue, &event);
         if (event.type == ALLEGRO_EVENT_TIMER)
             redraw = true;
-        else if ((event.type == ALLEGRO_EVENT_DISPLAY_CLOSE))
+        else if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
             break;
 
         if (redraw && al_is_event_queue_empty(queue)) {
@@ -214,7 +214,9 @@ int main() {
             al_draw_text(font, al_map_rgb(255, 255, 255), 0, 0, 0,
                          "I'm a teapot");
 
+            al_lock_bitmap(al_get_backbuffer(disp), ALLEGRO_PIXEL_FORMAT_ANY, 0);
             draw();
+            al_unlock_bitmap(al_get_backbuffer(disp));
             al_flip_display();
 
             redraw = false;
