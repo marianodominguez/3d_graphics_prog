@@ -173,31 +173,22 @@ void line(int x, int y, int x1, int y1, ALLEGRO_COLOR color)
     int x0 = x;
     int y0 = y;
     int dx = abs(x1 - x0);
-    int dy = abs(y1 - y0);
-    int sx = -1;
-    int sy = -1;
+    int dy = -abs(y1 - y0);
+    int sx,sy;
     int e2, error;
 
-    if (x0 < x1)
-    {
-        sx = 1;
-    }
-    if (y0 < y1)
-    {
-        sy = 1;
-    }
-    error = dx - dy;
-    while (x0 != x1 || y0 != y1)
-    {
+    sx = x0 < x1 ? 1 : -1;
+    sy = y0 < y1 ? 1 : -1;
+    error = dx + dy;
+
+    while (x0 != x1 || y0 != y1) {
         put_pixel(x0, y0, color);
         e2 = 2 * error;
-        if (e2 > -dy)
-        {
-            error -= dy;
+        if (e2 >= dy) {
+            error += dy;
             x0 += sx;
         }
-        if (e2 < dx)
-        {
+        if (e2 <= dx) {
             error += dx;
             y0 += sy;
         }
@@ -212,7 +203,7 @@ void fill_bottom(Point p[]) {
     float cx2 = p[0].x;
 
     for (int y = p[0].y; y <= p[2].y; y++) {
-        line(cx1, y, ceil(cx2), y, color);
+        line(cx1, y, cx2, y, color);
         cx1 += m1;
         cx2 += m2;
     }
@@ -226,7 +217,7 @@ void fill_top(Point p[]) {
     float cx2 = p[2].x;
 
     for (int y = p[2].y; y > p[0].y; y--) {
-        line(cx1, y, ceil(cx2), y, color);
+        line(cx1, y, cx2, y, color);
         cx1 -= m1;
         cx2 -= m2;
     }

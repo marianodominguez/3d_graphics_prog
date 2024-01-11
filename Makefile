@@ -1,3 +1,6 @@
+.PHONY: default
+default: all ;
+
 ############
 MACHINE= $(shell uname -s)
 
@@ -31,6 +34,7 @@ all: clean
 	$(CXX) $(COMPILER_FLAGS) -o bin/polar_curves basic/src/polar_curves.c $(INCLUDE) $(LIBS)
 	$(CXX) $(COMPILER_FLAGS) -o bin/test_bezier basic/src/test_bezier.c $(INCLUDE) $(LIBS)
 	$(CXX) $(COMPILER_FLAGS) -o bin/test_triangle basic/src/test_triangle.c teapot/src/auxiliar.c $(INCLUDE) $(LIBS)
+	$(CXX) $(COMPILER_FLAGS) -o bin/test_lines basic/src/test_lines.c teapot/src/auxiliar.c $(INCLUDE) $(LIBS)
 
 clean:
 	rm -rf bin/*

@@ -11,7 +11,7 @@
 const int nvert=4;
 const int nfaces=6;
 unsigned char idx;
-unsigned int screen,row,col;
+int screen,row,col;
 float th=0;
 
 int CUBE[]={
@@ -161,7 +161,7 @@ int cube(void) {
 			}
 			else {
 				//bline(x1,y1,xs,ys);
-                al_draw_line(x1,y1,xs,ys, al_map_rgb(255, 255, 255),0.0);
+                line(x1,y1,xs,ys);
 			}
 			x1=xs;
 			y1=ys;

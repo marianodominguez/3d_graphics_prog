@@ -175,7 +175,7 @@ int draw(void) {
             patch[j].z = pp.z;
         }
 
-        interpolate_mesh(patch, 20);
+        interpolate_mesh(patch, 4);
     }
     return EXIT_SUCCESS;
 }

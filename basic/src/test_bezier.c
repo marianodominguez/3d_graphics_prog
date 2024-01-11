@@ -269,7 +269,7 @@ int main()
         al_wait_for_event(queue, &event);
         if(event.type == ALLEGRO_EVENT_TIMER)
             redraw = true;
-        else if( (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE))
+        else if( event.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
             break;
 
         if(redraw && al_is_event_queue_empty(queue))
