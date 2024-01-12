@@ -29,8 +29,8 @@ int main() {
     al_init();
 
     for(int i=0; i<Y_MAX; i++) {
-        row_buffer[i].left=0;
-        row_buffer[i].right=X_MAX;
+        row_buffer[i].left=X_MAX;
+        row_buffer[i].right=0;
     }
 
     al_install_keyboard();

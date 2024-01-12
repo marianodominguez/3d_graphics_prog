@@ -256,23 +256,35 @@ void draw_triangle(Point t[]) {
 
 void measure_side(Point v1, Point v2) {
     int y1=v1.y,y2=v2.y,x1=v1.x,x2=v2.x;
-
-    if (v1.y > v2.y) {
-        y2=v1.y;
-        x2=v1.x;
-        y1=v2.y;
-        x2=v2.x;
-    }
-
     int dx=abs(x2-x1);
     int sx= x1 < x2 ? 1 :-1;
+    int dy=-abs(y2-y1);
+    int sy= y1 < y2 ? 1 :-1;
+    int error=dx+dy;
 
-    for(int y=y1; y<y2; y++) {
-        int x=y+sx*dx;
-        if (x<row_buffer[y].left) row_buffer[y].left=x;
-        if (x>row_buffer[y].right) row_buffer[y].right=x;
+
+    while(x1!=x2 || y1!=y2) {
+        if (x1<row_buffer[y1].left) row_buffer[y1].left=x1;
+        if (x1>row_buffer[y1].right) row_buffer[y1].right=x1;
+
+        int e2= 2*error;
+        if (e2>=dy) {
+            error+=dy;
+            x1+=sx;
+        }
+        if (e2 <= dx) {
+            error+=dx;
+            y1+=sy;
+        }
+
     }
 
+}
+
+void h_line(int x1, int y1, int x2, int y2) {
+    for(int x=x1; x<=x2; x++) {
+        put_pixel(x,y1,color);
+    }
 }
 
 void fill_triangle(Point t[]) {
@@ -289,6 +301,6 @@ void fill_triangle(Point t[]) {
     }
 
     for(int y=top; y<=bottom; y++) {
-        line(row_buffer[y].left,y,row_buffer[y].right,y, color);
+        h_line(row_buffer[y].left,y,row_buffer[y].right,y);
     }
 }
