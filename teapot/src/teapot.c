@@ -20,6 +20,7 @@ float th = M_PI;
 int X_MAX = 800, Y_MAX = 600;
 
 Point M[N_VERTICES];
+BufferLine row_buffer[600];
 
 Point VIEWPOINT = {5.5, -5.0, 6.0};
 ALLEGRO_COLOR color;
@@ -38,7 +39,7 @@ Point camera_projection(float x, float y, float z, float d) {
 
     r.x = x * d / z;
     r.y = y * d / z;
-    r.z = 0;
+    r.z = 1/z;
 
     // printf("(%f,%f)",r.x,r.y);
     return r;
@@ -129,7 +130,7 @@ void interpolate_mesh(Point C[], float n) {
 
             if (visible(patch)) {
                 poly = projection(patch);
-                draw_triangle(poly);
+                fill_triangle(poly);
             }
             patch[0] = bezier_curve(C, t, s);
             patch[1] = bezier_curve(C, t + (1 / n), s + (1 / n));
@@ -137,7 +138,8 @@ void interpolate_mesh(Point C[], float n) {
 
             if (visible(patch)) {
                 poly = projection(patch);
-                draw_triangle(poly);
+                //draw_triangle(poly);
+                fill_triangle(poly);
             }
         }
     }
@@ -181,6 +183,12 @@ int draw(void) {
 }
 
 int main() {
+
+    for(int i=0; i<Y_MAX; i++) {
+        row_buffer[i].left=X_MAX;
+        row_buffer[i].right=0;
+    }
+
     al_init();
     al_install_keyboard();
     al_init_primitives_addon();
