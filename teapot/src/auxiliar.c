@@ -164,7 +164,7 @@ void line(int x, int y, int x1, int y1, ALLEGRO_COLOR color) {
 
     while ( x0 != x1 || y0 != y1 ) {
         put_pixel(x0, y0, color);
-        
+
         e2 = 2 * error;
         if (e2 >= dy) {
             error += dy;
@@ -242,8 +242,8 @@ void draw_triangle(Point t[]) {
         fill_top(p);
     } else {
         v3.x =
-            p[0].x + 
-            ((float)(p[1].y - p[0].y) / (p[2].y - p[0].y)) 
+            p[0].x +
+            ((float)(p[1].y - p[0].y) / (p[2].y - p[0].y))
             * (p[2].x - p[0].x);
         v3.y = p[1].y;
         Point t1[3] = {p[0], p[1], v3};
@@ -254,3 +254,41 @@ void draw_triangle(Point t[]) {
     }
 }
 
+void measure_side(Point v1, Point v2) {
+    int y1=v1.y,y2=v2.y,x1=v1.x,x2=v2.x;
+
+    if (v1.y > v2.y) {
+        y2=v1.y;
+        x2=v1.x;
+        y1=v2.y;
+        x2=v2.x;
+    }
+
+    int dx=abs(x2-x1);
+    int sx= x1 < x2 ? 1 :-1;
+
+    for(int y=y1; y<y2; y++) {
+        int x=y+sx*dx;
+        if (x<row_buffer[y].left) row_buffer[y].left=x;
+        if (x>row_buffer[y].right) row_buffer[y].right=x;
+    }
+
+}
+
+void fill_triangle(Point t[]) {
+    measure_side(t[0], t[1]);
+    measure_side(t[0], t[2]);
+    measure_side(t[1], t[2]);
+
+    int top=Y_MAX;
+    int bottom=0;
+
+    for(int i=0; i<3;i++) {
+        if (t[i].y<top) top=t[i].y;
+        if (bottom < t[i].y) bottom=t[i].y;
+    }
+
+    for(int y=top; y<=bottom; y++) {
+        line(row_buffer[y].left,y,row_buffer[y].right,y, color);
+    }
+}

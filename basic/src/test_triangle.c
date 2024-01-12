@@ -10,29 +10,36 @@
 
 ALLEGRO_COLOR color;
 int X_MAX = 800, Y_MAX = 600;
-Point T[3];
-Point M[N_VERTICES];
+
+Point M[3];
 ALLEGRO_DISPLAY* disp;
+BufferLine row_buffer[600];
 
 void draw() {
     al_lock_bitmap(al_get_backbuffer(disp), ALLEGRO_PIXEL_FORMAT_ANY, 0);
     ALLEGRO_COLOR lc = al_map_rgb(255, 255, 255);
-    line(T[0].x, T[0].y, T[1].x, T[1].y, lc);
-    line(T[0].x, T[0].y, T[2].x, T[2].y, lc);
-    line(T[1].x, T[1].y, T[2].x, T[2].y, lc);
-    draw_triangle(T);
+    line(M[0].x, M[0].y, M[1].x, M[1].y, lc);
+    line(M[0].x, M[0].y, M[2].x, M[2].y, lc);
+    line(M[1].x, M[1].y, M[2].x, M[2].y, lc);
+    fill_triangle(M);
     al_unlock_bitmap(al_get_backbuffer(disp));
 }
 
 int main() {
     al_init();
+
+    for(int i=0; i<Y_MAX; i++) {
+        row_buffer[i].left=0;
+        row_buffer[i].right=X_MAX;
+    }
+
     al_install_keyboard();
     al_init_primitives_addon();
     color = al_map_rgb(64, 64, 255);
 
     ALLEGRO_TIMER* timer = al_create_timer(1.0 / 3.0);
     ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();
-    disp = al_create_display(800, 600);
+    disp = al_create_display(X_MAX, Y_MAX);
     ALLEGRO_FONT* font = al_create_builtin_font();
 
     al_register_event_source(queue, al_get_keyboard_event_source());
@@ -42,9 +49,9 @@ int main() {
     bool redraw = true;
     ALLEGRO_EVENT event;
 
-    T[0]=(Point) {10,10,0};
-    T[1]=(Point) {100,500,0};
-    T[2]=(Point) {700,400,0};
+    M[0]=(Point) {10,10,0};
+    M[1]=(Point) {100,500,0};
+    M[2]=(Point) {700,400,0};
 
     al_start_timer(timer);
     while(1)
@@ -57,11 +64,11 @@ int main() {
         else if( event.type == ALLEGRO_EVENT_DISPLAY_CLOSE )
             break;
 
-        T[1].y-=5;
-        if (T[1].y<10) T[1].y=500;
+        M[1].y-=5;
+        if (M[1].y<10) M[1].y=500;
 
-        T[0].y+=5;
-        if (T[0].y>500) T[0].y=0;
+        M[0].y+=5;
+        if (M[0].y>500) M[0].y=0;
 
         if(redraw && al_is_event_queue_empty(queue))
         {
