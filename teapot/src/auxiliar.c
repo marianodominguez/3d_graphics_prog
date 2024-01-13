@@ -191,13 +191,12 @@ void measure_side(Point v1, Point v2) {
     int sy= y1 < y2 ? 1 :-1;
     int error=dx+dy;
 
-
     while(x1!=x2 || y1!=y2) {
         if (x1<row_buffer[y1].left) row_buffer[y1].left=x1;
         if (x1>row_buffer[y1].right) row_buffer[y1].right=x1;
 
         int e2= 2*error;
-        if (e2>=dy) {
+        if (e2 >= dy) {
             error+=dy;
             x1+=sx;
         }
@@ -205,9 +204,7 @@ void measure_side(Point v1, Point v2) {
             error+=dx;
             y1+=sy;
         }
-
     }
-
 }
 
 void h_line(int x1, int y1, int x2, int y2) {
