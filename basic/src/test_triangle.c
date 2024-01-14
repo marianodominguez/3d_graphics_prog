@@ -10,18 +10,18 @@
 
 ALLEGRO_COLOR color;
 int X_MAX = 800, Y_MAX = 600;
-
-Vec3D M[3];
+Point M[1];
+Vec3D T[3];
 ALLEGRO_DISPLAY* disp;
 BufferLine row_buffer[600];
 
 void draw() {
     al_lock_bitmap(al_get_backbuffer(disp), ALLEGRO_PIXEL_FORMAT_ANY, 0);
     ALLEGRO_COLOR lc = al_map_rgb(255, 255, 255);
-    line(M[0].x, M[0].y, M[1].x, M[1].y, lc);
-    line(M[0].x, M[0].y, M[2].x, M[2].y, lc);
-    line(M[1].x, M[1].y, M[2].x, M[2].y, lc);
-    fill_triangle(M);
+    line(T[0].x, T[0].y, T[1].x, T[1].y, lc);
+    line(T[0].x, T[0].y, T[2].x, T[2].y, lc);
+    line(T[1].x, T[1].y, T[2].x, T[2].y, lc);
+    flat_triangle(T);
     al_unlock_bitmap(al_get_backbuffer(disp));
 }
 
@@ -49,9 +49,9 @@ int main() {
     bool redraw = true;
     ALLEGRO_EVENT event;
 
-    M[0]=(Vec3D) {10,5,0};
-    M[1]=(Vec3D) {300,485,0};
-    M[2]=(Vec3D) {185,400,0};
+    T[0]=(Vec3D) {10,5,0};
+    T[1]=(Vec3D) {300,485,0};
+    T[2]=(Vec3D) {185,400,0};
 
     int dy1=5,dy0=5,dx2=5;
 
@@ -66,21 +66,21 @@ int main() {
         else if( event.type == ALLEGRO_EVENT_DISPLAY_CLOSE )
             break;
 
-        if (M[1].y<=0) dy1=5;
-        if (M[1].y>=Y_MAX-5) dy1=-5;
-        M[1].y+=dy1;
+        if (T[1].y<=0) dy1=5;
+        if (T[1].y>=Y_MAX-5) dy1=-5;
+        T[1].y+=dy1;
 
-        if (M[0].y<=0) dy0=5;
-        if (M[0].y>=Y_MAX-5) dy0=-5;
-        M[0].y+=dy0;
+        if (T[0].y<=0) dy0=5;
+        if (T[0].y>=Y_MAX-5) dy0=-5;
+        T[0].y+=dy0;
 
-        if (M[2].x<=0) dx2=5;
-        if (M[2].x>=X_MAX-5) dx2=-5;
-        M[2].x+=dx2;
+        if (T[2].x<=0) dx2=5;
+        if (T[2].x>=X_MAX-5) dx2=-5;
+        T[2].x+=dx2;
 
-        // printf("%f,%f ", M[0].x, M[0].y);
-        // printf("%f,%f ", M[1].x, M[1].y);
-        // printf("%f,%f \n", M[2].x, M[2].y);
+        // printf("%f,%f ", T[0].x, T[0].y);
+        // printf("%f,%f ", T[1].x, T[1].y);
+        // printf("%f,%f \n", T[2].x, T[2].y);
 
         if(redraw && al_is_event_queue_empty(queue))
         {

@@ -10,22 +10,20 @@
 
 ALLEGRO_COLOR color;
 int X_MAX = 800, Y_MAX = 600;
-Vec3D M[1];
+Point M[1];
 BufferLine row_buffer[1];
 ALLEGRO_DISPLAY* disp;
 
 void draw() {
-    ALLEGRO_COLOR lc = al_map_rgb(128, 128, 255);
+    color = al_map_rgb(128, 128, 255);
     // for(int x=0; x<X_MAX; x+=1) {
     //     line(x,0,x,Y_MAX-1, lc);
     //     //al_draw_line(x,0,X_MAX-x,Y_MAX, lc, 1.0);
     // }
     // al_clear_to_color(al_map_rgb(0, 0, 0));
     al_lock_bitmap(al_get_backbuffer(disp), ALLEGRO_PIXEL_FORMAT_ANY, 0);
-    for(int x=100; x<X_MAX-10; x+=1) {
-        for(int y=100; y<Y_MAX-10; y+=1) {
-            put_pixel(x,y,lc);
-        }
+    for(int x=0; x<X_MAX; x+=3) {
+        line(x,0,X_MAX-x,Y_MAX,color);
     }
     al_unlock_bitmap(al_get_backbuffer(disp));
 }
@@ -61,7 +59,7 @@ int main() {
         if(redraw && al_is_event_queue_empty(queue))
         {
             al_clear_to_color(al_map_rgb(0, 0, 0));
-            al_draw_text(font, al_map_rgb(255, 255, 255), 0, 0, 0, "Triangle fill");
+            al_draw_text(font, al_map_rgb(255, 255, 255), 0, 0, 0, "Line fill");
 
             draw();
             al_flip_display();
