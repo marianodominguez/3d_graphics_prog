@@ -254,7 +254,7 @@ int main()
     al_init();
     al_install_keyboard();
     al_init_primitives_addon();
-    read_model("models/teapot_orig.dta");
+    read_model("teapot/models/teapot_orig.dta");
 
     ALLEGRO_TIMER* timer = al_create_timer(1.0);
     ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();

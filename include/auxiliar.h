@@ -42,4 +42,5 @@ void line(int x, int y, int x1, int y1, ALLEGRO_COLOR color);
 Vec3D bezier(Vec3D C[4][4], float t, float s);
 Vec3D bezier_curve(Vec3D B[], float t, float s);
 void draw_triangle(Vec3D t[]);
+void flat_triangle(Vec3D t[]);
 void fill_triangle(Point v[]);

@@ -23,7 +23,7 @@ unsigned int screen, row, col;
 float th = M_PI;
 int X_MAX = 800, Y_MAX = 600;
 
-Vec3D M[N_VERTICES];
+Point M[N_VERTICES];
 BufferLine row_buffer[601];
 
 Vec3D VIEWPOINT = {5.5, -5.0, 6.0};
@@ -136,7 +136,7 @@ void interpolate_mesh(Vec3D C[], float n) {
             if (visible(patch)) {
                 poly = projection(patch);
                 //draw_triangle(poly);
-                fill_triangle(poly);
+                flat_triangle(poly);
             }
             patch[0] = bezier_curve(C, t, s);
             patch[1] = bezier_curve(C, t + delta, s + delta);
@@ -145,7 +145,7 @@ void interpolate_mesh(Vec3D C[], float n) {
             if (visible(patch)) {
                 poly = projection(patch);
                 //draw_triangle(poly);
-                fill_triangle(poly);
+                flat_triangle(poly);
             }
         }
     }

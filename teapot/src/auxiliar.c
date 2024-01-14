@@ -232,6 +232,30 @@ void h_line(int x1, int y1, int x2, int y2) {
     }
 }
 
+
+void flat_triangle(Vec3D t[]) {
+    measure_side(t[0], t[1]);
+    measure_side(t[1], t[2]);
+    measure_side(t[2], t[0]);
+
+    int top=Y_MAX;
+    int bottom=0;
+
+    for(int i=0; i<3;i++) {
+        if (t[i].y<top && t[i].y>=0) top=t[i].y;
+        if (bottom < t[i].y && t[i].y<Y_MAX) bottom=t[i].y;
+    }
+
+    for(int y=top; y<=bottom; y++) {
+        h_line(row_buffer[y].left,y,row_buffer[y].right,y);
+        //printf("%d=%d,%d ",y,row_buffer[y].left,row_buffer[y].right);
+
+        row_buffer[y].left=X_MAX-1;
+        row_buffer[y].right=0;
+    }
+    //printf("\n");
+}
+
 void fill_triangle(Point v[]) {
     Vec3D t[3];
     for (int i=0; i<3; i++) {
