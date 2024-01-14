@@ -1,5 +1,4 @@
-.PHONY: default
-default: all ;
+.MAIN: teapot
 
 ############
 MACHINE= $(shell uname -s)
