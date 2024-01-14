@@ -181,28 +181,46 @@ void draw_triangle(Point t[]) {
     line(t[0].x,t[0].y,t[1].x,t[1].y, color);
     line(t[1].x,t[1].y,t[2].x,t[2].y, color);
     line(t[2].x,t[2].y,t[0].x,t[0].y, color);
+
+    //al_draw_line(t[0].x,t[0].y,t[1].x,t[1].y, color,1.0);
+    //al_draw_line(t[1].x,t[1].y,t[2].x,t[2].y, color,1.0);
+    //al_draw_line(t[2].x,t[2].y,t[0].x,t[0].y, color,1.0);
 }
 
-void measure_side(Point v1, Point v2) {
-    int y1=v1.y,y2=v2.y,x1=v1.x,x2=v2.x;
-    int dx=abs(x2-x1);
-    int sx= x1 < x2 ? 1 :-1;
-    int dy=-abs(y2-y1);
-    int sy= y1 < y2 ? 1 :-1;
+void measure_side(Point v0, Point v1) {
+    int y0=v0.y,y1=v1.y,x0=v0.x,x1=v1.x;
+    int dx=abs(x1-x0);
+    int sx= x0 < x1 ? 1 :-1;
+    int dy=-abs(y1-y0);
+    int sy= y0 < y1 ? 1 :-1;
     int error=dx+dy;
 
-    while(x1!=x2 || y1!=y2) {
-        if (x1<row_buffer[y1].left) row_buffer[y1].left=x1;
-        if (x1>row_buffer[y1].right) row_buffer[y1].right=x1;
+    if(x0==x1 && y0==y1) {
+        row_buffer[y0].left=x1;
+        row_buffer[y0].right=x1;
+        return;
+    }
+
+    while(x0!=x1 || y0!=y1) {
+        if (x0<row_buffer[y0].left && y0>0 && y0<Y_MAX)
+        {
+            row_buffer[y0].left=x0;
+            if (row_buffer[y0].left<0) row_buffer[y0].left=0;
+        }
+
+        if (x0>row_buffer[y0].right && y0>0 && y0<Y_MAX) {
+            row_buffer[y0].right=x0;
+            if (row_buffer[y0].right>X_MAX) row_buffer[y0].right=X_MAX;
+        }
 
         int e2= 2*error;
         if (e2 >= dy) {
             error+=dy;
-            x1+=sx;
+            x0+=sx;
         }
         if (e2 <= dx) {
             error+=dx;
-            y1+=sy;
+            y0+=sy;
         }
     }
 }
@@ -215,20 +233,23 @@ void h_line(int x1, int y1, int x2, int y2) {
 
 void fill_triangle(Point t[]) {
     measure_side(t[0], t[1]);
-    measure_side(t[0], t[2]);
     measure_side(t[1], t[2]);
+    measure_side(t[2], t[0]);
 
     int top=Y_MAX;
     int bottom=0;
 
     for(int i=0; i<3;i++) {
-        if (t[i].y<top) top=t[i].y;
-        if (bottom < t[i].y) bottom=t[i].y;
+        if (t[i].y<top && t[i].y>=0) top=t[i].y;
+        if (bottom < t[i].y && t[i].y<Y_MAX) bottom=t[i].y;
     }
 
     for(int y=top; y<=bottom; y++) {
         h_line(row_buffer[y].left,y,row_buffer[y].right,y);
-        row_buffer[y].left=X_MAX;
+        //printf("%d=%d,%d ",y,row_buffer[y].left,row_buffer[y].right);
+
+        row_buffer[y].left=X_MAX-1;
         row_buffer[y].right=0;
     }
+    //printf("\n");
 }

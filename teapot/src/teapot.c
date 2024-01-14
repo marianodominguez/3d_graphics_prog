@@ -20,7 +20,7 @@ float th = M_PI;
 int X_MAX = 800, Y_MAX = 600;
 
 Point M[N_VERTICES];
-BufferLine row_buffer[600];
+BufferLine row_buffer[601];
 
 Point VIEWPOINT = {5.5, -5.0, 6.0};
 ALLEGRO_COLOR color;
@@ -104,7 +104,7 @@ Point *projection(Point p[]) {
     float xs, ys, x, y;
     Point pp;
     for (int i = 0; i < 4; i++) {
-        // pp=camera_projection(p[i].x,p[i].y,p[i].z, -7.0);
+        //pp = camera_projection(p[i].x,p[i].y,p[i].z, -1.0);
         pp = isometric_projection(p[i].x, p[i].y, p[i].z);
         x = pp.x;
         y = pp.y;
@@ -112,7 +112,7 @@ Point *projection(Point p[]) {
         ys = 80 * y + Y_MAX / 2;
         poly[i].x = xs;
         poly[i].y = ys;
-        // printf("%f,%f ",xs,ys);
+        //printf("%f,%f ",xs,ys);
     }
     return poly;
 }
@@ -121,20 +121,22 @@ void interpolate_mesh(Point C[], float n) {
     float t = 0, s = 0;
     Point *poly;
     Point patch[4];
+    float delta=1.0/n;
 
-    for (s = 0; s < 1.0; s += 1 / n) {
-        for (t = 0; t < 1.0; t += 1 / n) {
+    for (s = 0; s < 1.0; s += delta) {
+        for (t = 0; t < 1.0; t += delta) {
             patch[0] = bezier_curve(C, t, s);
-            patch[1] = bezier_curve(C, t + (1 / n), s);
-            patch[2] = bezier_curve(C, t + (1 / n), s + (1 / n));
+            patch[1] = bezier_curve(C, t + delta, s);
+            patch[2] = bezier_curve(C, t + delta, s + delta);
 
             if (visible(patch)) {
                 poly = projection(patch);
+                //draw_triangle(poly);
                 fill_triangle(poly);
             }
             patch[0] = bezier_curve(C, t, s);
-            patch[1] = bezier_curve(C, t + (1 / n), s + (1 / n));
-            patch[2] = bezier_curve(C, t, s + (1 / n));
+            patch[1] = bezier_curve(C, t + delta, s + delta);
+            patch[2] = bezier_curve(C, t, s + delta);
 
             if (visible(patch)) {
                 poly = projection(patch);
@@ -152,10 +154,12 @@ int draw(void) {
     Point patch[16];
     Point trv = {-VIEWPOINT.x, -VIEWPOINT.y, -VIEWPOINT.z};
 
+    //idx = 13*16;
     idx = 0;
     al_clear_to_color(al_map_rgb(0, 0, 0));
     // N_VERTICES
     color = al_map_rgb(32, 32, 32);
+    //for (i = 0; i < 1; i++) {
     for (i = 0; i < N_VERTICES / 16; i++) {
         for (j = 0; j < 16; j++) {
             color = al_map_rgb(132, 132, 132);
@@ -165,7 +169,6 @@ int draw(void) {
             pp.y = M[idx].y;
             pp.z = M[idx].z;
             idx++;
-
             // rotation
             pp = rotate_x(pp.x, pp.y, pp.z, th);
             pp = rotate_z(pp.x, pp.y, pp.z, th / 5.0);
@@ -177,7 +180,7 @@ int draw(void) {
             patch[j].z = pp.z;
         }
 
-        interpolate_mesh(patch, 4);
+        interpolate_mesh(patch, 8.0);
     }
     return EXIT_SUCCESS;
 }

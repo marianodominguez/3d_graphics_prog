@@ -37,7 +37,7 @@ int main() {
     al_init_primitives_addon();
     color = al_map_rgb(64, 64, 255);
 
-    ALLEGRO_TIMER* timer = al_create_timer(1.0 / 3.0);
+    ALLEGRO_TIMER* timer = al_create_timer(1.0 / 5.0);
     ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();
     disp = al_create_display(X_MAX, Y_MAX);
     ALLEGRO_FONT* font = al_create_builtin_font();
@@ -49,9 +49,11 @@ int main() {
     bool redraw = true;
     ALLEGRO_EVENT event;
 
-    M[0]=(Point) {10,10,0};
-    M[1]=(Point) {100,500,0};
-    M[2]=(Point) {700,400,0};
+    M[0]=(Point) {10,5,0};
+    M[1]=(Point) {300,485,0};
+    M[2]=(Point) {185,400,0};
+
+    int dy1=5,dy0=5,dx2=5;
 
     al_start_timer(timer);
     while(1)
@@ -64,11 +66,21 @@ int main() {
         else if( event.type == ALLEGRO_EVENT_DISPLAY_CLOSE )
             break;
 
-        M[1].y-=5;
-        if (M[1].y<10) M[1].y=500;
+        if (M[1].y<=0) dy1=5;
+        if (M[1].y>=Y_MAX-5) dy1=-5;
+        M[1].y+=dy1;
 
-        M[0].y+=5;
-        if (M[0].y>500) M[0].y=0;
+        if (M[0].y<=0) dy0=5;
+        if (M[0].y>=Y_MAX-5) dy0=-5;
+        M[0].y+=dy0;
+
+        if (M[2].x<=0) dx2=5;
+        if (M[2].x>=X_MAX-5) dx2=-5;
+        M[2].x+=dx2;
+
+        // printf("%f,%f ", M[0].x, M[0].y);
+        // printf("%f,%f ", M[1].x, M[1].y);
+        // printf("%f,%f \n", M[2].x, M[2].y);
 
         if(redraw && al_is_event_queue_empty(queue))
         {

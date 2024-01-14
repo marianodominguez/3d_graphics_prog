@@ -1,4 +1,5 @@
 #include <allegro5/allegro5.h>
+//#include <allegro5/allegro_primitives.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>

@@ -29,13 +29,13 @@
     "makefile.makefilePath": "${workspaceFolder}",
     "makefile.launchConfigurations": [
         {
-            "cwd": "/home/mariano/3d_graphics_prog",
-            "binaryPath": "/home/mariano/3d_graphics_prog/bin/teapot",
+            "cwd": "/home/mariano/3d_graphics_prog/bin",
+            "binaryPath": "/home/mariano/3d_graphics_prog/bin/test_triangle",
             "binaryArgs": []
         },
         {
-            "cwd": "/home/mariano/3d_graphics_prog/bin",
-            "binaryPath": "/home/mariano/3d_graphics_prog/bin/test_triangle",
+            "cwd": "/home/mariano/3d_graphics_prog",
+            "binaryPath": "/home/mariano/3d_graphics_prog/bin/teapot",
             "binaryArgs": []
         }
     ],
