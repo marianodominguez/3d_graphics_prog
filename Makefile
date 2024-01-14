@@ -12,10 +12,10 @@ COMPILER_FLAGS= -g -O -W
 INCLUDE=-I include
 LIBS= -lallegro_font -lallegro -lm -lallegro_primitives -lallegro_main
 
-cube: clean
+cube:
 	$(CXX) $(COMPILER_FLAGS) -o bin/$@ teapot/src/cube.c $(INCLUDE) $(LIBS)
 
-teapot: clean
+teapot:
 	$(CXX) $(COMPILER_FLAGS) -o bin/$@ teapot/src/teapot.c teapot/src/auxiliar.c $(INCLUDE) $(LIBS)
 
 teapot_01:
@@ -33,7 +33,7 @@ teapot_04:
 teapot_05:
 	$(CXX) $(COMPILER_FLAGS) -o bin/$@ teapot/src/teapot_05.c teapot/src/auxiliar.c $(INCLUDE) $(LIBS)
 
-all: clean
+all: clean teapot teapot_01 teapot_02 teapot_03 teapot_04 teapot_05 cube
 	$(CXX) $(COMPILER_FLAGS) -o bin/polar_curves basic/src/polar_curves.c $(INCLUDE) $(LIBS)
 	$(CXX) $(COMPILER_FLAGS) -o bin/test_bezier basic/src/test_bezier.c $(INCLUDE) $(LIBS)
 	$(CXX) $(COMPILER_FLAGS) -o bin/test_triangle basic/src/test_triangle.c teapot/src/auxiliar.c $(INCLUDE) $(LIBS)

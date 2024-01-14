@@ -48,11 +48,11 @@ int CUBE[]={
 };
 
 
-void put_pixel(unsigned int x, unsigned int y) {
+void put_pixel(int x, int y) {
    al_draw_pixel(x, y,al_map_rgb(255, 255, 255)) ;
 }
 
-void line(unsigned int x, unsigned int y, unsigned int x1, unsigned int y1) {
+void line(int x,int y, int x1, int y1) {
     int x0=x;
     int y0=y;
     int dx=abs(x1-x0);
@@ -88,7 +88,7 @@ void line(unsigned int x, unsigned int y, unsigned int x1, unsigned int y1) {
     }
 }
 
-void bline(unsigned int x, unsigned int y, unsigned int u, unsigned int v) {
+void bline(int x, int y, int u, int v) {
     int x0=x;
     int y0=y;
     int x1=u;
@@ -131,13 +131,13 @@ void bline(unsigned int x, unsigned int y, unsigned int u, unsigned int v) {
 
 int cube(void) {
     int x,y,z,xp,yp,yr,zr;
-    unsigned int i,j,xs,ys,x1,y1,x0,y0;
+    int i,j,xs,ys,x1,y1,x0,y0;
     int sqrt2=1414;
     int sqrt6=2449;
-    unsigned int r = 80;
+    int r = 80;
 	idx=0;
 	al_clear_to_color(al_map_rgb(0, 0, 0));
-	
+
 	for(i=0;i<nfaces-1;i++) {
 		for(j=0; j<nvert; j++) {
 			x=CUBE[idx++]*100;
@@ -147,7 +147,7 @@ int cube(void) {
 			//rotation
 			yr =  ((long) y*cos(th)  - (long) z*sin(th));
 			zr =  ((long) y*sin(th)  + (long) z*cos(th));
-			
+
 
 			xp = (long) 1000*(x-zr)/sqrt2;
 			yp = (long) 1000*(x+2*yr+zr)/sqrt6;
@@ -193,7 +193,7 @@ int main()
     {
 		th= th + M_PI/20;
 		if(th>=2*M_PI) th=0;
-		
+
         al_wait_for_event(queue, &event);
 
         if(event.type == ALLEGRO_EVENT_TIMER)
