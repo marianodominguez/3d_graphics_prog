@@ -26,14 +26,14 @@ int X_MAX = 800, Y_MAX = 600;
 
 typedef struct {
     float x, y, z;
-} Point;
+} Vec3D;
 
-Point M[N_VERTICES];
-Point VIEWPOINT = {3.5, -4.0, 6.0};
+Vec3D M[N_VERTICES];
+Vec3D VIEWPOINT = {3.5, -4.0, 6.0};
 ALLEGRO_COLOR color;
 
-Point normalize(Point v) {
-    Point r;
+Vec3D normalize(Vec3D v) {
+    Vec3D r;
     float length = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
 
     r.x = v.x / length;
@@ -43,15 +43,15 @@ Point normalize(Point v) {
     return r;
 }
 
-Point cross(Point a, Point b) {
-    Point r;
+Vec3D cross(Vec3D a, Vec3D b) {
+    Vec3D r;
     r.x = (a.y * b.z - a.z * b.y);
     r.y = -(a.x * b.z - a.z * b.x);
     r.z = (a.x * b.y - a.y * b.x);
     return r;
 }
 
-float dot(Point a, Point b) { return a.x * b.x + a.y * b.y + a.z * b.z; }
+float dot(Vec3D a, Vec3D b) { return a.x * b.x + a.y * b.y + a.z * b.z; }
 
 void split(int a[], char *s) {
     char *token;
@@ -71,7 +71,7 @@ void read_model(char *fn) {
     char *dummy;
     char nv[5], line[255];
     int patch[16][32], points[16];
-    Point P[306];
+    Vec3D P[306];
 
     FILE *f = fopen(fn, "r");
     if (f == NULL) {
@@ -159,16 +159,16 @@ void line(int x, int y, int x1, int y1, ALLEGRO_COLOR color) {
     }
 }
 
-Point isometric_projection(float x, float y, float z) {
-    Point result;
+Vec3D isometric_projection(float x, float y, float z) {
+    Vec3D result;
     result.x = (x - z) / sqrt2;
     result.y = (x + 2 * y + z) / sqrt6;
     result.z = 0;
     return result;
 }
 
-Point camera_projection(float x, float y, float z, float d) {
-    Point r;
+Vec3D camera_projection(float x, float y, float z, float d) {
+    Vec3D r;
 
     r.x = x * d / z;
     r.y = y * d / z;
@@ -178,47 +178,47 @@ Point camera_projection(float x, float y, float z, float d) {
     return r;
 }
 
-Point translate(float x, float y, float z, Point d) {
-    Point result;
+Vec3D translate(float x, float y, float z, Vec3D d) {
+    Vec3D result;
     result.x = x + d.x;
     result.y = y + d.y;
     result.z = z + d.z;
     return result;
 }
 
-Point rotate_x(float x, float y, float z, float th) {
-    Point result;
+Vec3D rotate_x(float x, float y, float z, float th) {
+    Vec3D result;
     result.x = x;
     result.y = y * cos(th) - z * sin(th);
     result.z = y * sin(th) + z * cos(th);
     return result;
 }
 
-Point rotate_y(float x, float y, float z, float th) {
-    Point result;
+Vec3D rotate_y(float x, float y, float z, float th) {
+    Vec3D result;
     result.x = x * cos(th) + z * sin(th);
     result.y = y;
     result.z = -x * sin(th) + z * cos(th);
     return result;
 }
 
-Point rotate_z(float x, float y, float z, float th) {
-    Point result;
+Vec3D rotate_z(float x, float y, float z, float th) {
+    Vec3D result;
     result.x = x * cos(th) - y * sin(th);
     result.y = x * sin(th) + y * cos(th);
     result.z = z;
     return result;
 }
 
-void draw_polygon(Point t[], int n) {
+void draw_polygon(Vec3D t[], int n) {
     for (int i = 0; i < n - 1; i++) {
         line(t[i].x, t[i].y, t[i + 1].x, t[i + 1].y, color);
     }
     line(t[n - 1].x, t[n - 1].y, t[0].x, t[0].y, color);
 }
 
-Point bezier(Point C[4][4], float t, float s) {
-    Point p = {0, 0, 0};
+Vec3D bezier(Vec3D C[4][4], float t, float s) {
+    Vec3D p = {0, 0, 0};
     float b[4], c[4];
     b[0] = (1 - t) * (1 - t) * (1 - t);
     b[1] = 3 * t * (1 - t) * (1 - t);
@@ -240,8 +240,8 @@ Point bezier(Point C[4][4], float t, float s) {
     return p;
 }
 
-int visible(Point p[]) {
-    Point c, v0, v1, n;
+int visible(Vec3D p[]) {
+    Vec3D c, v0, v1, n;
 
     v0.x = p[1].x - p[0].x;
     v0.y = p[1].y - p[0].y;
@@ -262,9 +262,9 @@ int visible(Point p[]) {
     return 1;
 }
 
-Point bezier_curve(Point B[], float t, float s) {
-    static Point p;
-    Point C[4][4];
+Vec3D bezier_curve(Vec3D B[], float t, float s) {
+    static Vec3D p;
+    Vec3D C[4][4];
     for (int j = 0; j < 4; j++) {
         for (int i = 0; i < 4; i++) C[i][j] = B[4 * j + i];
     }
@@ -272,10 +272,10 @@ Point bezier_curve(Point B[], float t, float s) {
     return p;
 }
 
-Point *projection(Point p[]) {
-    static Point poly[4];
+Vec3D *projection(Vec3D p[]) {
+    static Vec3D poly[4];
     float xs, ys, x, y;
-    Point pp;
+    Vec3D pp;
     for (int i = 0; i < 4; i++) {
         // pp=camera_projection(p[i].x,p[i].y,p[i].z, -7.0);
         pp = isometric_projection(p[i].x, p[i].y, p[i].z);
@@ -290,10 +290,10 @@ Point *projection(Point p[]) {
     return poly;
 }
 
-void interpolate_mesh(Point C[], float n) {
+void interpolate_mesh(Vec3D C[], float n) {
     float t = 0, s = 0;
-    Point *poly;
-    Point patch[4];
+    Vec3D *poly;
+    Vec3D patch[4];
 
     for (s = 0; s < 1.0; s += 1 / n) {
         for (t = 0; t < 1.0; t += 1 / n) {
@@ -319,9 +319,9 @@ void interpolate_mesh(Point C[], float n) {
 int draw(void) {
     float x, y, z;
     unsigned int i, j;
-    Point pp;
-    Point patch[16];
-    Point trv = {-VIEWPOINT.x, -VIEWPOINT.y, -VIEWPOINT.z};
+    Vec3D pp;
+    Vec3D patch[16];
+    Vec3D trv = {-VIEWPOINT.x, -VIEWPOINT.y, -VIEWPOINT.z};
 
     idx = 0;
     al_clear_to_color(al_map_rgb(0, 0, 0));

@@ -11,7 +11,7 @@
 ALLEGRO_COLOR color;
 int X_MAX = 800, Y_MAX = 600;
 
-Point M[3];
+Vec3D M[3];
 ALLEGRO_DISPLAY* disp;
 BufferLine row_buffer[600];
 
@@ -49,9 +49,9 @@ int main() {
     bool redraw = true;
     ALLEGRO_EVENT event;
 
-    M[0]=(Point) {10,5,0};
-    M[1]=(Point) {300,485,0};
-    M[2]=(Point) {185,400,0};
+    M[0]=(Vec3D) {10,5,0};
+    M[1]=(Vec3D) {300,485,0};
+    M[2]=(Vec3D) {185,400,0};
 
     int dy1=5,dy0=5,dx2=5;
 

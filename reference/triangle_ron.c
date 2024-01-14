@@ -27,7 +27,7 @@ unsigned char buffer[HEIGHT][WIDTH][3];
 typedef struct {
   int x, y;
   color c;
-} Point;
+} Vec3D;
 
 typedef struct {
   int x0, x1;
@@ -69,7 +69,7 @@ void plot_point(int x, int y, color * c) {
   buffer[y][x][2] = channel_to_char(c->b);
 }
 
-void plot_line_low(Point * p0, Point * p1) {
+void plot_line_low(Vec3D * p0, Vec3D * p1) {
   color c = p0->c;
 
   int dx = p1->x - p0->x;
@@ -100,7 +100,7 @@ void plot_line_low(Point * p0, Point * p1) {
   }
 }
 
-void plot_line_high(Point * p0, Point * p1) {
+void plot_line_high(Vec3D * p0, Vec3D * p1) {
   color c = p0->c;
 
   int dx = p1->x - p0->x;
@@ -132,7 +132,7 @@ void plot_line_high(Point * p0, Point * p1) {
   }
 }
 
-void plot_line(Point * p0, Point * p1) {
+void plot_line(Vec3D * p0, Vec3D * p1) {
   if(abs(p1->y - p0->y) < abs(p1->x - p0->x)) {
     if(p0->x > p1->x) {
       plot_line_low(p1, p0);
@@ -171,7 +171,7 @@ void fill() {
 
 int main() {
   FILE* out;
-  Point p0, p1, p2;
+  Vec3D p0, p1, p2;
 
   p0.x = 10;   p0.y = 10;
   p1.x = 600;  p1.y = 80;

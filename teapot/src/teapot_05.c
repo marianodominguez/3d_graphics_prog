@@ -23,23 +23,23 @@ unsigned int screen, row, col;
 float th = M_PI;
 int X_MAX = 800, Y_MAX = 600;
 
-Point M[N_VERTICES];
+Vec3D M[N_VERTICES];
 BufferLine row_buffer[601];
 
-Point VIEWPOINT = {5.5, -5.0, 6.0};
+Vec3D VIEWPOINT = {5.5, -5.0, 6.0};
 ALLEGRO_COLOR color;
 ALLEGRO_DISPLAY *disp;
 
-Point isometric_projection(float x, float y, float z) {
-    Point result;
+Vec3D isometric_projection(float x, float y, float z) {
+    Vec3D result;
     result.x = (x - z) / sqrt2;
     result.y = (x + 2 * y + z) / sqrt6;
     result.z = 0;
     return result;
 }
 
-Point camera_projection(float x, float y, float z, float d) {
-    Point r;
+Vec3D camera_projection(float x, float y, float z, float d) {
+    Vec3D r;
 
     r.x = x * d / z;
     r.y = y * d / z;
@@ -49,40 +49,40 @@ Point camera_projection(float x, float y, float z, float d) {
     return r;
 }
 
-Point translate(float x, float y, float z, Point d) {
-    Point result;
+Vec3D translate(float x, float y, float z, Vec3D d) {
+    Vec3D result;
     result.x = x + d.x;
     result.y = y + d.y;
     result.z = z + d.z;
     return result;
 }
 
-Point rotate_x(float x, float y, float z, float th) {
-    Point result;
+Vec3D rotate_x(float x, float y, float z, float th) {
+    Vec3D result;
     result.x = x;
     result.y = y * cos(th) - z * sin(th);
     result.z = y * sin(th) + z * cos(th);
     return result;
 }
 
-Point rotate_y(float x, float y, float z, float th) {
-    Point result;
+Vec3D rotate_y(float x, float y, float z, float th) {
+    Vec3D result;
     result.x = x * cos(th) + z * sin(th);
     result.y = y;
     result.z = -x * sin(th) + z * cos(th);
     return result;
 }
 
-Point rotate_z(float x, float y, float z, float th) {
-    Point result;
+Vec3D rotate_z(float x, float y, float z, float th) {
+    Vec3D result;
     result.x = x * cos(th) - y * sin(th);
     result.y = x * sin(th) + y * cos(th);
     result.z = z;
     return result;
 }
 
-int visible(Point p[]) {
-    Point c, v0, v1, n;
+int visible(Vec3D p[]) {
+    Vec3D c, v0, v1, n;
 
     v0.x = p[1].x - p[0].x;
     v0.y = p[1].y - p[0].y;
@@ -103,10 +103,10 @@ int visible(Point p[]) {
     return 1;
 }
 
-Point *projection(Point p[]) {
-    static Point poly[4];
+Vec3D *projection(Vec3D p[]) {
+    static Vec3D poly[4];
     float xs, ys, x, y;
-    Point pp;
+    Vec3D pp;
     for (int i = 0; i < 4; i++) {
         //pp = camera_projection(p[i].x,p[i].y,p[i].z, -1.0);
         pp = isometric_projection(p[i].x, p[i].y, p[i].z);
@@ -121,10 +121,10 @@ Point *projection(Point p[]) {
     return poly;
 }
 
-void interpolate_mesh(Point C[], float n) {
+void interpolate_mesh(Vec3D C[], float n) {
     float t = 0, s = 0;
-    Point *poly;
-    Point patch[4];
+    Vec3D *poly;
+    Vec3D patch[4];
     float delta=1.0/n;
 
     for (s = 0; s < 1.0; s += delta) {
@@ -154,9 +154,9 @@ void interpolate_mesh(Point C[], float n) {
 int draw(void) {
     float x, y, z;
     unsigned int i, j;
-    Point pp;
-    Point patch[16];
-    Point trv = {-VIEWPOINT.x, -VIEWPOINT.y, -VIEWPOINT.z};
+    Vec3D pp;
+    Vec3D patch[16];
+    Vec3D trv = {-VIEWPOINT.x, -VIEWPOINT.y, -VIEWPOINT.z};
 
     //idx = 13*16;
     idx = 0;

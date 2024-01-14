@@ -36,7 +36,7 @@ float Mx[N_VERTICES],My[N_VERTICES], Mz[N_VERTICES];
 
 typedef struct {
     float x, y, z;
-} Point;
+} Vec3D;
 
 void read_model(char *fn) {
     char tmpx[12],tmpy[12],tmpz[12];
@@ -104,16 +104,16 @@ void line(int x, int y, int x1, int y1,  ALLEGRO_COLOR color) {
     }
 }
 
-Point isometric_projection(float x, float y, float z) {
-    Point result;
+Vec3D isometric_projection(float x, float y, float z) {
+    Vec3D result;
     result.x = (x-z)/sqrt2;
     result.y = (x+2*y+z)/sqrt6;
     result.z = 0;
     return result;
 }
 
-Point camera_projection(float x, float y, float z, float d) {
-    Point r;
+Vec3D camera_projection(float x, float y, float z, float d) {
+    Vec3D r;
     if ( z>=-0.000001 && z<=0.000001) {
         r.x = x*d/0.000001;
         r.y = y*d/0.000001;
@@ -127,23 +127,23 @@ Point camera_projection(float x, float y, float z, float d) {
     return r;
 }
 
-Point translate(float x, float y, float z, Point d) {
-    Point result;
+Vec3D translate(float x, float y, float z, Vec3D d) {
+    Vec3D result;
     result.x = x+d.x;
     result.y = y+d.y;
     result.z = z+d.z;
     return result;
 }
 
-Point rotate_x(float x, float y, float z, float th) {
-    Point result;
+Vec3D rotate_x(float x, float y, float z, float th) {
+    Vec3D result;
     result.x = x;
     result.y = (y*cos(th) - z*sin(th));
     result.z = (y*sin(th) + z*cos(th));
     return result;
 }
 
-void draw_polygon(Point t[], int n) {
+void draw_polygon(Vec3D t[], int n) {
     ALLEGRO_COLOR c = al_map_rgb(255, 255, 255);
     for(int i=0; i<n-1; i++) {
         c = al_map_rgb(64*(i+1),64*(i+1),64*(i+1));
@@ -156,8 +156,8 @@ void draw_polygon(Point t[], int n) {
 int draw(void) {
     float x,y,z,xs,ys;
     unsigned int i,j;
-    Point pp,tp={0.0,-2.0,-2.0};
-    Point poly[3];
+    Vec3D pp,tp={0.0,-2.0,-2.0};
+    Vec3D poly[3];
 
 	idx=0;
 	al_clear_to_color(al_map_rgb(0, 0, 0));
@@ -198,7 +198,7 @@ int main()
     al_init();
     al_install_keyboard();
     al_init_primitives_addon();
-    read_model("models/teapot.dta");
+    read_model("teapot/models/teapot.dta");
 
     ALLEGRO_TIMER* timer = al_create_timer(1.0);
     ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();

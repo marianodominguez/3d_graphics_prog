@@ -1,14 +1,14 @@
 #include "auxiliar.h"
 
-void copy_t(Point src[],Point d[]) {
+void copy_t(Vec3D src[],Vec3D d[]) {
     for(int i=0; i<3; i++) {
         d[i].x=src[i].x;
         d[i].y=src[i].y;
     }
 }
 
-Point normalize(Point v) {
-    Point r;
+Vec3D normalize(Vec3D v) {
+    Vec3D r;
     float length = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
 
     r.x = v.x / length;
@@ -18,15 +18,15 @@ Point normalize(Point v) {
     return r;
 }
 
-Point cross(Point a, Point b) {
-    Point r;
+Vec3D cross(Vec3D a, Vec3D b) {
+    Vec3D r;
     r.x = (a.y * b.z - a.z * b.y);
     r.y = -(a.x * b.z - a.z * b.x);
     r.z = (a.x * b.y - a.y * b.x);
     return r;
 }
 
-float dot(Point a, Point b) {
+float dot(Vec3D a, Vec3D b) {
     return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
@@ -44,8 +44,8 @@ void split(int a[], char *s) {
     }
 }
 
-Point bezier(Point C[4][4], float t, float s) {
-    Point p = {0, 0, 0};
+Vec3D bezier(Vec3D C[4][4], float t, float s) {
+    Vec3D p = {0, 0, 0};
     float b[4], c[4];
     b[0] = (1 - t) * (1 - t) * (1 - t);
     b[1] = 3 * t * (1 - t) * (1 - t);
@@ -67,9 +67,9 @@ Point bezier(Point C[4][4], float t, float s) {
     return p;
 }
 
-Point bezier_curve(Point B[], float t, float s) {
-    static Point p;
-    Point C[4][4];
+Vec3D bezier_curve(Vec3D B[], float t, float s) {
+    static Vec3D p;
+    Vec3D C[4][4];
     for (int j = 0; j < 4; j++) {
         for (int i = 0; i < 4; i++)
             C[i][j] = B[4 * j + i];
@@ -83,7 +83,7 @@ void read_model(char *fn) {
     char *dummy;
     char nv[5], line[255];
     int patch[16][32], points[16];
-    Point P[306];
+    Vec3D P[306];
 
     FILE *f = fopen(fn, "r");
     if (f == NULL) {
@@ -177,7 +177,7 @@ void line(int x, int y, int x1, int y1, ALLEGRO_COLOR color) {
     }
 }
 
-void draw_triangle(Point t[]) {
+void draw_triangle(Vec3D t[]) {
     line(t[0].x,t[0].y,t[1].x,t[1].y, color);
     line(t[1].x,t[1].y,t[2].x,t[2].y, color);
     line(t[2].x,t[2].y,t[0].x,t[0].y, color);
@@ -187,7 +187,7 @@ void draw_triangle(Point t[]) {
     //al_draw_line(t[2].x,t[2].y,t[0].x,t[0].y, color,1.0);
 }
 
-void measure_side(Point v0, Point v1) {
+void measure_side(Vec3D v0, Vec3D v1) {
     int y0=v0.y,y1=v1.y,x0=v0.x,x1=v1.x;
     int dx=abs(x1-x0);
     int sx= x0 < x1 ? 1 :-1;
@@ -226,12 +226,20 @@ void measure_side(Point v0, Point v1) {
 }
 
 void h_line(int x1, int y1, int x2, int y2) {
+
     for(int x=x1; x<=x2; x++) {
         put_pixel(x,y1,color);
     }
 }
 
-void fill_triangle(Point t[]) {
+void fill_triangle(Point v[]) {
+    Vec3D t[3];
+    for (int i=0; i<3; i++) {
+        t[i].x=v[i].x;
+        t[i].y=v[i].y;
+        t[i].z=v[i].z;
+    }
+
     measure_side(t[0], t[1]);
     measure_side(t[1], t[2]);
     measure_side(t[2], t[0]);
@@ -243,7 +251,9 @@ void fill_triangle(Point t[]) {
         if (t[i].y<top && t[i].y>=0) top=t[i].y;
         if (bottom < t[i].y && t[i].y<Y_MAX) bottom=t[i].y;
     }
-
+    //Test flat shading
+    color = al_map_rgb(v[0].r, v[0].g, v[0].b);
+    //printf("%d,%d,%d ", v[0].r, v[0].g, v[0].b);
     for(int y=top; y<=bottom; y++) {
         h_line(row_buffer[y].left,y,row_buffer[y].right,y);
         //printf("%d=%d,%d ",y,row_buffer[y].left,row_buffer[y].right);

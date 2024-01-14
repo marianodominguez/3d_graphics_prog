@@ -12,7 +12,14 @@ extern int Y_MAX,X_MAX;
 typedef struct
 {
     float x, y, z;
+    int r,g,b;
 } Point;
+
+typedef struct
+{
+    float x, y, z;
+} Vec3D;
+
 
 typedef struct
 {
@@ -24,15 +31,15 @@ extern Point M[];
 extern ALLEGRO_COLOR color;
 extern BufferLine row_buffer[];
 
-void copy_t(Point src[], Point dest[]);
-Point normalize(Point v);
-Point cross(Point a, Point b);
-float dot(Point a, Point b);
+void copy_t(Vec3D src[], Vec3D dest[]);
+Vec3D normalize(Vec3D v);
+Vec3D cross(Vec3D a, Vec3D b);
+float dot(Vec3D a, Vec3D b);
 void split(int a[], char *s);
 void read_model(char *fn);
 void put_pixel(int x, int y, ALLEGRO_COLOR color);
 void line(int x, int y, int x1, int y1, ALLEGRO_COLOR color);
-Point bezier(Point C[4][4], float t, float s);
-Point bezier_curve(Point B[], float t, float s);
-void draw_triangle(Point t[]);
-void fill_triangle(Point t[]);
+Vec3D bezier(Vec3D C[4][4], float t, float s);
+Vec3D bezier_curve(Vec3D B[], float t, float s);
+void draw_triangle(Vec3D t[]);
+void fill_triangle(Point v[]);
