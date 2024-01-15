@@ -33,7 +33,10 @@ teapot_04:
 teapot_05:
 	$(CXX) $(COMPILER_FLAGS) -o bin/$@ teapot/src/teapot_05.c teapot/src/auxiliar.c $(INCLUDE) $(LIBS)
 
-all: clean teapot teapot_01 teapot_02 teapot_03 teapot_04 teapot_05 cube
+teapot_06:
+	$(CXX) $(COMPILER_FLAGS) -o bin/$@ teapot/src/teapot_06.c teapot/src/auxiliar.c $(INCLUDE) $(LIBS)
+
+all: clean teapot teapot_01 teapot_02 teapot_03 teapot_04 teapot_05 teapot_06 cube
 	$(CXX) $(COMPILER_FLAGS) -o bin/polar_curves basic/src/polar_curves.c $(INCLUDE) $(LIBS)
 	$(CXX) $(COMPILER_FLAGS) -o bin/test_bezier basic/src/test_bezier.c $(INCLUDE) $(LIBS)
 	$(CXX) $(COMPILER_FLAGS) -o bin/test_triangle basic/src/test_triangle.c teapot/src/auxiliar.c $(INCLUDE) $(LIBS)
