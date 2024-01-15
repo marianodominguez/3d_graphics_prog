@@ -17,14 +17,14 @@ unsigned int idx;
 unsigned int screen, row, col;
 
 float th = M_PI;
-int X_MAX = 800, Y_MAX = 600;
 
 Point M[N_VERTICES];
-BufferLine row_buffer[601];
+BufferLine row_buffer[Y_MAX+1];
 
 const Vec3D VIEWPOINT = {5.5, -5.0, 6.0};
 const Vec3D LIGHT_SOURCE = {10, 10.0, 6.0};
 const float LIGHT_INTENSITY = 0.99;
+float Z_BUFFER[X_MAX][Y_MAX];
 
 ALLEGRO_COLOR color;
 ALLEGRO_DISPLAY *disp;
@@ -279,6 +279,7 @@ int main() {
         row_buffer[i].right=0;
     }
 
+
     al_init();
     al_install_keyboard();
     al_init_primitives_addon();
@@ -308,6 +309,10 @@ int main() {
             break;
 
         if (redraw && al_is_event_queue_empty(queue)) {
+            for(int i=0; i<X_MAX; i++)
+                for(int j=0; j<Y_MAX; j++)
+                Z_BUFFER[i][j]=-9999;
+
             al_clear_to_color(al_map_rgb(0, 0, 0));
             al_draw_text(font, al_map_rgb(255, 255, 255), 0, 0, 0,
                          "I'm a teapot");

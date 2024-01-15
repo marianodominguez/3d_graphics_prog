@@ -9,7 +9,7 @@
 #include "auxiliar.h"
 
 ALLEGRO_COLOR color;
-int X_MAX = 800, Y_MAX = 600;
+
 Point M[1];
 Vec3D T[3];
 ALLEGRO_DISPLAY* disp;

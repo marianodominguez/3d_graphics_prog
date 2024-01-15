@@ -5,7 +5,8 @@
         "functional": "c",
         "cmath": "c",
         "complex": "c",
-        "random": "c"
+        "random": "c",
+        "math.h": "c"
     },
     "makefile.configurations": [
         {

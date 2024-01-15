@@ -26,10 +26,9 @@ unsigned int idx;
 unsigned int screen, row, col;
 
 float th = M_PI;
-int X_MAX = 800, Y_MAX = 600;
 
 Point M[N_VERTICES];
-BufferLine row_buffer[601];
+BufferLine row_buffer[Y_MAX+1];
 
 const Vec3D VIEWPOINT = {5.5, -5.0, 6.0};
 const Vec3D LIGHT_SOURCE = {10, 10.0, 6.0};

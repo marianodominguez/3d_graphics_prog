@@ -9,7 +9,7 @@
 #include "auxiliar.h"
 
 ALLEGRO_COLOR color;
-int X_MAX = 800, Y_MAX = 600;
+
 Point M[1];
 BufferLine row_buffer[1];
 ALLEGRO_DISPLAY* disp;

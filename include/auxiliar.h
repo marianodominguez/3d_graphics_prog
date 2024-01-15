@@ -7,7 +7,8 @@
 
 #define N_VERTICES 32 * 16
 
-extern int Y_MAX,X_MAX;
+#define X_MAX 800
+#define Y_MAX 600
 
 typedef struct
 {
@@ -24,13 +25,13 @@ typedef struct
 typedef struct
 {
     int left, right;
-    int r,g,b;
 } BufferLine;
 
 
 extern Point M[];
 extern ALLEGRO_COLOR color;
 extern BufferLine row_buffer[];
+extern float Z_BUFFER[X_MAX][Y_MAX];
 
 void copy_t(Vec3D src[], Vec3D dest[]);
 Vec3D normalize(Vec3D v);
