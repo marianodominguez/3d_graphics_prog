@@ -1,3 +1,5 @@
+/*flat Shading teapot, it calculates the same normal for every face*/
+
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_primitives.h>
@@ -126,16 +128,18 @@ Point *projection(Point p[]) {
     return poly;
 }
 
-Point* lightModel(Vec3D patch[3], Vec3D normals[]) {
+Point* lightModel(Vec3D patch[3]) {
     static Point m[3];
 
     Vec3D v0={patch[0].x, patch[0].y, patch[0].z};
     Vec3D v1={patch[1].x, patch[1].y, patch[1].z};
     Vec3D v2={patch[2].x, patch[2].y, patch[2].z};
 
-    for(int i=0; i<3; i++) {
-        Vec3D normal = normals[i];
+    Vec3D v1v0 = {v1.x-v0.x, v1.y-v0.y, v1.z-v0.z};
+    Vec3D v2v0 = {v2.x-v0.x, v2.y-v0.y, v2.z-v0.z};
 
+    Vec3D normal = normalize( cross(v1v0, v2v0));
+    for(int i=0; i<3; i++) {
         m[i].x=patch[i].x;
         m[i].y=patch[i].y;
         m[i].z=patch[i].z;
@@ -147,59 +151,10 @@ Point* lightModel(Vec3D patch[3], Vec3D normals[]) {
     return m;
 }
 
-float derivativeBezier(float u , float x0, float x1, float x2, float x3) {
-    return -3 * (1 - u) * (1 - u) * x0 +
-       (3 * (1 - u) * (1 - u) - 6 * u * (1 - u)) * x1 +
-       (6 * u * (1 - u) - 3 * u * u) * x2 +
-       3 * u * u * x3;
-
-}
-
-Vec3D dUBezier(Vec3D C[], float u, float v) {
-    Vec3D P[4];
-    Vec3D vCurve[4];
-    Vec3D r;
-    for (int i = 0; i < 4; ++i) {
-       P[0] = C[i];
-       P[1] = C[4 + i];
-       P[2] = C[8 + i];
-       P[3] = C[12 + i];
-       vCurve[i] = bezier_2d(P, v);
-    }
-    r.x=derivativeBezier(u, vCurve[0].x,vCurve[1].x,vCurve[2].x,vCurve[3].x);
-    r.y=derivativeBezier(u, vCurve[0].y,vCurve[1].y,vCurve[2].y,vCurve[3].y);
-    r.z=derivativeBezier(u, vCurve[0].z,vCurve[1].z,vCurve[2].z,vCurve[3].z);
-
-    return r;
-}
-
-Vec3D dVBezier(Vec3D C[], float u, float v) {
-    Vec3D uCurve[4];
-    Vec3D r;
-    for (int i = 0; i < 4; ++i) {
-       uCurve[i] = bezier_2d(C + 4 * i, u);
-    }
-
-    r.x=derivativeBezier(v, uCurve[0].x,uCurve[1].x,uCurve[2].x,uCurve[3].x);
-    r.y=derivativeBezier(v, uCurve[0].y,uCurve[1].y,uCurve[2].y,uCurve[3].y);
-    r.z=derivativeBezier(v, uCurve[0].z,uCurve[1].z,uCurve[2].z,uCurve[3].z);
-
-    return r;
-}
-
-Vec3D bezier_normal(Vec3D C[], float u, float v) {
-    Vec3D N;
-    Vec3D dU = dUBezier(C, u, v);
-    Vec3D dV = dVBezier(C, u, v);
-    N = normalize(cross(dU,dV));
-    return N;
-}
-
 void interpolate_mesh(Vec3D C[], float n) {
     float t = 0, s = 0;
     Point *poly;
-    Vec3D patch[3];
-    Vec3D normals[3];
+    Vec3D patch[4];
     float delta=1.0/n;
     Point *mpatch;
 
@@ -209,12 +164,8 @@ void interpolate_mesh(Vec3D C[], float n) {
             patch[1] = bezier_curve(C, t + delta, s);
             patch[2] = bezier_curve(C, t + delta, s + delta);
 
-            normals[0] = bezier_normal(C, t, s);
-            normals[1] = bezier_normal(C, t + delta, s);
-            normals[2] = bezier_normal(C, t + delta, s + delta);
-
             if (visible(patch)) {
-                mpatch =lightModel(patch, normals);
+                mpatch =lightModel(patch);
                 poly = projection(mpatch);
                 //draw_triangle(poly);
                 fill_triangle(poly);
@@ -223,12 +174,8 @@ void interpolate_mesh(Vec3D C[], float n) {
             patch[1] = bezier_curve(C, t + delta, s + delta);
             patch[2] = bezier_curve(C, t, s + delta);
 
-            normals[0] = bezier_normal(C, t, s);
-            normals[1] = bezier_normal(C, t + delta, s + delta);
-            normals[2] = bezier_normal(C, t , s + delta);
-
             if (visible(patch)) {
-                mpatch = lightModel(patch, normals);
+                mpatch = lightModel(patch);
                 poly = projection(mpatch);
                 //draw_triangle(poly);
                 fill_triangle(poly);

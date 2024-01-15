@@ -1,4 +1,5 @@
-.MAIN: teapot
+.PHONY: default
+default: teapot ;
 
 ############
 MACHINE= $(shell uname -s)
@@ -37,6 +38,7 @@ all: clean teapot teapot_01 teapot_02 teapot_03 teapot_04 teapot_05 cube
 	$(CXX) $(COMPILER_FLAGS) -o bin/test_bezier basic/src/test_bezier.c $(INCLUDE) $(LIBS)
 	$(CXX) $(COMPILER_FLAGS) -o bin/test_triangle basic/src/test_triangle.c teapot/src/auxiliar.c $(INCLUDE) $(LIBS)
 	$(CXX) $(COMPILER_FLAGS) -o bin/test_lines basic/src/test_lines.c teapot/src/auxiliar.c $(INCLUDE) $(LIBS)
+	$(CXX) $(COMPILER_FLAGS) -o bin/test_triangle_color basic/src/test_triangle_color.c teapot/src/auxiliar.c $(INCLUDE) $(LIBS)
 
 clean:
 	rm -rf bin/*

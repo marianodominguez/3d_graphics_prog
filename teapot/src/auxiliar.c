@@ -44,6 +44,22 @@ void split(int a[], char *s) {
     }
 }
 
+Vec3D bezier_2d(Vec3D C[4], float t) {
+    Vec3D p = {0, 0, 0};
+    float b[4];
+    b[0] = (1 - t) * (1 - t) * (1 - t);
+    b[1] = 3 * t * (1 - t) * (1 - t);
+    b[2] = 3 * t * t * (1 - t);
+    b[3] = t * t * t;
+
+    for (int i = 0; i < 4; i++) {
+        p.x = p.x + b[i] * C[i].x;
+        p.y = p.y + b[i] * C[i].y;
+        p.z = p.z + b[i] * C[i].z;
+    }
+    return p;
+}
+
 Vec3D bezier(Vec3D C[4][4], float t, float s) {
     Vec3D p = {0, 0, 0};
     float b[4], c[4];
@@ -187,7 +203,7 @@ void draw_triangle(Vec3D t[]) {
     //al_draw_line(t[2].x,t[2].y,t[0].x,t[0].y, color,1.0);
 }
 
-void measure_side(Vec3D v0, Vec3D v1) {
+void measure_flat(Vec3D v0, Vec3D v1) {
     int y0=v0.y,y1=v1.y,x0=v0.x,x1=v1.x;
     int dx=abs(x1-x0);
     int sx= x0 < x1 ? 1 :-1;
@@ -225,6 +241,49 @@ void measure_side(Vec3D v0, Vec3D v1) {
     }
 }
 
+void measure_side(Point v0, Point v1) {
+    int y0=v0.y,y1=v1.y,x0=v0.x,x1=v1.x;
+    int dx=abs(x1-x0);
+    int sx= x0 < x1 ? 1 :-1;
+    int dy=-abs(y1-y0);
+    int sy= y0 < y1 ? 1 :-1;
+    int error=dx+dy;
+
+
+    if(x0==x1 && y0==y1) {
+        row_buffer[y0].left=x1;
+        row_buffer[y0].right=x1;
+        row_buffer[y0].r=v0.r;
+        row_buffer[y0].g=v0.g;
+        row_buffer[y0].b=v0.b;
+        return;
+    }
+
+    while(x0!=x1 || y0!=y1) {
+        if (x0<row_buffer[y0].left && y0>0 && y0<Y_MAX)
+        {
+            row_buffer[y0].left=x0;
+            if (row_buffer[y0].left<0) row_buffer[y0].left=0;
+
+        }
+
+        if (x0>row_buffer[y0].right && y0>0 && y0<Y_MAX) {
+            row_buffer[y0].right=x0;
+            if (row_buffer[y0].right>X_MAX) row_buffer[y0].right=X_MAX;
+        }
+
+        int e2= 2*error;
+        if (e2 >= dy) {
+            error+=dy;
+            x0+=sx;
+        }
+        if (e2 <= dx) {
+            error+=dx;
+            y0+=sy;
+        }
+    }
+}
+
 void h_line(int x1, int y1, int x2, int y2) {
 
     for(int x=x1; x<=x2; x++) {
@@ -232,11 +291,34 @@ void h_line(int x1, int y1, int x2, int y2) {
     }
 }
 
+void b_cordinates(int x, int y, Point v[], float t[]) {
+
+    float d= (v[1].y - v[2].y) * (v[0].x - v[2].x) + (v[2].x - v[1].x)*(v[0].y-v[2].y);
+    float lambda1=(v[1].y-v[2].y) *(x - v[2].x) + (v[2].x - v[1].x)*(y-v[2].y);
+    float lambda2=(v[2].y-v[0].y) *(x - v[2].x) + (v[0].x - v[2].x)*(y-v[2].y);
+
+    t[0]=lambda1/d;
+    t[1]=lambda2/d;
+    t[2]=1-lambda1/d-lambda2/d;
+}
+
+void color_line(int x1, int y1, int x2, int y2, Point v[]) {
+    int r,g,b;
+    float t[3];
+    for(int x=x1; x<=x2; x++) {
+        b_cordinates(x,y1,v,t);
+        r=floor(v[0].r * t[0] + v[1].r * t[1] + v[2].r * t[2]);
+        g=floor(v[0].g * t[0] + v[1].g * t[1] + v[2].g * t[2]);
+        b=floor(v[0].b * t[0] + v[1].b * t[1] + v[2].b * t[2]);
+        color = al_map_rgb(r, g, b);
+        put_pixel(x,y1,color);
+    }
+}
 
 void flat_triangle(Vec3D t[]) {
-    measure_side(t[0], t[1]);
-    measure_side(t[1], t[2]);
-    measure_side(t[2], t[0]);
+    measure_flat(t[0], t[1]);
+    measure_flat(t[1], t[2]);
+    measure_flat(t[2], t[0]);
 
     int top=Y_MAX;
     int bottom=0;
@@ -264,9 +346,9 @@ void fill_triangle(Point v[]) {
         t[i].z=v[i].z;
     }
 
-    measure_side(t[0], t[1]);
-    measure_side(t[1], t[2]);
-    measure_side(t[2], t[0]);
+    measure_side(v[0], v[1]);
+    measure_side(v[1], v[2]);
+    measure_side(v[2], v[0]);
 
     int top=Y_MAX;
     int bottom=0;
@@ -276,10 +358,9 @@ void fill_triangle(Point v[]) {
         if (bottom < t[i].y && t[i].y<Y_MAX) bottom=t[i].y;
     }
     //Test flat shading
-    color = al_map_rgb(v[0].r, v[0].g, v[0].b);
     //printf("%d,%d,%d ", v[0].r, v[0].g, v[0].b);
     for(int y=top; y<=bottom; y++) {
-        h_line(row_buffer[y].left,y,row_buffer[y].right,y);
+        color_line(row_buffer[y].left,y,row_buffer[y].right,y, v);
         //printf("%d=%d,%d ",y,row_buffer[y].left,row_buffer[y].right);
 
         row_buffer[y].left=X_MAX-1;

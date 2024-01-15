@@ -23,7 +23,8 @@ typedef struct
 
 typedef struct
 {
-    int left, right, r,g,b;
+    int left, right;
+    int r,g,b;
 } BufferLine;
 
 
@@ -44,3 +45,4 @@ Vec3D bezier_curve(Vec3D B[], float t, float s);
 void draw_triangle(Vec3D t[]);
 void flat_triangle(Vec3D t[]);
 void fill_triangle(Point v[]);
+Vec3D bezier_2d(Vec3D C[4], float t);
