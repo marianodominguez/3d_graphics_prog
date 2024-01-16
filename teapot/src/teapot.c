@@ -113,8 +113,8 @@ Point *projection(Point p[]) {
         y = pp.y;
         xs = 100 * x + X_MAX / 2;
         ys = 100 * y + Y_MAX / 2;
-        poly[i].x = xs;
-        poly[i].y = ys;
+        poly[i].x = round(xs);
+        poly[i].y = round(ys);
         poly[i].z = pp.z;
 
         poly[i].r= p[i].r;
