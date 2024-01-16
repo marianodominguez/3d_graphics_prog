@@ -201,6 +201,15 @@ void draw_triangle(Vec3D t[]) {
 
 void measure_side(Vec3D v0, Vec3D v1) {
     int y0=v0.y,y1=v1.y,x0=v0.x,x1=v1.x;
+
+    //order with increasing y
+    if (v1.y < v0.y) {
+        y0=v1.y;
+        x0=v1.x;
+        y1=v0.y;
+        x1=v0.x;
+    }
+
     int dx=abs(x1-x0);
     int sx= x0 < x1 ? 1 :-1;
     int dy=-abs(y1-y0);
@@ -213,15 +222,15 @@ void measure_side(Vec3D v0, Vec3D v1) {
         return;
     }
     while(x0!=x1 || y0!=y1) {
-        if (x0<row_buffer[y0].left && y0>0 && y0<Y_MAX)
+        if (x0<row_buffer[y0].left)
         {
-            row_buffer[y0].left=x0;
+            if (y0>=0 && y0<Y_MAX) row_buffer[y0].left=x0;
             if (row_buffer[y0].left<0) row_buffer[y0].left=0;
         }
 
-        if (x0>row_buffer[y0].right && y0>0 && y0<Y_MAX) {
-            row_buffer[y0].right=x0;
-            if (row_buffer[y0].right>X_MAX) row_buffer[y0].right=X_MAX;
+        if (x0>row_buffer[y0].right) {
+            if (y0>=0 && y0<Y_MAX) row_buffer[y0].right=x0;
+            if (row_buffer[y0].right>X_MAX-1) row_buffer[y0].right=X_MAX-1;
         }
         int e2= 2*error;
         if (e2 >= dy) {
@@ -261,6 +270,11 @@ void color_line(int x1, int y1, int x2, int y2, Point v[], bool enable_zbuffer) 
     int r,g,b;
     float w;
     float t[3];
+    if (x2>= X_MAX) x2=X_MAX-1;
+    if (x1<0) x1=0;
+    if (y1<0) return;
+    if (y1>= Y_MAX) return;
+
     for(int x=x1; x<=x2; x++) {
         b_coordinates(x,y1,v,t);
         if (enable_zbuffer) {
@@ -316,7 +330,7 @@ void fill_triangle(Point v[],bool enable_zbuffer) {
     measure_side(t[1], t[2]);
     measure_side(t[2], t[0]);
 
-    int top=Y_MAX;
+    int top=0;
     int bottom=0;
 
     for(int i=0; i<3;i++) {

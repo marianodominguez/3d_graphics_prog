@@ -50,9 +50,9 @@ int main() {
     bool redraw = true;
     ALLEGRO_EVENT event;
 
-    M[0]=(Point) {10,5,0, 255, 0, 0};
-    M[1]=(Point) {300,485,0, 0, 255, 0};
-    M[2]=(Point) {185,400,0, 0, 0, 255};
+    M[0]=(Point) {400,0,0, 255, 0, 0};
+    M[1]=(Point) {0,599,0, 0, 255, 0};
+    M[2]=(Point) {799,599,0, 0, 0, 255};
 
     int dy1=5,dy0=5,dx2=5;
 

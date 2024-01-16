@@ -111,8 +111,8 @@ Point *projection(Point p[]) {
         pp = isometric_projection(p[i].x, p[i].y, p[i].z);
         x = pp.x;
         y = pp.y;
-        xs = 100 * x + X_MAX / 2;
-        ys = 100 * y + Y_MAX / 2;
+        xs = 80 * x + X_MAX / 2;
+        ys = 80 * y + Y_MAX / 2;
         poly[i].x = xs;
         poly[i].y = ys;
         poly[i].z = pp.z;
@@ -273,9 +273,10 @@ int draw(void) {
 int main() {
 
     for(int i=0; i<Y_MAX; i++) {
-        row_buffer[i].left=X_MAX-1;
+        row_buffer[i].left=X_MAX;
         row_buffer[i].right=0;
     }
+
 
     al_init();
     al_install_keyboard();

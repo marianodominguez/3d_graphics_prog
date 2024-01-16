@@ -60,8 +60,13 @@ Backface culling, using normals
 Triangle filling and rasterization algorithm
 
 -/teapot/teapot_06
-Flat shaading
+Flat shading
 
+-/teapot/teapot_07
+Smooth shading, Goreaud algorithm, use derivatives to calculate normals.
+
+-/teapot/teapot_08
+Z-Buffer, hiding surfaces.
 
 Succesive steps of rendering (WIP)
 

@@ -36,7 +36,13 @@
         },
         {
             "cwd": "/home/mariano/3d_graphics_prog",
+            "name":"teapot",
             "binaryPath": "/home/mariano/3d_graphics_prog/bin/teapot",
+            "binaryArgs": []
+        },
+        {
+            "cwd": "/home/mariano/3d_graphics_prog/bin",
+            "binaryPath": "/home/mariano/3d_graphics_prog/bin/test_triangle_color",
             "binaryArgs": []
         }
     ],
