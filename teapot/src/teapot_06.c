@@ -26,6 +26,7 @@ BufferLine row_buffer[Y_MAX+1];
 const Vec3D VIEWPOINT = {5.5, -5.0, 6.0};
 const Vec3D LIGHT_SOURCE = {10, 10.0, 6.0};
 const float LIGHT_INTENSITY = 0.99;
+float Z_BUFFER[1][Y_MAX];
 
 ALLEGRO_COLOR color;
 ALLEGRO_DISPLAY *disp;
@@ -153,7 +154,7 @@ Point* lightModel(Vec3D patch[3]) {
 void interpolate_mesh(Vec3D C[], float n) {
     float t = 0, s = 0;
     Point *poly;
-    Vec3D patch[4];
+    Vec3D patch[3];
     float delta=1.0/n;
     Point *mpatch;
 
@@ -166,8 +167,8 @@ void interpolate_mesh(Vec3D C[], float n) {
             if (visible(patch)) {
                 mpatch =lightModel(patch);
                 poly = projection(mpatch);
-                //draw_triangle(poly);
-                fill_triangle(poly);
+
+                fill_triangle(poly, false);
             }
             patch[0] = bezier_curve(C, t, s);
             patch[1] = bezier_curve(C, t + delta, s + delta);
@@ -176,8 +177,8 @@ void interpolate_mesh(Vec3D C[], float n) {
             if (visible(patch)) {
                 mpatch = lightModel(patch);
                 poly = projection(mpatch);
-                //draw_triangle(poly);
-                fill_triangle(poly);
+
+                fill_triangle(poly, false);
             }
         }
     }

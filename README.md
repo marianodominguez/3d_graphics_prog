@@ -44,7 +44,24 @@ Draws and rotates a bezier patch, interpolating 10 points
 
 Minimal 3D example, a rotating wireframe cube
 
--/teapot/teapot_01 ..
+-/teapot/teapot_01
+Wireframe model, projection, translation and rotation
+
+-/teapot/teapot_02
+Testing a naive linear interpolation, it does not generate proper polygons.
+
+-/teapot/teapot_03
+Wireframe interpolation with Bezier patches
+
+-/teapot/teapot_04
+Backface culling, using normals
+
+-/teapot/teapot_05
+Triangle filling and rasterization algorithm
+
+-/teapot/teapot_06
+Flat shaading
+
 
 Succesive steps of rendering (WIP)
 

@@ -14,6 +14,7 @@ Point M[1];
 Vec3D T[3];
 ALLEGRO_DISPLAY* disp;
 BufferLine row_buffer[600];
+float Z_BUFFER[1][Y_MAX];
 
 void draw() {
     al_lock_bitmap(al_get_backbuffer(disp), ALLEGRO_PIXEL_FORMAT_ANY, 0);

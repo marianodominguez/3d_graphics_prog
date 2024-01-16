@@ -1,5 +1,5 @@
 /**
- * Code interpolation example by Ron Hasting
+ * Code interpolation example by Ron Barry
 */
 
 #include <stdio.h>

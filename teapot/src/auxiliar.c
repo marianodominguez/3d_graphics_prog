@@ -197,10 +197,6 @@ void draw_triangle(Vec3D t[]) {
     line(t[0].x,t[0].y,t[1].x,t[1].y, color);
     line(t[1].x,t[1].y,t[2].x,t[2].y, color);
     line(t[2].x,t[2].y,t[0].x,t[0].y, color);
-
-    //al_draw_line(t[0].x,t[0].y,t[1].x,t[1].y, color,1.0);
-    //al_draw_line(t[1].x,t[1].y,t[2].x,t[2].y, color,1.0);
-    //al_draw_line(t[2].x,t[2].y,t[0].x,t[0].y, color,1.0);
 }
 
 void measure_side(Vec3D v0, Vec3D v1) {
@@ -261,15 +257,23 @@ float calculate_w(float x,float y,Point v[],float t[]) {
     return v[0].z*t[0]+v[1].z*t[1]+v[2].z*t[2];
 }
 
-void color_line(int x1, int y1, int x2, int y2, Point v[]) {
+void color_line(int x1, int y1, int x2, int y2, Point v[], bool enable_zbuffer) {
     int r,g,b;
     float w;
     float t[3];
     for(int x=x1; x<=x2; x++) {
         b_coordinates(x,y1,v,t);
-        w = calculate_w(x,y1,v,t);
-        if (w > Z_BUFFER[x][y1]) {
-            Z_BUFFER[x][y1] = w;
+        if (enable_zbuffer) {
+            w = calculate_w(x,y1,v,t);
+            if (w > Z_BUFFER[x][y1]) {
+                Z_BUFFER[x][y1] = w;
+                r=floor(v[0].r * t[0] + v[1].r * t[1] + v[2].r * t[2]);
+                g=floor(v[0].g * t[0] + v[1].g * t[1] + v[2].g * t[2]);
+                b=floor(v[0].b * t[0] + v[1].b * t[1] + v[2].b * t[2]);
+                color = al_map_rgb(r, g, b);
+                put_pixel(x,y1,color);
+            }
+        } else {
             r=floor(v[0].r * t[0] + v[1].r * t[1] + v[2].r * t[2]);
             g=floor(v[0].g * t[0] + v[1].g * t[1] + v[2].g * t[2]);
             b=floor(v[0].b * t[0] + v[1].b * t[1] + v[2].b * t[2]);
@@ -300,7 +304,7 @@ void flat_triangle(Vec3D t[]) {
     }
 }
 
-void fill_triangle(Point v[]) {
+void fill_triangle(Point v[],bool enable_zbuffer) {
     Vec3D t[3];
     for (int i=0; i<3; i++) {
         t[i].x=v[i].x;
@@ -320,7 +324,7 @@ void fill_triangle(Point v[]) {
         if (bottom < t[i].y && t[i].y<Y_MAX) bottom=t[i].y;
     }
     for(int y=top; y<=bottom; y++) {
-        color_line(row_buffer[y].left,y,row_buffer[y].right,y, v);
+        color_line(row_buffer[y].left,y,row_buffer[y].right,y, v, enable_zbuffer);
 
         row_buffer[y].left=X_MAX-1;
         row_buffer[y].right=0;

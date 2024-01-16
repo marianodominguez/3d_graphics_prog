@@ -24,6 +24,7 @@ float th = M_PI;
 
 Point M[N_VERTICES];
 BufferLine row_buffer[Y_MAX+1];
+float Z_BUFFER[1][Y_MAX];
 
 Vec3D VIEWPOINT = {5.5, -5.0, 6.0};
 ALLEGRO_COLOR color;

@@ -31,7 +31,7 @@ typedef struct
 extern Point M[];
 extern ALLEGRO_COLOR color;
 extern BufferLine row_buffer[];
-extern float Z_BUFFER[X_MAX][Y_MAX];
+extern float Z_BUFFER[][Y_MAX];
 
 void copy_t(Vec3D src[], Vec3D dest[]);
 Vec3D normalize(Vec3D v);
@@ -45,5 +45,5 @@ Vec3D bezier(Vec3D C[4][4], float t, float s);
 Vec3D bezier_curve(Vec3D B[], float t, float s);
 void draw_triangle(Vec3D t[]);
 void flat_triangle(Vec3D t[]);
-void fill_triangle(Point v[]);
+void fill_triangle(Point v[], bool enable_zbuffer);
 Vec3D bezier_2d(Vec3D C[4], float t);

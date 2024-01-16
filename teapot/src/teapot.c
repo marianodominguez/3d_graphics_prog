@@ -217,7 +217,7 @@ void interpolate_mesh(Vec3D C[], float n) {
                 mpatch =lightModel(patch, normals);
                 poly = projection(mpatch);
                 //draw_triangle(poly);
-                fill_triangle(poly);
+                fill_triangle(poly, true);
             }
             patch[0] = bezier_curve(C, t, s);
             patch[1] = bezier_curve(C, t + delta, s + delta);
@@ -231,7 +231,7 @@ void interpolate_mesh(Vec3D C[], float n) {
                 mpatch = lightModel(patch, normals);
                 poly = projection(mpatch);
                 //draw_triangle(poly);
-                fill_triangle(poly);
+                fill_triangle(poly, true);
             }
         }
     }

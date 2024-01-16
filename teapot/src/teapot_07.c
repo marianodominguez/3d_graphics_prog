@@ -29,6 +29,7 @@ float th = M_PI;
 
 Point M[N_VERTICES];
 BufferLine row_buffer[Y_MAX+1];
+float Z_BUFFER[1][Y_MAX];
 
 const Vec3D VIEWPOINT = {5.5, -5.0, 6.0};
 const Vec3D LIGHT_SOURCE = {10, 10.0, 6.0};
@@ -225,7 +226,7 @@ void interpolate_mesh(Vec3D C[], float n) {
                 mpatch =lightModel(patch, normals);
                 poly = projection(mpatch);
                 //draw_triangle(poly);
-                fill_triangle(poly);
+                fill_triangle(poly, false);
             }
             patch[0] = bezier_curve(C, t, s);
             patch[1] = bezier_curve(C, t + delta, s + delta);
@@ -239,7 +240,7 @@ void interpolate_mesh(Vec3D C[], float n) {
                 mpatch = lightModel(patch, normals);
                 poly = projection(mpatch);
                 //draw_triangle(poly);
-                fill_triangle(poly);
+                fill_triangle(poly, false);
             }
         }
     }

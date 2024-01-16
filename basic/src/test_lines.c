@@ -13,6 +13,7 @@ ALLEGRO_COLOR color;
 Point M[1];
 BufferLine row_buffer[1];
 ALLEGRO_DISPLAY* disp;
+float Z_BUFFER[1][Y_MAX];
 
 void draw() {
     color = al_map_rgb(128, 128, 255);
