@@ -19,7 +19,7 @@ unsigned int screen, row, col;
 float th = M_PI;
 
 Point M[N_VERTICES];
-BufferLine row_buffer[Y_MAX+1];
+BufferLine row_buffer[Y_MAX];
 
 const Vec3D VIEWPOINT = {5.5, -5.0, 6.0};
 const Vec3D LIGHT_SOURCE = {10, 10.0, 6.0};
@@ -39,12 +39,9 @@ Vec3D isometric_projection(float x, float y, float z) {
 
 Vec3D camera_projection(float x, float y, float z, float d) {
     Vec3D r;
-
     r.x = x * d / z;
     r.y = y * d / z;
     r.z = 1/z;
-
-    // printf("(%f,%f)",r.x,r.y);
     return r;
 }
 
@@ -82,7 +79,6 @@ Vec3D rotate_z(float x, float y, float z, float th) {
 
 int visible(Vec3D p[]) {
     Vec3D c, v0, v1, n;
-
     v0.x = p[1].x - p[0].x;
     v0.y = p[1].y - p[0].y;
     v0.z = p[1].z - p[0].z;
@@ -140,9 +136,13 @@ Point* lightModel(Vec3D patch[3], Vec3D normals[]) {
         m[i].y=patch[i].y;
         m[i].z=patch[i].z;
 
-        m[i].r=(dot(normal, normalize(LIGHT_SOURCE))*LIGHT_INTENSITY)*128+128;
-        m[i].g=(dot(normal, normalize(LIGHT_SOURCE))*LIGHT_INTENSITY)*128+128;
-        m[i].b=(dot(normal, normalize(LIGHT_SOURCE))*LIGHT_INTENSITY)*128+128;
+        m[i].r=(dot(normal, normalize(LIGHT_SOURCE))*LIGHT_INTENSITY)*120+150;
+        m[i].g=(dot(normal, normalize(LIGHT_SOURCE))*LIGHT_INTENSITY)*120+150;
+        m[i].b=(dot(normal, normalize(LIGHT_SOURCE))*LIGHT_INTENSITY)*120+150;
+
+        if (m[i].r<0) m[i].r =0;
+        if (m[i].g<0) m[i].g =0;
+        if (m[i].b<0) m[i].b =0;
     }
     return m;
 }
@@ -152,7 +152,6 @@ float derivativeBezier(float u , float x0, float x1, float x2, float x3) {
        (3 * (1 - u) * (1 - u) - 6 * u * (1 - u)) * x1 +
        (6 * u * (1 - u) - 3 * u * u) * x2 +
        3 * u * u * x3;
-
 }
 
 Vec3D dUBezier(Vec3D C[], float u, float v) {
@@ -242,11 +241,10 @@ int draw(void) {
     Vec3D patch[16];
     Vec3D trv = {-VIEWPOINT.x, -VIEWPOINT.y, -VIEWPOINT.z};
 
-    //idx = 13*16;
+    //idx = 15*16;
     idx = 0;
     al_clear_to_color(al_map_rgb(0, 0, 0));
     // N_VERTICES
-    color = al_map_rgb(32, 32, 32);
     //for (i = 0; i < 1; i++) {
     for (i = 0; i < N_VERTICES / 16; i++) {
         for (j = 0; j < 16; j++) {
