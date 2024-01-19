@@ -295,7 +295,7 @@ int main() {
     al_start_timer(timer);
     while (1) {
         th = th + M_PI / 20;
-        // if(th>=2*M_PI) th=-2*M_PI;
+        if(th/5.0>=2*M_PI) th=0;
 
         al_wait_for_event(queue, &event);
         if (event.type == ALLEGRO_EVENT_TIMER)
@@ -311,7 +311,7 @@ int main() {
             al_clear_to_color(al_map_rgb(0, 0, 0));
             al_draw_text(font, al_map_rgb(255, 255, 255), 0, 0, 0,
                          "I'm a teapot");
-
+            printf("%f\n", th);
             al_lock_bitmap(al_get_backbuffer(disp), ALLEGRO_PIXEL_FORMAT_ANY, 0);
             draw();
             al_unlock_bitmap(al_get_backbuffer(disp));

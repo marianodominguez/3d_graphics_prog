@@ -326,6 +326,10 @@ void fill_triangle(Point v[],bool enable_zbuffer) {
         t[i].z=v[i].z;
     }
 
+    if (t[0].x==t[1].x && t[0].y==t[1].y) return;
+    if (t[0].x==t[2].x && t[0].y==t[2].y) return;
+    if (t[1].x==t[2].x && t[1].y==t[2].y) return;
+
     measure_side(t[0], t[1]);
     measure_side(t[1], t[2]);
     measure_side(t[2], t[0]);
@@ -334,9 +338,12 @@ void fill_triangle(Point v[],bool enable_zbuffer) {
     int bottom=0;
 
     for(int i=0; i<3;i++) {
-        if (t[i].y<top && t[i].y>=0) top=t[i].y;
-        if (bottom < t[i].y && t[i].y<Y_MAX) bottom=t[i].y;
+        if (t[i].y<top) top=t[i].y;
+        if (bottom < t[i].y) bottom=t[i].y;
     }
+    if (top<0) top=0;
+    if (bottom>=Y_MAX) bottom=Y_MAX-1;
+
     for(int y=top; y<=bottom; y++) {
         color_line(row_buffer[y].left,y,row_buffer[y].right,y, v, enable_zbuffer);
 
