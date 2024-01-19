@@ -194,6 +194,13 @@ Vec3D bezier_normal(Vec3D C[], float u, float v) {
     return N;
 }
 
+bool invalid_triangle(Vec3D t[3]) {
+    if (t[0].x==t[1].x && t[0].y==t[1].y) return true; 
+    if (t[0].x==t[2].x && t[0].y==t[2].y) return true;
+    if (t[1].x==t[2].x && t[1].y==t[2].y) return true;
+    return false;
+}
+
 void interpolate_mesh(Vec3D C[], float n) {
     float t = 0, s = 0;
     Point *poly;
@@ -212,7 +219,7 @@ void interpolate_mesh(Vec3D C[], float n) {
             normals[1] = bezier_normal(C, t + delta, s);
             normals[2] = bezier_normal(C, t + delta, s + delta);
 
-            if (visible(patch)) {
+            if (visible(patch) && !invalid_triangle(patch) ) {
                 mpatch =lightModel(patch, normals);
                 poly = projection(mpatch);
                 fill_triangle(poly, true);
@@ -225,7 +232,7 @@ void interpolate_mesh(Vec3D C[], float n) {
             normals[1] = bezier_normal(C, t + delta, s + delta);
             normals[2] = bezier_normal(C, t , s + delta);
 
-            if (visible(patch)) {
+            if (visible(patch) && !invalid_triangle(patch)) {
                 mpatch = lightModel(patch, normals);
                 poly = projection(mpatch);
                 fill_triangle(poly, true);
@@ -311,7 +318,7 @@ int main() {
             al_clear_to_color(al_map_rgb(0, 0, 0));
             al_draw_text(font, al_map_rgb(255, 255, 255), 0, 0, 0,
                          "I'm a teapot");
-            printf("%f\n", th);
+            //printf("%f\n", th);
             al_lock_bitmap(al_get_backbuffer(disp), ALLEGRO_PIXEL_FORMAT_ANY, 0);
             draw();
             al_unlock_bitmap(al_get_backbuffer(disp));

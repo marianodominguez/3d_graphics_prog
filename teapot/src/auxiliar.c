@@ -329,7 +329,7 @@ void fill_triangle(Point v[],bool enable_zbuffer) {
     if (t[0].x==t[1].x && t[0].y==t[1].y) return;
     if (t[0].x==t[2].x && t[0].y==t[2].y) return;
     if (t[1].x==t[2].x && t[1].y==t[2].y) return;
-
+    
     measure_side(t[0], t[1]);
     measure_side(t[1], t[2]);
     measure_side(t[2], t[0]);
