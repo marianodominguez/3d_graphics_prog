@@ -275,7 +275,7 @@ void color_line(int x1, int y1, int x2, int y2, Point v[], bool enable_zbuffer) 
     if (y1<0) return;
     if (y1>= Y_MAX) return;
 
-    for(int x=x1; x<=x2; x++) {
+    for(int x=x1; x<x2; x++) {
         b_coordinates(x,y1,v,t);
         if (enable_zbuffer) {
             w = calculate_w(x,y1,v,t);
@@ -329,7 +329,7 @@ void fill_triangle(Point v[],bool enable_zbuffer) {
     if (t[0].x==t[1].x && t[0].y==t[1].y) return;
     if (t[0].x==t[2].x && t[0].y==t[2].y) return;
     if (t[1].x==t[2].x && t[1].y==t[2].y) return;
-    
+
     measure_side(t[0], t[1]);
     measure_side(t[1], t[2]);
     measure_side(t[2], t[0]);

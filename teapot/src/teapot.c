@@ -22,8 +22,8 @@ Point M[N_VERTICES];
 BufferLine row_buffer[Y_MAX];
 
 const Vec3D VIEWPOINT = {5.5, -5.0, 6.0};
-const Vec3D LIGHT_SOURCE = {10, 10.0, 6.0};
-const float LIGHT_INTENSITY = 0.99;
+const Vec3D LIGHT_SOURCE = {10.0, 5.0, 10.0};
+const float LIGHT_INTENSITY = 1.0;
 float Z_BUFFER[X_MAX][Y_MAX];
 
 ALLEGRO_COLOR color;
@@ -136,9 +136,9 @@ Point* lightModel(Vec3D patch[3], Vec3D normals[]) {
         m[i].y=patch[i].y;
         m[i].z=patch[i].z;
 
-        m[i].r=(dot(normal, normalize(LIGHT_SOURCE))*LIGHT_INTENSITY)*120+150;
-        m[i].g=(dot(normal, normalize(LIGHT_SOURCE))*LIGHT_INTENSITY)*120+150;
-        m[i].b=(dot(normal, normalize(LIGHT_SOURCE))*LIGHT_INTENSITY)*120+150;
+        m[i].r=(dot(normal, normalize(LIGHT_SOURCE))*LIGHT_INTENSITY)*130+150;
+        m[i].g=(dot(normal, normalize(LIGHT_SOURCE))*LIGHT_INTENSITY)*130+150;
+        m[i].b=(dot(normal, normalize(LIGHT_SOURCE))*LIGHT_INTENSITY)*130+150;
 
         if (m[i].r<0) m[i].r =0;
         if (m[i].g<0) m[i].g =0;
@@ -195,9 +195,9 @@ Vec3D bezier_normal(Vec3D C[], float u, float v) {
 }
 
 bool invalid_triangle(Vec3D t[3]) {
-    if (t[0].x==t[1].x && t[0].y==t[1].y) return true; 
-    if (t[0].x==t[2].x && t[0].y==t[2].y) return true;
-    if (t[1].x==t[2].x && t[1].y==t[2].y) return true;
+    if (t[0].x==t[1].x && t[0].y==t[1].y && t[0].z==t[1].z) return true;
+    if (t[0].x==t[2].x && t[0].y==t[2].y && t[0].z==t[2].z) return true;
+    if (t[1].x==t[2].x && t[1].y==t[2].y && t[1].z==t[2].z) return true;
     return false;
 }
 
@@ -270,7 +270,7 @@ int draw(void) {
             patch[j].z = pp.z;
         }
 
-        interpolate_mesh(patch, 10.0);
+        interpolate_mesh(patch, 12.0);
     }
     return EXIT_SUCCESS;
 }
