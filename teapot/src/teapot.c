@@ -143,6 +143,10 @@ Point* lightModel(Vec3D patch[3], Vec3D normals[]) {
         if (m[i].r<0) m[i].r =0;
         if (m[i].g<0) m[i].g =0;
         if (m[i].b<0) m[i].b =0;
+
+        if (m[i].r>255) m[i].r =255;
+        if (m[i].g>255) m[i].g =255;
+        if (m[i].b>255) m[i].b =255;
     }
     return m;
 }
@@ -267,6 +271,7 @@ int draw(void) {
             // rotation
             pp = rotate_x(pp.x, pp.y, pp.z, th);
             pp = rotate_z(pp.x, pp.y, pp.z, th / 5.0);
+            pp = rotate_y(pp.x, pp.y, pp.z, th / 5.0);
             // translate to center
 
             pp = translate(pp.x, pp.y, pp.z, trv);
