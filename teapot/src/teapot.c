@@ -218,8 +218,8 @@ void interpolate_mesh(Vec3D C[], float n) {
     float delta=1.0/n;
     Point *mpatch;
 
-    for (s =  0; s <= 1.0; s += delta) {
-        for (t = 0; t <= 1.0; t += delta) {
+    for (s =  0; s <= 1.0-delta; s += delta) {
+        for (t = 0; t <= 1.0-delta; t += delta) {
             patch[0] = bezier_curve(C, t, s);
             patch[1] = bezier_curve(C, t + delta, s);
             patch[2] = bezier_curve(C, t + delta, s + delta);
