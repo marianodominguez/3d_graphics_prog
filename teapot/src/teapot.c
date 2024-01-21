@@ -198,7 +198,7 @@ Vec3D bezier_normal(Vec3D C[], float u, float v) {
     return N;
 }
 
-bool invalid_triangle(Point t[3]) {
+bool invalid_triangle(Vec3D t[3]) {
     if (t[0].x==t[1].x && t[0].y==t[1].y) return true;
     if (t[0].x==t[2].x && t[0].y==t[2].y) return true;
     if (t[1].x==t[2].x && t[1].y==t[2].y)  return true;
