@@ -23,7 +23,7 @@ BufferLine row_buffer[Y_MAX];
 
 const Vec3D VIEWPOINT = {5.5, -5.0, 6.0};
 const Vec3D LIGHT_SOURCE = {10, 10.0, 6.0};
-const float LIGHT_INTENSITY = 0.45;
+const float LIGHT_INTENSITY = 0.6;
 float Z_BUFFER[X_MAX][Y_MAX];
 
 ALLEGRO_COLOR color;
@@ -198,14 +198,14 @@ Vec3D bezier_normal(Vec3D C[], float u, float v) {
     return N;
 }
 
-bool invalid_triangle(Vec3D t[3]) {
-    if (t[0].x==t[1].x && t[0].y==t[1].y && t[0].z==t[1].z) return true;
-    if (t[0].x==t[2].x && t[0].y==t[2].y && t[0].z==t[2].z) return true;
-    if (t[1].x==t[2].x && t[1].y==t[2].y && t[1].z==t[2].z) return true;
+bool invalid_triangle(Point t[3]) {
+    if (t[0].x==t[1].x && t[0].y==t[1].y) return true;
+    if (t[0].x==t[2].x && t[0].y==t[2].y) return true;
+    if (t[1].x==t[2].x && t[1].y==t[2].y)  return true;
 
-    if (fabs(t[0].x-t[1].x) <= 0.001 && fabs(t[0].y-t[1].y) <= 0.001 && fabs(t[0].z-t[1].z)<= 0.001) return true;
-    if (fabs(t[0].x-t[2].x) <= 0.001 && fabs(t[0].y-t[2].y) <= 0.001 && fabs(t[0].z-t[2].z)<= 0.001) return true;
-    if (fabs(t[1].x-t[2].x) <= 0.001 && fabs(t[1].y-t[2].y) <= 0.001 && fabs(t[1].z-t[2].z)<= 0.001) return true;
+    if (fabs(t[0].x-t[1].x) <= 0.01 && fabs(t[0].y-t[1].y) <= 0.001 && fabs(t[0].z-t[1].z)<= 0.001) return true;
+    if (fabs(t[0].x-t[2].x) <= 0.01 && fabs(t[0].y-t[2].y) <= 0.001 && fabs(t[0].z-t[2].z)<= 0.001) return true;
+    if (fabs(t[1].x-t[2].x) <= 0.01 && fabs(t[1].y-t[2].y) <= 0.001 && fabs(t[1].z-t[2].z)<= 0.001) return true;
 
     return false;
 }

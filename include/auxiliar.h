@@ -35,6 +35,7 @@ extern float Z_BUFFER[][Y_MAX];
 
 void copy_t(Vec3D src[], Vec3D dest[]);
 Vec3D normalize(Vec3D v);
+float length(Vec3D v);
 Vec3D cross(Vec3D a, Vec3D b);
 float dot(Vec3D a, Vec3D b);
 void split(int a[], char *s);

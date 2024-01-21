@@ -7,6 +7,10 @@ void copy_t(Vec3D src[],Vec3D d[]) {
     }
 }
 
+float length(Vec3D v) {
+    return sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+}
+
 Vec3D normalize(Vec3D v) {
     Vec3D r;
     float length = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
@@ -245,7 +249,6 @@ void measure_side(Vec3D v0, Vec3D v1) {
 }
 
 void h_line(int x1, int y1, int x2, int y2) {
-
     for(int x=x1; x<=x2; x++) {
         put_pixel(x,y1,color);
     }
@@ -279,7 +282,7 @@ void color_line(int x1, int y1, int x2, int y2, Point v[], bool enable_zbuffer) 
         b_coordinates(x,y1,v,t);
         if (enable_zbuffer) {
             w = calculate_w(x,y1,v,t);
-            if (w >= Z_BUFFER[x][y1]) {
+            if (w > Z_BUFFER[x][y1]) {
                 Z_BUFFER[x][y1] = w;
                 r=floor(v[0].r * t[0] + v[1].r * t[1] + v[2].r * t[2]);
                 g=floor(v[0].g * t[0] + v[1].g * t[1] + v[2].g * t[2]);
