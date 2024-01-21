@@ -1,3 +1,8 @@
+/**
+ * Smooth shading, remove hidden surface by z-buffer
+ * remove degenerate triangles (2 repeated vertices)
+*/
+
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_primitives.h>
@@ -19,11 +24,11 @@ unsigned int screen, row, col;
 float th = M_PI;
 
 Point M[N_VERTICES];
-BufferLine row_buffer[Y_MAX+1];
+BufferLine row_buffer[Y_MAX];
 
 const Vec3D VIEWPOINT = {5.5, -5.0, 6.0};
-const Vec3D LIGHT_SOURCE = {10, 10.0, 6.0};
-const float LIGHT_INTENSITY = 0.99;
+const Vec3D LIGHT_SOURCE = {10.0, 10.0, 6.0};
+const float LIGHT_INTENSITY = 0.89;
 float Z_BUFFER[X_MAX][Y_MAX];
 
 ALLEGRO_COLOR color;
@@ -113,8 +118,11 @@ Point *projection(Point p[]) {
         y = pp.y;
         xs = 80 * x + X_MAX / 2;
         ys = 80 * y + Y_MAX / 2;
-        poly[i].x = xs;
-        poly[i].y = ys;
+
+        //projection introduces errors, round before screen
+
+        poly[i].x = round(xs);
+        poly[i].y = round(ys);
         poly[i].z = pp.z;
 
         poly[i].r= p[i].r;
@@ -143,6 +151,10 @@ Point* lightModel(Vec3D patch[3], Vec3D normals[]) {
         m[i].r=(dot(normal, normalize(LIGHT_SOURCE))*LIGHT_INTENSITY)*128+128;
         m[i].g=(dot(normal, normalize(LIGHT_SOURCE))*LIGHT_INTENSITY)*128+128;
         m[i].b=(dot(normal, normalize(LIGHT_SOURCE))*LIGHT_INTENSITY)*128+128;
+
+        if (m[i].r<0) m[i].r =0;
+        if (m[i].g<0) m[i].g =0;
+        if (m[i].b<0) m[i].b =0;
     }
     return m;
 }
@@ -195,6 +207,19 @@ Vec3D bezier_normal(Vec3D C[], float u, float v) {
     return N;
 }
 
+bool invalid_triangle(Vec3D t[3]) {
+    if (t[0].x==t[1].x && t[0].y==t[1].y) return true;
+    if (t[0].x==t[2].x && t[0].y==t[2].y) return true;
+    if (t[1].x==t[2].x && t[1].y==t[2].y)  return true;
+
+    if (fabs(t[0].x-t[1].x) <= 0.01 && fabs(t[0].y-t[1].y) <= 0.001 && fabs(t[0].z-t[1].z)<= 0.001) return true;
+    if (fabs(t[0].x-t[2].x) <= 0.01 && fabs(t[0].y-t[2].y) <= 0.001 && fabs(t[0].z-t[2].z)<= 0.001) return true;
+    if (fabs(t[1].x-t[2].x) <= 0.01 && fabs(t[1].y-t[2].y) <= 0.001 && fabs(t[1].z-t[2].z)<= 0.001) return true;
+
+    return false;
+}
+
+
 void interpolate_mesh(Vec3D C[], float n) {
     float t = 0, s = 0;
     Point *poly;
@@ -203,8 +228,8 @@ void interpolate_mesh(Vec3D C[], float n) {
     float delta=1.0/n;
     Point *mpatch;
 
-    for (s = 0; s < 1.0; s += delta) {
-        for (t = 0; t < 1.0; t += delta) {
+    for (s = 0; s <= 1.0-delta; s += delta) {
+        for (t = 0; t <= 1.0-delta; t += delta) {
             patch[0] = bezier_curve(C, t, s);
             patch[1] = bezier_curve(C, t + delta, s);
             patch[2] = bezier_curve(C, t + delta, s + delta);
@@ -213,7 +238,7 @@ void interpolate_mesh(Vec3D C[], float n) {
             normals[1] = bezier_normal(C, t + delta, s);
             normals[2] = bezier_normal(C, t + delta, s + delta);
 
-            if (visible(patch)) {
+            if (visible(patch) && !invalid_triangle(patch)) {
                 mpatch =lightModel(patch, normals);
                 poly = projection(mpatch);
                 fill_triangle(poly, true);
@@ -226,7 +251,7 @@ void interpolate_mesh(Vec3D C[], float n) {
             normals[1] = bezier_normal(C, t + delta, s + delta);
             normals[2] = bezier_normal(C, t , s + delta);
 
-            if (visible(patch)) {
+            if (visible(patch) && !invalid_triangle(patch)) {
                 mpatch = lightModel(patch, normals);
                 poly = projection(mpatch);
                 fill_triangle(poly, true);
@@ -265,7 +290,7 @@ int draw(void) {
             patch[j].z = pp.z;
         }
 
-        interpolate_mesh(patch, 10.0);
+        interpolate_mesh(patch, 16.0);
     }
     return EXIT_SUCCESS;
 }
@@ -273,7 +298,7 @@ int draw(void) {
 int main() {
 
     for(int i=0; i<Y_MAX; i++) {
-        row_buffer[i].left=X_MAX;
+        row_buffer[i].left=X_MAX-1;
         row_buffer[i].right=0;
     }
 

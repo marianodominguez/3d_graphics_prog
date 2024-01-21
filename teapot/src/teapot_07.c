@@ -28,7 +28,7 @@ unsigned int screen, row, col;
 float th = M_PI;
 
 Point M[N_VERTICES];
-BufferLine row_buffer[Y_MAX+1];
+BufferLine row_buffer[Y_MAX];
 float Z_BUFFER[1][Y_MAX];
 
 const Vec3D VIEWPOINT = {5.5, -5.0, 6.0};

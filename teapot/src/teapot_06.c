@@ -21,7 +21,7 @@ unsigned int screen, row, col;
 float th = M_PI;
 
 Point M[N_VERTICES];
-BufferLine row_buffer[Y_MAX+1];
+BufferLine row_buffer[Y_MAX];
 
 const Vec3D VIEWPOINT = {5.5, -5.0, 6.0};
 const Vec3D LIGHT_SOURCE = {10, 10.0, 6.0};
@@ -159,10 +159,6 @@ bool invalid_triangle(Vec3D t[3]) {
     if (t[0].x==t[1].x && t[0].y==t[1].y && t[0].z==t[1].z) return true;
     if (t[0].x==t[2].x && t[0].y==t[2].y && t[0].z==t[2].z) return true;
     if (t[1].x==t[2].x && t[1].y==t[2].y && t[1].z==t[2].z) return true;
-
-    if (fabs(t[0].x-t[1].x) <= 0.001 && fabs(t[0].y-t[1].y) <= 0.001 && fabs(t[0].z-t[1].z)<= 0.001) return true;
-    if (fabs(t[0].x-t[2].x) <= 0.001 && fabs(t[0].y-t[2].y) <= 0.001 && fabs(t[0].z-t[2].z)<= 0.001) return true;
-    if (fabs(t[1].x-t[2].x) <= 0.001 && fabs(t[1].y-t[2].y) <= 0.001 && fabs(t[1].z-t[2].z)<= 0.001) return true;
 
     return false;
 }

@@ -199,14 +199,12 @@ Vec3D bezier_normal(Vec3D C[], float u, float v) {
 }
 
 bool invalid_triangle(Vec3D t[3]) {
-    if (t[0].x==t[1].x && t[0].y==t[1].y) return true;
-    if (t[0].x==t[2].x && t[0].y==t[2].y) return true;
-    if (t[1].x==t[2].x && t[1].y==t[2].y)  return true;
+    Vec3D ac,ab;
+    ac=(Vec3D) {t[2].x-t[0].x,t[2].y-t[0].y,t[2].z-t[0].z};
+    ab=(Vec3D) {t[1].x-t[0].x,t[1].y-t[0].y,t[1].z-t[0].z};
+    float a = 0.5*length(cross(ac,ab));
 
-    if (fabs(t[0].x-t[1].x) <= 0.01 && fabs(t[0].y-t[1].y) <= 0.001 && fabs(t[0].z-t[1].z)<= 0.001) return true;
-    if (fabs(t[0].x-t[2].x) <= 0.01 && fabs(t[0].y-t[2].y) <= 0.001 && fabs(t[0].z-t[2].z)<= 0.001) return true;
-    if (fabs(t[1].x-t[2].x) <= 0.01 && fabs(t[1].y-t[2].y) <= 0.001 && fabs(t[1].z-t[2].z)<= 0.001) return true;
-
+    if (a<=0.00001) return true;
     return false;
 }
 
@@ -218,8 +216,8 @@ void interpolate_mesh(Vec3D C[], float n) {
     float delta=1.0/n;
     Point *mpatch;
 
-    for (s =  0; s <= 1.0-delta; s += delta) {
-        for (t = 0; t <= 1.0-delta; t += delta) {
+    for (s =  0; s <= 1.0; s += delta) {
+        for (t = 0; t <= 1.0; t += delta) {
             patch[0] = bezier_curve(C, t, s);
             patch[1] = bezier_curve(C, t + delta, s);
             patch[2] = bezier_curve(C, t + delta, s + delta);
@@ -280,7 +278,7 @@ int draw(void) {
             patch[j].z = pp.z;
         }
 
-        interpolate_mesh(patch, 16.0);
+        interpolate_mesh(patch, 64.0);
     }
     return EXIT_SUCCESS;
 }
