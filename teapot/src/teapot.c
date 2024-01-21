@@ -22,8 +22,8 @@ Point M[N_VERTICES];
 BufferLine row_buffer[Y_MAX];
 
 const Vec3D VIEWPOINT = {5.5, -5.0, 6.0};
-const Vec3D LIGHT_SOURCE = {10.0, 5.0, 10.0};
-const float LIGHT_INTENSITY = 1.0;
+const Vec3D LIGHT_SOURCE = {10, 10.0, 6.0};
+const float LIGHT_INTENSITY = 0.45;
 float Z_BUFFER[X_MAX][Y_MAX];
 
 ALLEGRO_COLOR color;
@@ -136,9 +136,9 @@ Point* lightModel(Vec3D patch[3], Vec3D normals[]) {
         m[i].y=patch[i].y;
         m[i].z=patch[i].z;
 
-        m[i].r=(dot(normal, normalize(LIGHT_SOURCE))*LIGHT_INTENSITY)*130+150;
-        m[i].g=(dot(normal, normalize(LIGHT_SOURCE))*LIGHT_INTENSITY)*130+150;
-        m[i].b=(dot(normal, normalize(LIGHT_SOURCE))*LIGHT_INTENSITY)*130+150;
+        m[i].r=(dot(normal, normalize(LIGHT_SOURCE))*LIGHT_INTENSITY)*128+128;
+        m[i].g=(dot(normal, normalize(LIGHT_SOURCE))*LIGHT_INTENSITY)*128+128;
+        m[i].b=(dot(normal, normalize(LIGHT_SOURCE))*LIGHT_INTENSITY)*128+128;
 
         if (m[i].r<0) m[i].r =0;
         if (m[i].g<0) m[i].g =0;
@@ -218,8 +218,8 @@ void interpolate_mesh(Vec3D C[], float n) {
     float delta=1.0/n;
     Point *mpatch;
 
-    for (s = 0; s <= 1.0-delta; s += delta) {
-        for (t = 0; t <= 1.0-delta; t += delta) {
+    for (s =  0; s <= 1.0; s += delta) {
+        for (t = 0; t <= 1.0; t += delta) {
             patch[0] = bezier_curve(C, t, s);
             patch[1] = bezier_curve(C, t + delta, s);
             patch[2] = bezier_curve(C, t + delta, s + delta);

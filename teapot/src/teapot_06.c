@@ -147,8 +147,24 @@ Point* lightModel(Vec3D patch[3]) {
         m[i].r=(dot(normal, normalize(LIGHT_SOURCE))*LIGHT_INTENSITY)*128+128;
         m[i].g=(dot(normal, normalize(LIGHT_SOURCE))*LIGHT_INTENSITY)*128+128;
         m[i].b=(dot(normal, normalize(LIGHT_SOURCE))*LIGHT_INTENSITY)*128+128;
+
+        if (m[i].r<0) m[i].r =0;
+        if (m[i].g<0) m[i].g =0;
+        if (m[i].b<0) m[i].b =0;
     }
     return m;
+}
+
+bool invalid_triangle(Vec3D t[3]) {
+    if (t[0].x==t[1].x && t[0].y==t[1].y && t[0].z==t[1].z) return true;
+    if (t[0].x==t[2].x && t[0].y==t[2].y && t[0].z==t[2].z) return true;
+    if (t[1].x==t[2].x && t[1].y==t[2].y && t[1].z==t[2].z) return true;
+
+    if (fabs(t[0].x-t[1].x) <= 0.001 && fabs(t[0].y-t[1].y) <= 0.001 && fabs(t[0].z-t[1].z)<= 0.001) return true;
+    if (fabs(t[0].x-t[2].x) <= 0.001 && fabs(t[0].y-t[2].y) <= 0.001 && fabs(t[0].z-t[2].z)<= 0.001) return true;
+    if (fabs(t[1].x-t[2].x) <= 0.001 && fabs(t[1].y-t[2].y) <= 0.001 && fabs(t[1].z-t[2].z)<= 0.001) return true;
+
+    return false;
 }
 
 void interpolate_mesh(Vec3D C[], float n) {
@@ -158,13 +174,13 @@ void interpolate_mesh(Vec3D C[], float n) {
     float delta=1.0/n;
     Point *mpatch;
 
-    for (s = 0; s < 1.0; s += delta) {
-        for (t = 0; t < 1.0; t += delta) {
+    for (s = 0; s <= 1.0-delta; s += delta) {
+        for (t = 0; t <= 1.0-delta; t += delta) {
             patch[0] = bezier_curve(C, t, s);
             patch[1] = bezier_curve(C, t + delta, s);
             patch[2] = bezier_curve(C, t + delta, s + delta);
 
-            if (visible(patch)) {
+            if (visible(patch) && !invalid_triangle(patch)) {
                 mpatch =lightModel(patch);
                 poly = projection(mpatch);
 
@@ -174,7 +190,7 @@ void interpolate_mesh(Vec3D C[], float n) {
             patch[1] = bezier_curve(C, t + delta, s + delta);
             patch[2] = bezier_curve(C, t, s + delta);
 
-            if (visible(patch)) {
+            if (visible(patch) && !invalid_triangle(patch)) {
                 mpatch = lightModel(patch);
                 poly = projection(mpatch);
 
@@ -214,7 +230,7 @@ int draw(void) {
             patch[j].z = pp.z;
         }
 
-        interpolate_mesh(patch, 10.0);
+        interpolate_mesh(patch, 12.0);
     }
     return EXIT_SUCCESS;
 }
