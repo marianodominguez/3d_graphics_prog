@@ -9,7 +9,7 @@ OBJS= main.o
 CXX=gcc
 COMPILER_FLAGS= -g -O -Wno-parentheses-equality
 #INCLUDE= -I/usr/include/aarch64-linux-gnu
-INCLUDE=-I include
+INCLUDE=-I include -I /usr/local/include
 LIBS= -lallegro_font -lallegro -lm -lallegro_primitives -lallegro_main
 
 cube:
@@ -51,6 +51,9 @@ all: clean teapot_01 teapot_02 teapot_03 teapot_04 teapot_05 teapot_06 teapot_07
 	$(CXX) $(COMPILER_FLAGS) -o bin/test_triangle basic/src/test_triangle.c teapot/src/auxiliar.c $(INCLUDE) $(LIBS)
 	$(CXX) $(COMPILER_FLAGS) -o bin/test_lines basic/src/test_lines.c teapot/src/auxiliar.c $(INCLUDE) $(LIBS)
 
+
+gl_cube:
+	$(CXX) $(COMPILER_FLAGS) -o bin/$@ gl/src/cube.c $(INCLUDE) -lglfw -lGL -lX11 -lpthread -lXrandr -lXi -ldl -lcairo -lwayland-server -lwayland-client -lwayland-cursor -lwayland-egl -lm
 
 clean:
 	rm -rf bin/*
