@@ -30,9 +30,10 @@ brew install allegro
 Pass the program name, e.g.
 
 ```
-cd teapot
 
 make teapot_01
+
+# or 'make all' to create all binaries
 
 bin/teapot_01
 ```
