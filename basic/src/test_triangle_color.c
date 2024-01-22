@@ -17,13 +17,11 @@ BufferLine row_buffer[600];
 float Z_BUFFER[1][Y_MAX];
 
 void draw() {
-    al_lock_bitmap(al_get_backbuffer(disp), ALLEGRO_PIXEL_FORMAT_ANY, 0);
     ALLEGRO_COLOR lc = al_map_rgb(255, 255, 255);
     line(M[0].x, M[0].y, M[1].x, M[1].y, lc);
     line(M[0].x, M[0].y, M[2].x, M[2].y, lc);
     line(M[1].x, M[1].y, M[2].x, M[2].y, lc);
     fill_triangle(M,false);
-    al_unlock_bitmap(al_get_backbuffer(disp));
 }
 
 int main() {
@@ -88,7 +86,9 @@ int main() {
             al_clear_to_color(al_map_rgb(0, 0, 0));
             al_draw_text(font, al_map_rgb(255, 255, 255), 0, 0, 0, "Triangle fill");
 
+            al_lock_bitmap(al_get_backbuffer(disp), ALLEGRO_PIXEL_FORMAT_ANY, 0);
             draw();
+            al_unlock_bitmap(al_get_backbuffer(disp));
             al_flip_display();
 
             redraw = false;

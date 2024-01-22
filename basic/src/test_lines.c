@@ -17,16 +17,9 @@ float Z_BUFFER[1][Y_MAX];
 
 void draw() {
     color = al_map_rgb(128, 128, 255);
-    // for(int x=0; x<X_MAX; x+=1) {
-    //     line(x,0,x,Y_MAX-1, lc);
-    //     //al_draw_line(x,0,X_MAX-x,Y_MAX, lc, 1.0);
-    // }
-    // al_clear_to_color(al_map_rgb(0, 0, 0));
-    al_lock_bitmap(al_get_backbuffer(disp), ALLEGRO_PIXEL_FORMAT_ANY, 0);
     for(int x=0; x<X_MAX; x+=3) {
         line(x,0,X_MAX-x,Y_MAX,color);
     }
-    al_unlock_bitmap(al_get_backbuffer(disp));
 }
 
 int main() {
@@ -62,7 +55,9 @@ int main() {
             al_clear_to_color(al_map_rgb(0, 0, 0));
             al_draw_text(font, al_map_rgb(255, 255, 255), 0, 0, 0, "Line fill");
 
+            al_lock_bitmap(al_get_backbuffer(disp), ALLEGRO_PIXEL_FORMAT_ANY, 0);
             draw();
+            al_unlock_bitmap(al_get_backbuffer(disp));
             al_flip_display();
 
             redraw = false;

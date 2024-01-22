@@ -7,7 +7,7 @@ MACHINE= $(shell uname -s)
 # object files have corresponding source files
 OBJS= main.o
 CXX=gcc
-COMPILER_FLAGS= -g -O -W
+COMPILER_FLAGS= -g -O -Wno-parentheses-equality
 #INCLUDE= -I/usr/include/aarch64-linux-gnu
 INCLUDE=-I include
 LIBS= -lallegro_font -lallegro -lm -lallegro_primitives -lallegro_main

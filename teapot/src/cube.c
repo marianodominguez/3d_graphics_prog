@@ -205,8 +205,9 @@ int main()
         {
             al_clear_to_color(al_map_rgb(0, 0, 0));
             al_draw_text(font, al_map_rgb(255, 255, 255), 0, 0, 0, "3D cube");
-
+            al_lock_bitmap(al_get_backbuffer(disp), ALLEGRO_PIXEL_FORMAT_ANY, 0);
             cube();
+            al_unlock_bitmap(al_get_backbuffer(disp));
             al_flip_display();
 
             redraw = false;

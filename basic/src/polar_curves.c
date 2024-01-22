@@ -59,7 +59,10 @@ int main() {
             sprintf(buffer,"2D shapes: k=%.3f,l=%.3f", k,l);
             al_draw_text(font, al_map_rgb(255, 255, 255), 0, 0, 0, buffer);
 
+            al_lock_bitmap(al_get_backbuffer(disp), ALLEGRO_PIXEL_FORMAT_ANY, 0);
             draw();
+            al_unlock_bitmap(al_get_backbuffer(disp));
+            
             th=0;
             //r2+=1;
 
