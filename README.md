@@ -8,14 +8,21 @@ This is a progression of writing a basic rendering pipeline, it should work in a
 
 ## Installing libraries and requirements
 
-ubuntu/raspbian
-most of them are already installed: a c compiler, makefile and basic libraries,
+## ubuntu/raspbian
+
+Most of them are already installed: a c compiler, makefile and basic libraries,
 this should cover it.
 
 
 ```
  sudo apt install build-essential
  sudo apt install liballegro5
+```
+
+## OSX
+
+```
+brew install allegro
 ```
 
 ## Runing the program with makefiles
@@ -30,7 +37,7 @@ make teapot_01
 bin/teapot_01
 ```
 
-## contents
+## Contents
 
 - /basic/src/polar_curves
 
@@ -44,29 +51,44 @@ Draws and rotates a bezier patch, interpolating 10 points
 
 Minimal 3D example, a rotating wireframe cube
 
--/teapot/teapot_01
+- /teapot/teapot_01
+
 Wireframe model, projection, translation and rotation
 
--/teapot/teapot_02
+- /teapot/teapot_02
+
 Testing a naive linear interpolation, it does not generate proper polygons.
 
--/teapot/teapot_03
+- /teapot/teapot_03
+
 Wireframe interpolation with Bezier patches
 
--/teapot/teapot_04
+- /teapot/teapot_04
+
 Backface culling, using normals
 
--/teapot/teapot_05
+- /teapot/teapot_05
+
 Triangle filling and rasterization algorithm
 
--/teapot/teapot_06
+- /teapot/teapot_06
+
 Flat shading
 
--/teapot/teapot_07
-Smooth shading, Goreaud algorithm, use derivatives to calculate normals.
+- /teapot/teapot_07
 
--/teapot/teapot_08
+Smooth shading, Gouraud algorithm, use derivatives to calculate normals.
+
+- /teapot/teapot_08
+
 Z-Buffer, hiding surfaces.
 
-Succesive steps of rendering (WIP)
+# References
+
+1. https://www.gabrielgambetta.com/computer-graphics-from-scratch/
+
+1. https://cs.brown.edu/people/jhughes/papers/vanDam-CGP-1995/main.htm
+
+1. https://www.scratchapixel.com/lessons/geometry/bezier-curve-rendering-utah-teapot/bezier-patch-normal.html
+
 
