@@ -6,7 +6,9 @@
         "cmath": "c",
         "complex": "c",
         "random": "c",
-        "math.h": "c"
+        "math.h": "c",
+        "glfw3.h": "c",
+        "string_view": "c"
     },
     "makefile.configurations": [
         {
@@ -36,13 +38,18 @@
         },
         {
             "cwd": "/home/mariano/3d_graphics_prog",
-            "name":"teapot",
+            "name": "teapot",
             "binaryPath": "/home/mariano/3d_graphics_prog/bin/teapot",
             "binaryArgs": []
         },
         {
             "cwd": "/home/mariano/3d_graphics_prog/bin",
             "binaryPath": "/home/mariano/3d_graphics_prog/bin/test_triangle_color",
+            "binaryArgs": []
+        },
+        {
+            "cwd": "/home/mariano/3d_graphics_prog/bin",
+            "binaryPath": "/home/mariano/3d_graphics_prog/bin/gl_cube",
             "binaryArgs": []
         }
     ],

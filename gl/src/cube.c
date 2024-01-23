@@ -1,8 +1,7 @@
 
-#include <GLES2/gl2.h>
-#include <EGL/egl.h>
+#define GLEW_STATIC
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
-
 #include "linmath.h"
 #include <math.h>
 #include <stdlib.h>
@@ -52,24 +51,63 @@ static const struct
     {1.0f,-1.0f, 1.0f}
 };
 
+GLfloat light_position[] = { 1.0, 1.0, 1.0, 0.0 };
+
 static const char* vertex_shader_text =
-"#version 110\n"
-"uniform mat4 MVP;\n"
-"attribute vec3 vCol;\n"
-"attribute vec3 vPos;\n"
-"varying vec3 color;\n"
-"void main()\n"
-"{\n"
-"    gl_Position = MVP * vec4(vPos, 1.0);\n"
-"    color = vec3(1.0,1.0,1.0);\n"
+"#version 150\n"
+"uniform mat4 camera;\n"
+"uniform mat4 model;\n"
+"in vec3 vert;\n"
+"in vec2 vertTexCoord;\n"
+"in vec3 vertNormal;\n"
+"out vec3 fragVert;\n"
+"out vec2 fragTexCoord;\n"
+"out vec3 fragNormal;\n"
+"void main() {\n"
+"    // Pass some variables to the fragment shader\n"
+"    fragTexCoord = vertTexCoord;\n"
+"    fragNormal = vertNormal;\n"
+"    fragVert = vert;\n"
+"\n"
+"    // Apply all matrix transformations to vert\n"
+"    gl_Position = camera * model * vec4(vert, 1);\n"
 "}\n";
 
 static const char* fragment_shader_text =
-"#version 110\n"
-"varying vec3 color;\n"
-"void main()\n"
-"{\n"
-"    gl_FragColor = vec4(color, 1.0);\n"
+"#version 150\n"
+"\n"
+"uniform mat4 model;\n"
+"uniform sampler2D tex;\n"
+"\n"
+"uniform struct Light {\n"
+"   vec3 position;\n"
+"   vec3 intensities; //a.k.a the color of the light\n"
+"} light;\n"
+"in vec2 fragTexCoord;\n"
+"in vec3 fragNormal;\n"
+"in vec3 fragVert;\n"
+"out vec4 finalColor;\n"
+"void main() {\n"
+"    //calculate normal in world coordinates\n"
+"    mat3 normalMatrix = transpose(inverse(mat3(model)));\n"
+"    vec3 normal = normalize(normalMatrix * fragNormal);\n"
+"\n"
+"    //calculate the location of this fragment (pixel) in world coordinates\n"
+"    vec3 fragPosition = vec3(model * vec4(fragVert, 1));\n"
+"\n"
+"    //calculate the vector from this pixels surface to the light source\n"
+"    vec3 surfaceToLight = light.position - fragPosition;\n"
+"\n"
+"    //calculate the cosine of the angle of incidence\n"
+"    float brightness = dot(normal, surfaceToLight) / (length(surfaceToLight) * length(normal));\n"
+"    brightness = clamp(brightness, 0, 1);\n"
+"\n"
+"    //calculate final color of the pixel, based on:\n"
+"    // 1. The angle of incidence: brightness\n"
+"    // 2. The color/intensities of the light: light.intensities\n"
+"    // 3. The texture and texture coord: texture(tex, fragTexCoord)\n"
+"    vec4 surfaceColor = texture(tex, fragTexCoord);\n"
+"    finalColor = vec4(brightness * light.intensities * surfaceColor.rgb, surfaceColor.a);\n"
 "}\n";
 
 static void error_callback(int error, const char* description)
@@ -107,11 +145,19 @@ int main(void)
     glfwSetKeyCallback(window, key_callback);
 
     glfwMakeContextCurrent(window);
+    glewExperimental = GL_TRUE;
+    glewInit();
     glfwSwapInterval(1);
 
     // NOTE: OpenGL error checks have been omitted for brevity
 
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+    glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glShadeModel(GL_SMOOTH);
+
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -140,6 +186,9 @@ int main(void)
     //glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE,
       //                    sizeof(vertices[0]), (void*) (sizeof(float) * 2));
 
+    GLfloat cyan[] = {0.f, .8f, .8f, 1.f};
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, cyan);
+
     while (!glfwWindowShouldClose(window))
     {
         float ratio;
@@ -166,7 +215,6 @@ int main(void)
         );
         mat4x4_mul(mvp, v, m);
         mat4x4_mul(mvp, p, mvp);
-
 
         glUseProgram(program);
         glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*) mvp);
