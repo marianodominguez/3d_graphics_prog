@@ -53,7 +53,7 @@ all: clean teapot_01 teapot_02 teapot_03 teapot_04 teapot_05 teapot_06 teapot_07
 
 
 gl_cube:
-	$(CXX) $(COMPILER_FLAGS) -o bin/$@ gl/src/cube.c $(INCLUDE) -lglfw -lGL -lX11 -lpthread -lXrandr -lXi -ldl -lcairo -lwayland-server -lwayland-client -lwayland-cursor -lwayland-egl -lm
+	$(CXX) $(COMPILER_FLAGS) -o bin/$@ gl/src/cube.c $(INCLUDE) -lglfw -lGLEW -framework OpenGL -lm
 
 clean:
 	rm -rf bin/*
