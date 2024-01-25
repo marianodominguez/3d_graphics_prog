@@ -60,7 +60,7 @@ static const char* vertex_shader_text =
 "void main()\n"
 "{\n"
 "    gl_Position = MVP * vec4(vPos, 1.0);\n"
-"    color = vec3(1.0,1.0,1.0);\n"
+"    Normal = mat3(transpose(inverse(model))) * aNormal;
 "}\n";
 
 static const char* fragment_shader_text =
@@ -140,6 +140,16 @@ int main(void)
     //glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE,
       //                    sizeof(vertices[0]), (void*) (sizeof(float) * 2));
 
+
+    static GLfloat pos[4] = {5.f, 5.f, 10.f, 0.f};
+    glLightfv(GL_LIGHT0, GL_POSITION, pos);
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_DEPTH_TEST);
+    glShadeModel(GL_SMOOTH);
+    glEnable(GL_NORMALIZE);
+
     while (!glfwWindowShouldClose(window))
     {
         float ratio;
@@ -170,6 +180,7 @@ int main(void)
 
         glUseProgram(program);
         glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*) mvp);
+        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, (GLfloat[]){0.8f, 0.1f, 0.f, 1.f});
         glDrawArrays(GL_TRIANGLES, 0, 3*12);
 
         glfwSwapBuffers(window);
