@@ -6,7 +6,8 @@
         "cmath": "c",
         "complex": "c",
         "random": "c",
-        "math.h": "c"
+        "math.h": "c",
+        "stdlib.h": "c"
     },
     "makefile.configurations": [
         {

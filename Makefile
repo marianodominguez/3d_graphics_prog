@@ -3,6 +3,10 @@ default: teapot ;
 
 ############
 MACHINE= $(shell uname -s)
+GL_LIBS= -lglfw -lGLEW -lm -framework OpenGL
+ifeq ($(MACHINE),Linux)
+	GL_LIBS=-lglfw -lGLEW -lm -lGL
+endif
 
 # object files have corresponding source files
 OBJS= main.o
@@ -53,7 +57,7 @@ all: clean teapot_01 teapot_02 teapot_03 teapot_04 teapot_05 teapot_06 teapot_07
 
 
 gl_cube:
-	$(CXX) $(COMPILER_FLAGS) -o bin/$@ gl/src/cube.c $(INCLUDE) -lglfw -lGLEW -framework OpenGL -lm
+	$(CXX) $(COMPILER_FLAGS) -o bin/$@ gl/src/cube.c $(INCLUDE) $(GL_LIBS)
 
 clean:
 	rm -rf bin/*
