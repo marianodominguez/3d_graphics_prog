@@ -8,10 +8,7 @@
 #include <stdio.h>
 
 
-static const struct
-{
-    float x, y,z;
-} vertices[3*12] =
+vec3 vertices[3*12] =
 {
     {-1.0f,-1.0f,-1.0f}, // triangle 1 : begin
     {-1.0f,-1.0f, 1.0f},
@@ -50,16 +47,27 @@ static const struct
     {-1.0f, 1.0f, 1.0f},
     {1.0f,-1.0f, 1.0f}
 };
+static vec3 normals[3*12];
 
 static const char* vertex_shader_text =
 "#version 330\n"
 "uniform mat4 MVP;\n"
+"uniform mat4 MV;\n"
 "attribute vec3 vPos;\n"
+"attribute vec3 vNormal;\n"
 "varying vec3 color;\n"
+"uniform vec4 LightPosition,DiffuseProduct;\n"
+
 "void main()\n"
 "{\n"
-"    color=vec3(1.0,0.5,0.9);\n"
-"    gl_Position = MVP * vec4(vPos, 1.0);\n"
+"    vec3 position = MV * vec4(vPos, 1.0).xyz;\n"
+"    vec3 L = normalize(LightPosition.xyz - position);\n"
+"    vec3 V = normalize(-position);\n"
+"    vec3 N= normalize( MV*vec4(vNormal,0.0).xyz );\n"
+"    vec4 diffuse = max( dot(L,N),0.0)*DiffuseProduct;\n"
+"    position = MVP * vec4(vPos, 1.0);\n"
+"    color=diffuse;\n"
+"    color.a=1.0;\n"
 "}\n";
 
 static const char* fragment_shader_text =
@@ -85,7 +93,7 @@ int main(void)
 {
     GLFWwindow* window;
     GLuint vertex_buffer, vertex_shader, fragment_shader, program;
-    GLint mvp_location, vpos_location, vcol_location;
+    GLint mvp_location, vpos_location, vcol_location,mv_location;
 
     glfwSetErrorCallback(error_callback);
 
@@ -129,19 +137,28 @@ int main(void)
     glLinkProgram(program);
 
     mvp_location = glGetUniformLocation(program, "MVP");
+    mv_location = glGetUniformLocation(program, "MV");
     vpos_location = glGetAttribLocation(program, "vPos");
+    GLint light_location = glGetUniformLocation(program, "LightPosition");
+    GLint diffuse_p_location = glGetUniformLocation(program, "DiffuseProduct");
+    GLint normal_location = glGetUniformLocation(program, "vNormal");
     //vcol_location = glGetAttribLocation(program, "vCol");
 
     glEnableVertexAttribArray(vpos_location);
     glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
                           sizeof(vertices[0]), (void*) 0);
+
+    glVertexAttribPointer(normal_location, 3, GL_FLOAT, GL_FALSE,
+                          sizeof(normals[0]), (void*) 0);
+
     //glEnableVertexAttribArray(vcol_location);
     //glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE,
       //                    sizeof(vertices[0]), (void*) (sizeof(float) * 2));
 
 
-    static GLfloat pos[4] = {5.f, 5.f, 10.f, 0.f};
-    glLightfv(GL_LIGHT0, GL_POSITION, pos);
+    static vec3 LightPosition = (vec3){5.0f, 5.0f, 10.0f};
+    static vec3 DiffuseProduct = (vec3){1.0f, 1.0f, 1.0f};
+
     glEnable(GL_CULL_FACE);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
@@ -153,7 +170,7 @@ int main(void)
     {
         float ratio;
         int width, height;
-        mat4x4 m, p, mvp,v;
+        mat4x4 m,p,mvp,v,mv;
 
         glfwGetFramebufferSize(window, &width, &height);
         ratio = width / (float) height;
@@ -173,13 +190,15 @@ int main(void)
         (vec3){0,0,0}, // and looks at the origin
         (vec3){0,1,0}  // Head is up (set to 0,-1,0 to look upside-down)
         );
-        mat4x4_mul(mvp, v, m);
-        mat4x4_mul(mvp, p, mvp);
-
+        mat4x4_mul(mv, v, m);
+        mat4x4_mul(mvp, p, mv);
 
         glUseProgram(program);
+        glUniformMatrix4fv(mv_location, 1, GL_FALSE, (const GLfloat*) mv);
         glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*) mvp);
-        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, (GLfloat[]){0.8f, 0.1f, 0.f, 1.f});
+        glUniform3fv(light_location,1,(const GLfloat*) LightPosition);
+        glUniform3fv(diffuse_p_location,1,(const GLfloat*) DiffuseProduct);
+
         glDrawArrays(GL_TRIANGLES, 0, 3*12);
 
         glfwSwapBuffers(window);
