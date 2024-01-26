@@ -54,11 +54,11 @@ static const struct
 static const char* vertex_shader_text =
 "#version 330\n"
 "uniform mat4 MVP;\n"
-"attribute vec3 vCol;\n"
 "attribute vec3 vPos;\n"
 "varying vec3 color;\n"
 "void main()\n"
 "{\n"
+"    color=vec3(1.0,0.5,0.9);\n"
 "    gl_Position = MVP * vec4(vPos, 1.0);\n"
 "}\n";
 
