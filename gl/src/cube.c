@@ -50,7 +50,7 @@ static const vec3 vertices[nvertices] =
 };
 
 static vec3 normals[nvertices];
-static vec3 LightPosition  = (vec3){3.0f, 3.0f, 5.0f};
+static vec3 LightPosition  = (vec3){1.2f, 1.0f, 2.0f};
 
 static const char* vertex_shader_text =
 "#version 330 core\n"
@@ -65,7 +65,7 @@ static const char* vertex_shader_text =
 "{\n"
 "    FragPos =vec3( M * vec4(vPos, 1.0) );\n"
 "    Normal = vNormal;\n"
-"    gl_Position = P*V*vec4(FragPos, 1.0);\n"
+"    gl_Position = P*V*M*vec4(vPos, 1.0);\n"
 "}\n";
 
 static const char* fragment_shader_text =
@@ -75,11 +75,11 @@ static const char* fragment_shader_text =
 "uniform vec3 lightPos;\n"
 "void main()\n"
 "{\n"
-"    vec3 ambient = vec3(0.3,0.3,0.3);\n"
+"    float ambient = 0.2;\n"
 "    vec3 norm = normalize(Normal);\n"
 "    vec3 lightDir = normalize(lightPos - FragPos);\n"
 "    float diff = max(dot(norm, lightDir), 0.0);\n"
-"    vec3 color = diff*vec3(1.0,1.0,1.0)+ambient;\n"
+"    vec3 color = diff+ambient*vec3(1.0,0.2,1.0);\n"
 "    gl_FragColor = vec4(color, 1.0);\n"
 "}\n";
 
