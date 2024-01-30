@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define nvertices 3*12
+#define nvertices 36
 
 static const vec3 vertices[nvertices] =
 {
@@ -50,7 +50,7 @@ static const vec3 vertices[nvertices] =
 };
 
 static vec3 normals[nvertices];
-static vec3 LightPosition  = (vec3){5.0f, 5.0f, 10.0f};
+static vec3 LightPosition  = (vec3){3.0f, 3.0f, 5.0f};
 
 static const char* vertex_shader_text =
 "#version 330 core\n"
@@ -105,9 +105,7 @@ void makeNormalMatrix() {
         vec3_mul_cross(normals[i],ac,ab);
         vec3_mul_cross(normals[i+1],bc,ba);
         vec3_mul_cross(normals[i+2],ac,bc);
-
     }
-    vec3_mul_cross(normals[nvertices-1],vertices[nvertices-1], vertices[0]);
 }
 
 int main(void)
@@ -138,9 +136,9 @@ int main(void)
     glewInit();
     glfwSwapInterval(1);
 
-    // NOTE: OpenGL error checks have been omitted for brevity
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
 
-    //glEnable(GL_DEPTH_TEST);
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
