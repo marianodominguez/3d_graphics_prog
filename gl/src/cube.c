@@ -208,7 +208,7 @@ int main(void)
     {
         float ratio;
         int width, height;
-        mat4x4 m, p, mvp,v;
+        mat4x4 m, p,v;
 
         glfwGetFramebufferSize(window, &width, &height);
         ratio = width / (float) height;
@@ -218,6 +218,7 @@ int main(void)
 
         mat4x4_identity(m);
         mat4x4_rotate_X(m, m, (float) glfwGetTime());
+        mat4x4_scale(m,m,3.0);
         //mat4x4_rotate_Y(m, m, (float) glfwGetTime());
         mat4x4_rotate_Z(m, m, (float) glfwGetTime());
 
@@ -229,9 +230,6 @@ int main(void)
         (vec3){0,0,0}, // and looks at the origin
         (vec3){0,1,0}  // Head is up (set to 0,-1,0 to look upside-down)
         );
-        mat4x4_mul(mvp, v, m);
-        mat4x4_mul(mvp, p, mvp);
-
 
         glUseProgram(program);
         glUniformMatrix4fv(m_location, 1, GL_FALSE, (const GLfloat*) m);
