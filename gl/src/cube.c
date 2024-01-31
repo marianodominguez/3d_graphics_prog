@@ -70,12 +70,12 @@ static vec3 normals[nvertices] =
         {0.0f,  0.0f,  1.0f},
         {0.0f,  0.0f,  1.0f},
 
-        {1.0f,  0.0f,  0.0f},
-        {1.0f,  0.0f,  0.0f},
-        {1.0f,  0.0f,  0.0f},
-        {1.0f,  0.0f,  0.0f},
-        {1.0f,  0.0f,  0.0f},
-        {1.0f,  0.0f,  0.0f},
+        {-1.0f,  0.0f,  0.0f},
+        {-1.0f,  0.0f,  0.0f},
+        {-1.0f,  0.0f,  0.0f},
+        {-1.0f,  0.0f,  0.0f},
+        {-1.0f,  0.0f,  0.0f},
+        {-1.0f,  0.0f,  0.0f},
 
         {1.0f,  0.0f,  0.0f},
         {1.0f,  0.0f,  0.0f},
@@ -99,7 +99,7 @@ static vec3 normals[nvertices] =
         {0.0f,  1.0f,  0.0f}
 };
 
-static vec3 LightPosition  = (vec3){1.2f, 1.0f, 2.0f};
+static vec3 LightPosition  = (vec3){2.0f, 3.0f, 2.0f};
 
 static const char* vertex_shader_text =
 "#version 330 core\n"
@@ -172,7 +172,6 @@ int main(void)
     glfwSwapInterval(1);
 
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
 
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
@@ -220,13 +219,13 @@ int main(void)
         mat4x4_identity(m);
         mat4x4_rotate_X(m, m, (float) glfwGetTime());
         //mat4x4_rotate_Y(m, m, (float) glfwGetTime());
-        //mat4x4_rotate_Z(m, m, (float) glfwGetTime());
+        mat4x4_rotate_Z(m, m, (float) glfwGetTime());
 
         mat4x4_perspective(p, M_PI/2 , (float) width / (float)height, 0.1f, 100.0f);
 
         // Camera matrix
         mat4x4_look_at(v,
-        (vec3){3,2,2}, // Camera in World Space
+        (vec3){2,2,3}, // Camera in World Space
         (vec3){0,0,0}, // and looks at the origin
         (vec3){0,1,0}  // Head is up (set to 0,-1,0 to look upside-down)
         );
