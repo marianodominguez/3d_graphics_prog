@@ -11,45 +11,94 @@
 
 static const vec3 vertices[nvertices] =
 {
-    {-1.0f,-1.0f,-1.0f}, // triangle 1 : begin
-    {-1.0f,-1.0f, 1.0f},
-    {-1.0f, 1.0f, 1.0f}, // triangle 1 : end
-    {1.0f, 1.0f,-1.0f}, // triangle 2 : begin
-    {-1.0f,-1.0f,-1.0f},
-    {-1.0f, 1.0f,-1.0f}, // triangle 2 : end
-    {1.0f,-1.0f, 1.0f},
-    {-1.0f,-1.0f,-1.0f},
-    {1.0f,-1.0f,-1.0f},
-    {1.0f, 1.0f,-1.0f},
-    {1.0f,-1.0f,-1.0f},
-    {-1.0f,-1.0f,-1.0f},
-    {-1.0f,-1.0f,-1.0f},
-    {-1.0f, 1.0f, 1.0f},
-    {-1.0f, 1.0f,-1.0f},
-    {1.0f,-1.0f, 1.0f},
-    {-1.0f,-1.0f, 1.0f},
-    {-1.0f,-1.0f,-1.0f},
-    {-1.0f, 1.0f, 1.0f},
-    {-1.0f,-1.0f, 1.0f},
-    {1.0f,-1.0f, 1.0f},
-    {1.0f, 1.0f, 1.0f},
-    {1.0f,-1.0f,-1.0f},
-    {1.0f, 1.0f,-1.0f},
-    {1.0f,-1.0f,-1.0f},
-    {1.0f, 1.0f, 1.0f},
-    {1.0f,-1.0f, 1.0f},
-    {1.0f, 1.0f, 1.0f},
-    {1.0f, 1.0f,-1.0f},
-    {-1.0f, 1.0f,-1.0f},
-    {1.0f, 1.0f, 1.0f},
-    {-1.0f, 1.0f,-1.0f},
-    {-1.0f, 1.0f, 1.0f},
-    {1.0f, 1.0f, 1.0f},
-    {-1.0f, 1.0f, 1.0f},
-    {1.0f,-1.0f, 1.0f}
+        {-0.5f, -0.5f, -0.5f},
+        { 0.5f, -0.5f, -0.5f},
+        { 0.5f,  0.5f, -0.5f},
+        { 0.5f,  0.5f, -0.5f},
+        {-0.5f,  0.5f, -0.5f},
+        {-0.5f, -0.5f, -0.5f},
+
+        {-0.5f, -0.5f,  0.5f},
+        { 0.5f, -0.5f,  0.5f},
+        { 0.5f,  0.5f,  0.5f},
+        { 0.5f,  0.5f,  0.5f},
+        {-0.5f,  0.5f,  0.5f},
+        {-0.5f, -0.5f,  0.5f},
+
+        {-0.5f,  0.5f,  0.5f},
+        {-0.5f,  0.5f, -0.5f},
+        {-0.5f, -0.5f, -0.5f},
+        {-0.5f, -0.5f, -0.5f},
+        {-0.5f, -0.5f,  0.5f},
+        {-0.5f,  0.5f,  0.5f},
+
+        { 0.5f,  0.5f,  0.5f},
+        { 0.5f,  0.5f, -0.5f},
+        { 0.5f, -0.5f, -0.5f},
+        { 0.5f, -0.5f, -0.5f},
+        { 0.5f, -0.5f,  0.5f},
+        { 0.5f,  0.5f,  0.5f},
+
+        {-0.5f, -0.5f, -0.5f},
+        { 0.5f, -0.5f, -0.5f},
+        { 0.5f, -0.5f,  0.5f},
+        { 0.5f, -0.5f,  0.5f},
+        {-0.5f, -0.5f,  0.5f},
+        {-0.5f, -0.5f, -0.5f},
+
+        {-0.5f,  0.5f, -0.5f},
+        { 0.5f,  0.5f, -0.5f},
+        { 0.5f,  0.5f,  0.5f},
+        { 0.5f,  0.5f,  0.5f},
+        {-0.5f,  0.5f,  0.5f},
+        {-0.5f,  0.5f, -0.5f}
 };
 
-static vec3 normals[nvertices];
+static vec3 normals[nvertices] =
+{
+        {0.0f,  0.0f, -1.0f},
+        {0.0f,  0.0f, -1.0f},
+        {0.0f,  0.0f, -1.0f},
+        {0.0f,  0.0f, -1.0f},
+        {0.0f,  0.0f, -1.0f},
+        {0.0f,  0.0f, -1.0f},
+
+        {0.0f,  0.0f,  1.0f},
+        {0.0f,  0.0f,  1.0f},
+        {0.0f,  0.0f,  1.0f},
+        {0.0f,  0.0f,  1.0f},
+        {0.0f,  0.0f,  1.0f},
+        {0.0f,  0.0f,  1.0f},
+
+        {1.0f,  0.0f,  0.0f},
+        {1.0f,  0.0f,  0.0f},
+        {1.0f,  0.0f,  0.0f},
+        {1.0f,  0.0f,  0.0f},
+        {1.0f,  0.0f,  0.0f},
+        {1.0f,  0.0f,  0.0f},
+
+        {1.0f,  0.0f,  0.0f},
+        {1.0f,  0.0f,  0.0f},
+        {1.0f,  0.0f,  0.0f},
+        {1.0f,  0.0f,  0.0f},
+        {1.0f,  0.0f,  0.0f},
+        {1.0f,  0.0f,  0.0f},
+
+        {0.0f, -1.0f,  0.0f},
+        {0.0f, -1.0f,  0.0f},
+        {0.0f, -1.0f,  0.0f},
+        {0.0f, -1.0f,  0.0f},
+        {0.0f, -1.0f,  0.0f},
+        {0.0f, -1.0f,  0.0f},
+
+        {0.0f,  1.0f,  0.0f},
+        {0.0f,  1.0f,  0.0f},
+        {0.0f,  1.0f,  0.0f},
+        {0.0f,  1.0f,  0.0f},
+        {0.0f,  1.0f,  0.0f},
+        {0.0f,  1.0f,  0.0f}
+};
+
 static vec3 LightPosition  = (vec3){1.2f, 1.0f, 2.0f};
 
 static const char* vertex_shader_text =
@@ -94,23 +143,9 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
-void makeNormalMatrix() {
-    for(int i=0; i<nvertices; i+=3) {
-        vec3 ab,ac,bc,ba;
-        vec2_sub(ab,normals[i+1], vertices[i]);
-        vec2_sub(ac,normals[i+2], vertices[i]);
-        vec2_sub(bc,normals[i+2], vertices[i+1]);
-        vec2_sub(ba,normals[i], vertices[i+1]);
-
-        vec3_mul_cross(normals[i],ac,ab);
-        vec3_mul_cross(normals[i+1],bc,ba);
-        vec3_mul_cross(normals[i+2],ac,bc);
-    }
-}
-
 int main(void)
 {
-    makeNormalMatrix();
+
     GLFWwindow* window;
     GLuint vertex_buffer, vertex_shader, fragment_shader, program;
     GLint p_location,v_location,m_location, vpos_location, vnormal_location,light_location;
@@ -183,8 +218,9 @@ int main(void)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         mat4x4_identity(m);
-        mat4x4_rotate_Z(m, m, (float) glfwGetTime());
-        //mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
+        mat4x4_rotate_X(m, m, (float) glfwGetTime());
+        //mat4x4_rotate_Y(m, m, (float) glfwGetTime());
+        //mat4x4_rotate_Z(m, m, (float) glfwGetTime());
 
         mat4x4_perspective(p, M_PI/2 , (float) width / (float)height, 0.1f, 100.0f);
 
