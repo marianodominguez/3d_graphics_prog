@@ -117,7 +117,7 @@ static const char* vertex_shader_text =
 "{\n"
 "    FragPos =vec3( M * vec4(vPos, 1.0) );\n"
 "    lightCamera =vec3( V * vec4(lightPos, 1.0) );\n"
-"    Normal = normal_matrix * vNormal;\n"
+"    Normal = vec3(normal_matrix * vNormal);\n"
 "    gl_Position = P*V*M*vec4(vPos, 1.0);\n"
 "}\n";
 
@@ -153,6 +153,12 @@ int main(void)
     GLFWwindow* window;
     GLuint vertex_buffer, vertex_shader, fragment_shader, program;
     GLint p_location,v_location,m_location, vpos_location, vnormal_location,light_location,normal_location;
+    float ratio;
+    int width, height;
+
+    mat4 m,p,mv,v;
+    mat3 normal_matrix=GLM_MAT3_IDENTITY_INIT,
+        t=GLM_MAT3_IDENTITY_INIT;
 
     glfwSetErrorCallback(error_callback);
 
@@ -212,11 +218,6 @@ int main(void)
 
     while (!glfwWindowShouldClose(window))
     {
-        float ratio;
-        int width, height;
-        mat4 m,p,mv,v;
-        vec3 lightInCamera;
-        mat3 normal_matrix,t;
 
         glfwGetFramebufferSize(window, &width, &height);
         ratio = width / (float) height;
@@ -226,12 +227,13 @@ int main(void)
 
         // Camera matrix
         glm_lookat(
-        (vec3){1,1,1.5}, // Camera in World Space
+        (vec3){2,2,3}, // Camera in World Space
         (vec3){0,0,0}, // and looks at the origin
         (vec3){0,1,0}  // Head is up (set to 0,-1,0 to look upside-down)
         ,v);
 
         glm_mat4_identity(m);
+        glm_scale(m, (vec3){2.5,2.5,2.5} );
         glm_rotate_x(m, (float) glfwGetTime(),m);
         //glm_rotate_y(m, (float) glfwGetTime(),m);
         //glm_rotate_z(m, (float) glfwGetTime(),m);
