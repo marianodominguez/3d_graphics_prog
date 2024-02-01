@@ -240,7 +240,7 @@ int main(void)
 
         glm_perspective(M_PI/2 , (float) width / (float)height, 0.1f, 50.0f,p);
 
-        glm_mat4_mul(m,v,mv);
+        glm_mat4_mul(v,m,mv);
         glm_mat4_pick3(mv,t);
         glm_mat3_inv(t,normal_matrix);
 
