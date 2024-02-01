@@ -212,14 +212,22 @@ int main(void)
     {
         float ratio;
         int width, height;
-        mat4 m,p,v,mv,normal_matrix;
+        mat4 m,p,mv,normal_matrix;
         vec3 lightInCamera;
+        mat4 v;
 
         glfwGetFramebufferSize(window, &width, &height);
         ratio = width / (float) height;
 
         glViewport(0, 0, width, height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // Camera matrix
+        glm_lookat(
+        (vec3){2,2,3}, // Camera in World Space
+        (vec3){0,0,0}, // and looks at the origin
+        (vec3){0,1,0}  // Head is up (set to 0,-1,0 to look upside-down)
+        ,v);
 
         glm_mat4_identity(m);
         glm_mat4_scale(v,2.0);
@@ -237,17 +245,14 @@ int main(void)
         //Normal = normal_matrix * vNormal;
 
         for(int i=0; i< nvertices; i++) {
-            glm_mat4_mulv3(normal_matrix,normals[i],1.0,normals[i]);
+            vec3 n,r;
+            glm_vec3_copy(normals[i],n);
+            glm_mat4_mulv3(normal_matrix,n,1.0,r);
+            glm_vec3_copy(r,normals[i]);
+
         }
         //LightPosition[0]+=0.1;
         //if (LightPosition[0]>12.0) LightPosition[0]=-5.0;
-
-        // Camera matrix
-        glm_lookat(
-        (vec3){2,2,3}, // Camera in World Space
-        (vec3){0,0,0}, // and looks at the origin
-        (vec3){0,1,0}  // Head is up (set to 0,-1,0 to look upside-down)
-        ,v);
 
         glUniformMatrix4fv(m_location, 1, GL_FALSE, (const GLfloat*) m);
         glUniformMatrix4fv(v_location, 1, GL_FALSE, (const GLfloat*) v);
