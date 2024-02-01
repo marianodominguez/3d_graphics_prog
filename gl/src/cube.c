@@ -112,11 +112,12 @@ static const char* vertex_shader_text =
 "uniform mat4 M;\n"
 "uniform mat4 V;\n"
 "uniform mat4 P;\n"
+"uniform mat3 normal_matrix;\n"
 "void main()\n"
 "{\n"
 "    FragPos =vec3( M * vec4(vPos, 1.0) );\n"
 "    lightCamera =vec3( V * vec4(lightPos, 1.0) );\n"
-"    Normal = vNormal;\n"
+"    Normal = vec3 ( normal_matrix * vNormal );\n"
 "    gl_Position = P*V*M*vec4(vPos, 1.0);\n"
 "}\n";
 
@@ -151,7 +152,11 @@ int main(void)
 
     GLFWwindow* window;
     GLuint vertex_buffer, vertex_shader, fragment_shader, program;
-    GLint p_location,v_location,m_location, vpos_location, vnormal_location,light_location;
+    GLint p_location,v_location,m_location, vpos_location, vnormal_location,light_location,normal_location;
+    float ratio;
+    int width, height;
+    mat4 m,p,mv,v;
+    mat3 normal_matrix,t;
 
     glfwSetErrorCallback(error_callback);
 
@@ -193,12 +198,13 @@ int main(void)
     glAttachShader(program, fragment_shader);
     glLinkProgram(program);
 
-    m_location = glGetUniformLocation(program, "M");
-    v_location = glGetUniformLocation(program, "V");
-    p_location = glGetUniformLocation(program, "P");
-    vpos_location = glGetAttribLocation(program, "vPos");
+    m_location      = glGetUniformLocation(program, "M");
+    v_location      = glGetUniformLocation(program, "V");
+    p_location      = glGetUniformLocation(program, "P");
+    vpos_location   = glGetAttribLocation(program, "vPos");
     vnormal_location = glGetAttribLocation(program, "vNormal");
-    light_location = glGetUniformLocation(program, "lightPos");
+    light_location  = glGetUniformLocation(program, "lightPos");
+    normal_location = glGetAttribLocation(program, "normal_matrix");
 
     glEnableVertexAttribArray(vpos_location);
     glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
@@ -210,12 +216,6 @@ int main(void)
 
     while (!glfwWindowShouldClose(window))
     {
-        float ratio;
-        int width, height;
-        mat4 m,p,mv,normal_matrix;
-        vec3 lightInCamera;
-        mat4 v;
-
         glfwGetFramebufferSize(window, &width, &height);
         ratio = width / (float) height;
 
@@ -237,26 +237,20 @@ int main(void)
 
         glm_perspective(M_PI/2 , (float) width / (float)height, 0.1f, 50.0f,p);
 
-        glm_mat4_mul(m,v,mv);
-        glm_mat4_inv(mv,normal_matrix);
-        glm_mat4_transpose(normal_matrix);
-
         //mat3 normal_matrix = mat3(transpose(inverse(M * V)));
-        //Normal = normal_matrix * vNormal;
 
-        for(int i=0; i< nvertices; i++) {
-            vec3 n,r;
-            glm_vec3_copy(normals[i],n);
-            glm_mat4_mulv3(normal_matrix,n,1.0,r);
-            glm_vec3_copy(r,normals[i]);
+        glm_mat4_mul(m,v,mv);
+        glm_mat4_pick3(mv,t);
+        glm_mat3_inv(t,normal_matrix);
 
-        }
         //LightPosition[0]+=0.1;
         //if (LightPosition[0]>12.0) LightPosition[0]=-5.0;
 
         glUniformMatrix4fv(m_location, 1, GL_FALSE, (const GLfloat*) m);
         glUniformMatrix4fv(v_location, 1, GL_FALSE, (const GLfloat*) v);
         glUniformMatrix4fv(p_location, 1, GL_FALSE, (const GLfloat*) p);
+        //transpose normal_matrix at sending
+        glUniformMatrix4fv(normal_location, 1, GL_TRUE, (const GLfloat*) normal_matrix);
         glUniform3fv(light_location,1,(const GLfloat*) LightPosition);
         glDrawArrays(GL_TRIANGLES, 0, 3*12);
 
