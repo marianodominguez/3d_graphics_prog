@@ -2,7 +2,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "linmath.h"
+#include <cglm/cglm.h>
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -99,7 +99,7 @@ static vec3 normals[nvertices] =
         {0.0f,  1.0f,  0.0f}
 };
 
-static vec3 LightPosition  = (vec3){2.0f, 3.0f, 2.0f};
+static vec3 LightPosition  = (vec3){3.2f, 2.0f, 3.0f};
 
 static const char* vertex_shader_text =
 "#version 330 core\n"
@@ -200,15 +200,17 @@ int main(void)
     glEnableVertexAttribArray(vpos_location);
     glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
                           sizeof(vertices[0]), (void*) 0);
-    glEnableVertexAttribArray(vnormal_location);
     glVertexAttribPointer(vnormal_location, 3, GL_FLOAT, GL_FALSE,
                           sizeof(normals[0]), (void*) 0 );
+    glEnableVertexAttribArray(vnormal_location);
+    glUseProgram(program);
 
     while (!glfwWindowShouldClose(window))
     {
         float ratio;
         int width, height;
-        mat4x4 m, p,v;
+        mat4 m,p,v,mv,normal_matrix;
+        vec3 lightInCamera;
 
         glfwGetFramebufferSize(window, &width, &height);
         ratio = width / (float) height;
@@ -216,26 +218,38 @@ int main(void)
         glViewport(0, 0, width, height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        mat4x4_identity(m);
-        mat4x4_rotate_X(m, m, (float) glfwGetTime());
-        mat4x4_scale(m,m,3.0);
-        //mat4x4_rotate_Y(m, m, (float) glfwGetTime());
-        mat4x4_rotate_Z(m, m, (float) glfwGetTime());
+        glm_mat4_identity(m);
+        glm_mat4_scale(v,2.0);
+        glm_rotate_x(m, (float) glfwGetTime(),m);
+        //glm_rotate_y(m, (float) glfwGetTime(),m);
+        glm_rotate_z(m, (float) glfwGetTime(),m);
 
-        mat4x4_perspective(p, M_PI/2 , (float) width / (float)height, 0.1f, 100.0f);
+        glm_perspective(M_PI/2 , (float) width / (float)height, 0.1f, 50.0f,p);
+
+        glm_mat4_mul(m,v,mv);
+        glm_mat4_inv(mv,normal_matrix);
+        //mat3 normal_matrix = mat3(transpose(inverse(M * V)));
+        //Normal = normal_matrix * vNormal;
+        glm_mat4_transpose(normal_matrix);
+
+        for(int i=0; i< nvertices; i++) {
+            glm_mat4_mulv3(normal_matrix,normals[i],1.0,normals[i]);
+        }
 
         // Camera matrix
-        mat4x4_look_at(v,
+        glm_lookat(
         (vec3){2,2,3}, // Camera in World Space
         (vec3){0,0,0}, // and looks at the origin
         (vec3){0,1,0}  // Head is up (set to 0,-1,0 to look upside-down)
-        );
+        ,v);
 
-        glUseProgram(program);
+        // light position
+        glm_mat4_mulv3(v,LightPosition,1.0,lightInCamera);
+
         glUniformMatrix4fv(m_location, 1, GL_FALSE, (const GLfloat*) m);
         glUniformMatrix4fv(v_location, 1, GL_FALSE, (const GLfloat*) v);
         glUniformMatrix4fv(p_location, 1, GL_FALSE, (const GLfloat*) p);
-        glUniform3fv(light_location,1,(const GLfloat*) LightPosition);
+        glUniform3fv(light_location,1,(const GLfloat*) lightInCamera);
         glDrawArrays(GL_TRIANGLES, 0, 3*12);
 
         glfwSwapBuffers(window);
