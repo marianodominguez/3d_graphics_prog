@@ -103,15 +103,16 @@ int main(void)
     int width, height;
 
     mat4 m, p, mv = GLM_MAT4_IDENTITY_INIT, v;
-    mat3 normal_matrix = GLM_MAT3_IDENTITY_INIT, t = GLM_MAT3_IDENTITY_INIT;
+    mat3 normal_matrix = GLM_MAT3_IDENTITY_INIT;
     vec4 LightCameraPosition;
 
     glfwSetErrorCallback(error_callback);
 
-    if (!glfwInit()) exit(EXIT_FAILURE);
+    if (!glfwInit())
+        exit(EXIT_FAILURE);
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
     window = glfwCreateWindow(640, 480, "Simple example", NULL, NULL);
     if (!window) {
@@ -184,15 +185,19 @@ int main(void)
         glm_perspective(M_PI / 2, (float)width / (float)height, 0.1f, 50.0f, p);
 
         glm_mat4_mul(v, m, mv);
+
         glm_mat4_pick3(mv, normal_matrix);
         glm_mat3_inv(normal_matrix, normal_matrix);
         glm_mat3_transpose(normal_matrix);
 
-        glm_mat4_mulv(v, LightPosition, LightCameraPosition);        glUniformMatrix4fv(m_location, 1, GL_FALSE, (const GLfloat*)m);
-        glUniformMatrix4fv(v_location, 1, GL_FALSE, (const GLfloat*)v);
-        glUniformMatrix4fv(p_location, 1, GL_FALSE, (const GLfloat*)p);
-        // transpose when passing
+        glm_mat4_mulv(v, LightPosition, LightCameraPosition);
 
+        glUniformMatrix4fv(m_location, 1, GL_FALSE, (const GLfloat *)m);
+        glUniformMatrix4fv(v_location, 1, GL_FALSE, (const GLfloat *)v);
+        glUniformMatrix4fv(p_location, 1, GL_FALSE, (const GLfloat *)p);
+        // transpose when passing
+        glUniformMatrix3fv(normal_location, 1, GL_FALSE,
+                           (const GLfloat *)normal_matrix);
         glUniform3fv(light_location, 1, (const GLfloat*)LightCameraPosition);
         glDrawArrays(GL_TRIANGLES, 0, 3 * 12);
 
