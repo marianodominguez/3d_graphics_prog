@@ -99,7 +99,7 @@ static vec3 normals[nvertices] =
         {0.0f,  1.0f,  0.0f}
 };
 
-static vec3 LightPosition  = (vec3){2.0f, 12.0f, 5.0f};
+vec3 LightPosition  = (vec3){2.0f, 12.0f, 5.0f};
 
 static const char* vertex_shader_text =
 "#version 330 core\n"
@@ -156,7 +156,7 @@ int main(void)
     float ratio;
     int width, height;
 
-    mat4 m,p,mv,v;
+    mat4 m,p,mv=GLM_MAT4_IDENTITY_INIT,v;
     mat3 normal_matrix=GLM_MAT3_IDENTITY_INIT,
         t=GLM_MAT3_IDENTITY_INIT;
 
@@ -216,6 +216,13 @@ int main(void)
     glEnableVertexAttribArray(vnormal_location);
     glUseProgram(program);
 
+    // Camera matrix
+    glm_lookat(
+    (vec3){2,2,3}, // Camera in World Space
+    (vec3){0,0,0}, // and looks at the origin
+    (vec3){0,1,0}  // Head is up (set to 0,-1,0 to look upside-down)
+    ,v);
+
     while (!glfwWindowShouldClose(window))
     {
 
@@ -225,18 +232,11 @@ int main(void)
         glViewport(0, 0, width, height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Camera matrix
-        glm_lookat(
-        (vec3){2,2,3}, // Camera in World Space
-        (vec3){0,0,0}, // and looks at the origin
-        (vec3){0,1,0}  // Head is up (set to 0,-1,0 to look upside-down)
-        ,v);
-
         glm_mat4_identity(m);
         glm_scale(m, (vec3){2.5,2.5,2.5} );
         glm_rotate_x(m, (float) glfwGetTime(),m);
         //glm_rotate_y(m, (float) glfwGetTime(),m);
-        //glm_rotate_z(m, (float) glfwGetTime(),m);
+        glm_rotate_z(m, (float) glfwGetTime(),m);
 
         glm_perspective(M_PI/2 , (float) width / (float)height, 0.1f, 50.0f,p);
 
@@ -244,15 +244,12 @@ int main(void)
         glm_mat4_pick3(mv,t);
         glm_mat3_inv(t,normal_matrix);
 
-        //LightPosition[0]+=0.1;
-        //if (LightPosition[0]>12.0) LightPosition[0]=-5.0;
-
         glUniformMatrix4fv(m_location, 1, GL_FALSE, (const GLfloat*) m);
         glUniformMatrix4fv(v_location, 1, GL_FALSE, (const GLfloat*) v);
         glUniformMatrix4fv(p_location, 1, GL_FALSE, (const GLfloat*) p);
         //transpose when passing
         glUniformMatrix3fv(normal_location, 1,GL_TRUE, (const GLfloat*) normal_matrix);
-        glUniform3fv(light_location,1,(const GLfloat*) LightPosition);
+        glUniform3fv(light_location,1, (const GLfloat*) LightPosition);
         glDrawArrays(GL_TRIANGLES, 0, 3*12);
 
         glfwSwapBuffers(window);
