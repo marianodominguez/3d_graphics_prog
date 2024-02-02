@@ -112,6 +112,7 @@ static const char* vertex_shader_text =
 "uniform mat4 M;\n"
 "uniform mat4 V;\n"
 "uniform mat4 P;\n"
+"// TODO: calculate this in cpu \n"
 "//uniform mat3 normal_matrix;\n"
 "\n"
 "void main()\n"
@@ -152,7 +153,6 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 int main(void)
 {
-
     GLFWwindow* window;
     GLuint vertex_buffer, vertex_shader, fragment_shader, program;
     GLint p_location,v_location,m_location, vpos_location, vnormal_location,light_location,normal_location;
@@ -251,6 +251,7 @@ int main(void)
         glUniformMatrix4fv(v_location, 1, GL_FALSE, (const GLfloat*) v);
         glUniformMatrix4fv(p_location, 1, GL_FALSE, (const GLfloat*) p);
         //transpose when passing
+
         glUniformMatrix3fv(normal_location, 1,GL_TRUE, (const GLfloat*) normal_matrix);
         glUniform3fv(light_location,1, (const GLfloat*) LightPosition);
         glDrawArrays(GL_TRIANGLES, 0, 3*12);
