@@ -46,7 +46,7 @@ static vec3 normals[nvertices] = {
     {0.0f, 1.0f, 0.0f},  {0.0f, 1.0f, 0.0f},  {0.0f, 1.0f, 0.0f},
     {0.0f, 1.0f, 0.0f},  {0.0f, 1.0f, 0.0f},  {0.0f, 1.0f, 0.0f}};
 
-vec3 LightPosition = (vec3){2.0f, 12.0f, 5.0f};
+vec4 LightPosition = (vec4){2.0f, 12.0f, 5.0f, 1.0f};
 
 static const char *vertex_shader_text =
     "#version 330 core\n"
@@ -94,7 +94,7 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action,
 
 int main(void)
 {
-    GLFWwindow* window;
+    GLFWwindow *window;
     GLuint vertex_buffer, normal_buffer, vertex_shader, fragment_shader,
         program;
     GLint p_location, v_location, m_location, vpos_location, vnormal_location,
@@ -188,7 +188,6 @@ int main(void)
 
         glm_mat4_pick3(mv, normal_matrix);
         glm_mat3_inv(normal_matrix, normal_matrix);
-        glm_mat3_transpose(normal_matrix);
 
         glm_mat4_mulv(v, LightPosition, LightCameraPosition);
 
@@ -196,9 +195,9 @@ int main(void)
         glUniformMatrix4fv(v_location, 1, GL_FALSE, (const GLfloat *)v);
         glUniformMatrix4fv(p_location, 1, GL_FALSE, (const GLfloat *)p);
         // transpose when passing
-        glUniformMatrix3fv(normal_location, 1, GL_FALSE,
+        glUniformMatrix3fv(normal_location, 1, GL_TRUE,
                            (const GLfloat *)normal_matrix);
-        glUniform3fv(light_location, 1, (const GLfloat*)LightCameraPosition);
+        glUniform4fv(light_location, 1, (const GLfloat *)LightCameraPosition);
         glDrawArrays(GL_TRIANGLES, 0, 3 * 12);
 
         glfwSwapBuffers(window);
