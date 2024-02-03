@@ -1,3 +1,4 @@
+//#define CGLM_DEFINE_PRINTS 0
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -6,8 +7,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <cglm/io.h>
 
-#define nvertices 5144
+#define nvertices 5144*3
 
 GLFWwindow *window;
 GLuint vertex_buffer, normal_buffer, vertex_shader, fragment_shader,
@@ -24,7 +26,7 @@ vec4 LightCameraPosition;
 static vec3 vertices[nvertices];
 static vec3 normals[nvertices];
 
-vec4 LightPosition = (vec4){2.0f, 12.0f, 5.0f, 1.0f};
+vec4 LightPosition = (vec4){40.0f, 20.0f, 40.0f, 1.0f};
 
 static void error_callback(int error, const char *description) {
     fprintf(stderr, "Error: %s\n", description);
@@ -85,6 +87,7 @@ int load_model(char *filename) {
     int size;
     float x,y,z;
     FILE *fp;
+    char line[255];
 
     fp = fopen(filename, "r");
 
@@ -95,17 +98,23 @@ int load_model(char *filename) {
 
     fscanf(fp, "%d",&size);
 
-    if (size != nvertices) {
+    if (size*3 != nvertices) {
         printf("%s", "Wrong model");
         exit(1);
     }
-
-    for (int i=0; i<size; i++) {
-        fscanf(fp, "%f %f %f", &x, &y, &z);
-        memcpy (vertices[i], (vec3){x,y,z}, sizeof ((vec3){x,y,z}));
-        fscanf(fp, "%f %f %f", &x, &y, &z);
-        memcpy (normals[i], (vec3){x,y,z}, sizeof ((vec3){x,y,z}));
-        //printf("%f,%f,%f", normals[i][0],normals[i][1],normals[i][2]);
+    int i=0;
+    while (i<nvertices) {
+        fgets(line,255,fp);
+        if (strlen(line) >10 ) {
+            sscanf(line, "%f %f %f", &x, &y, &z);
+            memcpy (vertices[i], (vec3){x,y,z}, sizeof ((vec3){x,y,z}));
+            fgets(line,255,fp);
+            sscanf(line, "%f %f %f", &x, &y, &z);
+            memcpy (normals[i], (vec3){x,y,z}, sizeof ((vec3){x,y,z}));
+            glm_vec3_print(vertices[i],stderr);
+            glm_vec3_print(normals[i],stderr);
+            i++;
+        }
     }
     fclose(fp);
 }
@@ -119,8 +128,8 @@ void drawScene() {
 
     glm_mat4_identity(m);
     glm_scale(m, (vec3){2.5, 2.5, 2.5});
-    glm_rotate_x(m, (float)glfwGetTime(), m);
-    //glm_rotate_y(m, (float) glfwGetTime(),m);
+    //glm_rotate_x(m, M_PI, m);
+    glm_rotate_y(m, (float) glfwGetTime(),m);
     //glm_rotate_z(m, (float)glfwGetTime()/5.0, m);
 
     glm_perspective(M_PI / 2, (float)width / (float)height, 0.1f, 50.0f, p);
@@ -204,12 +213,11 @@ int main(void)
     glUseProgram(program);
 
     // Camera matrix
-    glm_lookat((vec3){10, 10, 5},  // Camera in World Space
+    glm_lookat((vec3){10, 10, 10},  // Camera in World Space
                (vec3){0, 0, 0},  // and looks at the origin
                (vec3){0, 1, 0}
                // Head is up (set to 0,-1,0 to look upside-down)
-               ,
-               v);
+               ,v);
 
     while (!glfwWindowShouldClose(window)) {
         drawScene();
