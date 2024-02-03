@@ -163,8 +163,8 @@ int main(void)
     if (!glfwInit())
         exit(EXIT_FAILURE);
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,1);
 
     window = glfwCreateWindow(640, 480, "Simple example", NULL, NULL);
     if (!window) {
@@ -178,6 +178,7 @@ int main(void)
     glewInit();
     glfwSwapInterval(1);
 
+
     glEnable(GL_DEPTH_TEST);
 
     vertex_shader   =   load_shader("gl/src/vertex_shader.gsl", GL_VERTEX_SHADER);
@@ -186,10 +187,6 @@ int main(void)
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    // glGenBuffers(1, &normal_buffer);
-    // glBindBuffer(GL_ARRAY_BUFFER, normal_buffer);
-    // glBufferData(GL_ARRAY_BUFFER, sizeof(normals), normals, GL_STATIC_DRAW);
 
     program = glCreateProgram();
     glAttachShader(program, vertex_shader);
@@ -218,6 +215,8 @@ int main(void)
                (vec3){0, 1, 0}
                // Head is up (set to 0,-1,0 to look upside-down)
                ,v);
+
+    puts(glGetString(GL_VERSION));
 
     while (!glfwWindowShouldClose(window)) {
         drawScene();
