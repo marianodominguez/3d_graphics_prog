@@ -56,6 +56,11 @@
             "cwd": "/home/mariano/3d_graphics_prog/bin",
             "binaryPath": "/home/mariano/3d_graphics_prog/bin/gl_cube",
             "binaryArgs": []
+        },
+        {
+            "cwd": "/home/mariano/3d_graphics_prog",
+            "binaryPath": "/home/mariano/3d_graphics_prog/bin/gl_teapot",
+            "binaryArgs": []
         }
     ],
 }

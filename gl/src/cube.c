@@ -180,7 +180,7 @@ int main(void)
         glm_scale(m, (vec3){2.5, 2.5, 2.5});
         glm_rotate_x(m, (float)glfwGetTime(), m);
         // glm_rotate_y(m, (float) glfwGetTime(),m);
-        glm_rotate_z(m, (float)glfwGetTime(), m);
+        glm_rotate_z(m, (float)glfwGetTime()/5.0, m);
 
         glm_perspective(M_PI / 2, (float)width / (float)height, 0.1f, 50.0f, p);
 
