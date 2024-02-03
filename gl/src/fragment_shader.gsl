@@ -12,6 +12,6 @@ void main()
     vec3 lightDir = normalize(vec3(lightCamera) - FragPos);
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 color = diff+ambient*vec3(1.0,0.2,1.0);
-    //color=Normal;
+
     gl_FragColor = vec4(color, 1.0);
 }

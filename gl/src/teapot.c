@@ -128,7 +128,7 @@ void drawScene() {
 
     glm_mat4_identity(m);
     glm_scale(m, (vec3){2.5, 2.5, 2.5});
-    //glm_rotate_x(m, M_PI, m);
+    //glm_rotate_x(m, (float)glfwGetTime()/7.0, m);
     glm_rotate_y(m, (float) glfwGetTime(),m);
     //glm_rotate_z(m, (float)glfwGetTime()/5.0, m);
 
