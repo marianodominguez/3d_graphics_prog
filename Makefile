@@ -55,7 +55,6 @@ all: clean teapot_01 teapot_02 teapot_03 teapot_04 teapot_05 teapot_06 teapot_07
 	$(CXX) $(COMPILER_FLAGS) -o bin/test_triangle basic/src/test_triangle.c teapot/src/auxiliar.c $(INCLUDE) $(LIBS)
 	$(CXX) $(COMPILER_FLAGS) -o bin/test_lines basic/src/test_lines.c teapot/src/auxiliar.c $(INCLUDE) $(LIBS)
 
-
 gl_teapot:
 	$(CXX) $(COMPILER_FLAGS) -o bin/$@ gl/src/teapot.c $(INCLUDE) $(GL_LIBS)
 
@@ -65,9 +64,8 @@ gl_teapot_diffuse:
 gl_teapot_specular:
 	$(CXX) $(COMPILER_FLAGS) -o bin/$@ gl/src/teapot_spec.c $(INCLUDE) $(GL_LIBS)
 
-
 gl_cube:
-	$(CXX) $(COMPILER_FLAGS) -o bin/$@ gl/src/cube.c $(INCLUDE) $(GL_LIBS
+	$(CXX) $(COMPILER_FLAGS) -o bin/$@ gl/src/cube.c $(INCLUDE) $(GL_LIBS)
 
 clean:
 	rm -rf bin/*
