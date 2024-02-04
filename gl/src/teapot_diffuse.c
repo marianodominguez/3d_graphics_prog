@@ -188,6 +188,7 @@ int main(void)
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices)+sizeof(normals), vertices, GL_STATIC_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices), sizeof(normals), normals);
 
     program = glCreateProgram();
     glAttachShader(program, vertex_shader);

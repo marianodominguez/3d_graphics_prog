@@ -7,6 +7,7 @@
 #include <stdlib.h>
 
 #define nvertices 36
+#define BUFFER_OFFSET( offset )   ((GLvoid*) (offset))
 
 static const vec3 vertices[nvertices] = {
     {-0.5f, -0.5f, -0.5f}, {0.5f, -0.5f, -0.5f}, {0.5f, 0.5f, -0.5f},
@@ -111,9 +112,6 @@ int main(void)
     if (!glfwInit())
         exit(EXIT_FAILURE);
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-
     window = glfwCreateWindow(640, 480, "Simple example", NULL, NULL);
     if (!window) {
         glfwTerminate();
@@ -130,7 +128,8 @@ int main(void)
 
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices)+sizeof(normals), vertices, GL_STATIC_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices), sizeof(normals), normals);
 
     vertex_shader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertex_shader, 1, &vertex_shader_text, NULL);
@@ -155,9 +154,9 @@ int main(void)
 
     glEnableVertexAttribArray(vpos_location);
     glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
-                          sizeof(vertices[0]), (void *)0);
+                          sizeof(vertices[0]), BUFFER_OFFSET(0) );
     glVertexAttribPointer(vnormal_location, 3, GL_FLOAT, GL_FALSE,
-                          sizeof(normals[0]), (void *)0);
+                          sizeof(normals[0]), BUFFER_OFFSET( sizeof(vertices) ) );
     glEnableVertexAttribArray(vnormal_location);
     glUseProgram(program);
 
@@ -166,8 +165,7 @@ int main(void)
                (vec3){0, 0, 0},  // and looks at the origin
                (vec3){0, 1, 0}
                // Head is up (set to 0,-1,0 to look upside-down)
-               ,
-               v);
+               ,v);
 
     while (!glfwWindowShouldClose(window)) {
         glfwGetFramebufferSize(window, &width, &height);

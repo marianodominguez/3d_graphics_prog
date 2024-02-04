@@ -26,7 +26,7 @@ vec4 LightCameraPosition;
 static vec3 vertices[nvertices];
 static vec3 normals[nvertices];
 
-vec4 LightPosition = (vec4){40.0f, 20.0f, 40.0f, 1.0f};
+vec4 LightPosition = (vec4){20.0f, 5.0f, 40.0f, 1.0f};
 vec3 cameraPosition = (vec3){10, 10, 10};
 
 static void error_callback(int error, const char *description) {
@@ -185,6 +185,7 @@ int main(void)
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices)+sizeof(normals), vertices, GL_STATIC_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices), sizeof(normals), normals);
 
     program = glCreateProgram();
     glAttachShader(program, vertex_shader);
