@@ -27,8 +27,8 @@ vec4 LightCameraPosition;
 static vec3 vertices[nvertices];
 static vec3 normals[nvertices];
 
-vec4 LightPosition = (vec4){20.0f, 5.0f, 40.0f, 1.0f};
-vec3 cameraPosition = (vec3){10, 10, 10};
+vec4 LightPosition = (vec4){20.0f, 25.0f, 30.0f, 1.0f};
+vec3 cameraPosition = (vec3){8, 7, 12};
 
 static void error_callback(int error, const char *description) {
     fprintf(stderr, "Error: %s\n", description);
@@ -130,7 +130,7 @@ void drawScene() {
 
     glm_mat4_identity(m);
     glm_scale(m, (vec3){2.5, 2.5, 2.5});
-    //glm_rotate_x(m, (float)glfwGetTime()/7.0, m);
+    glm_rotate_x(m, (float)glfwGetTime()/7.0, m);
     glm_rotate_y(m, (float) glfwGetTime(),m);
     //glm_rotate_z(m, (float)glfwGetTime()/5.0, m);
 
