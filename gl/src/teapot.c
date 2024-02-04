@@ -129,12 +129,14 @@ void drawScene() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glm_mat4_identity(m);
-    glm_scale(m, (vec3){2.5, 2.5, 2.5});
+    glm_scale(m, (vec3){2.0, 3.0, 2.0});
     glm_rotate_x(m, (float)glfwGetTime()/7.0, m);
     glm_rotate_y(m, (float) glfwGetTime(),m);
     //glm_rotate_z(m, (float)glfwGetTime()/5.0, m);
 
-    glm_perspective(M_PI / 2, (float)width / (float)height, 0.1f, 50.0f, p);
+    //glm_perspective(M_PI / 2, (float)width / (float)height, 0.1f, 50.0f, p);
+
+    glm_ortho( -15.0, 15.0, -15.0, 15.0, 0.1, 100,p);
 
     glm_mat4_mul(v, m, mv);
 
