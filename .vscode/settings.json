@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.gsl": "glsl",
         "allegro_primitives.h": "c",
         "allegro5.h": "c",
         "functional": "c",
@@ -8,7 +9,8 @@
         "random": "c",
         "math.h": "c",
         "stdlib.h": "c",
-        "linmath.h": "c"
+        "linmath.h": "c",
+        "glfw3.h": "c"
     },
     "makefile.configurations": [
         {

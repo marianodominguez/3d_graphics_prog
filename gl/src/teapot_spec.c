@@ -1,4 +1,3 @@
-//#define CGLM_DEFINE_PRINTS 0
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -10,6 +9,7 @@
 #include <cglm/io.h>
 
 #define nvertices 5144*3
+#define BUFFER_OFFSET( offset )   ((GLvoid*) (offset))
 
 GLFWwindow *window;
 GLuint vertex_buffer, normal_buffer, vertex_shader, fragment_shader,
@@ -165,11 +165,6 @@ int main(void)
     if (!glfwInit())
         exit(EXIT_FAILURE);
 
-    //glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    //glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
     window = glfwCreateWindow(640, 480, "Simple example", NULL, NULL);
     if (!window) {
         glfwTerminate();
@@ -182,7 +177,6 @@ int main(void)
     glewInit();
     glfwSwapInterval(1);
 
-
     glEnable(GL_DEPTH_TEST);
 
     vertex_shader   =   load_shader("gl/src/vertex_shader.gsl", GL_VERTEX_SHADER);
@@ -190,7 +184,7 @@ int main(void)
 
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices)+sizeof(normals), vertices, GL_STATIC_DRAW);
 
     program = glCreateProgram();
     glAttachShader(program, vertex_shader);
@@ -210,9 +204,9 @@ int main(void)
 
     glEnableVertexAttribArray(vpos_location);
     glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
-                          sizeof(vertices[0]), (void *)0);
+                          sizeof(vertices[0]), BUFFER_OFFSET(0) );
     glVertexAttribPointer(vnormal_location, 3, GL_FLOAT, GL_FALSE,
-                          sizeof(normals[0]), (void *)0);
+                          sizeof(normals[0]), BUFFER_OFFSET(sizeof(vertices)) );
     glEnableVertexAttribArray(vnormal_location);
     glUseProgram(program);
 
