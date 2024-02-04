@@ -15,7 +15,7 @@ GLFWwindow *window;
 GLuint vertex_buffer, normal_buffer, vertex_shader, fragment_shader,
     program;
 GLint p_location, v_location, m_location, vpos_location, vnormal_location,
-    light_location, normal_location,camera_location;
+    light_location, normal_location;
 float ratio;
 int width, height;
 
@@ -27,7 +27,6 @@ static vec3 vertices[nvertices];
 static vec3 normals[nvertices];
 
 vec4 LightPosition = (vec4){40.0f, 20.0f, 40.0f, 1.0f};
-vec3 cameraPosition = (vec3){10, 10, 10};
 
 static void error_callback(int error, const char *description) {
     fprintf(stderr, "Error: %s\n", description);
@@ -149,7 +148,6 @@ void drawScene() {
     glUniformMatrix3fv(normal_location, 1, GL_TRUE,
                         (const GLfloat *)normal_matrix);
     glUniform4fv(light_location, 1, (const GLfloat *)LightCameraPosition);
-    glUniform3fv(camera_location, 1, (const GLfloat *)cameraPosition);
     glDrawArrays(GL_TRIANGLES, 0, nvertices);
 
     glfwSwapBuffers(window);
@@ -165,10 +163,8 @@ int main(void)
     if (!glfwInit())
         exit(EXIT_FAILURE);
 
-    //glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    //glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,1);
 
     window = glfwCreateWindow(640, 480, "Simple example", NULL, NULL);
     if (!window) {
@@ -186,7 +182,7 @@ int main(void)
     glEnable(GL_DEPTH_TEST);
 
     vertex_shader   =   load_shader("gl/src/vertex_shader.gsl", GL_VERTEX_SHADER);
-    fragment_shader =   load_shader("gl/src/fragment_shader.gsl", GL_FRAGMENT_SHADER);
+    fragment_shader =   load_shader("gl/src/fragment_shader_diff.gsl", GL_FRAGMENT_SHADER);
 
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
@@ -197,8 +193,6 @@ int main(void)
     glAttachShader(program, fragment_shader);
     glLinkProgram(program);
 
-    //lightingShader.setVec3("viewPos", camera.Position);
-
     m_location = glGetUniformLocation(program, "M");
     v_location = glGetUniformLocation(program, "V");
     p_location = glGetUniformLocation(program, "P");
@@ -206,7 +200,6 @@ int main(void)
     vnormal_location = glGetAttribLocation(program, "vNormal");
     normal_location = glGetUniformLocation(program, "normal_matrix");
     light_location = glGetUniformLocation(program, "lightCamera");
-    camera_location = glGetUniformLocation(program, "viewPos");
 
     glEnableVertexAttribArray(vpos_location);
     glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
@@ -217,7 +210,7 @@ int main(void)
     glUseProgram(program);
 
     // Camera matrix
-    glm_lookat(cameraPosition,  // Camera in World Space
+    glm_lookat((vec3){10, 10, 10},  // Camera in World Space
                (vec3){0, 0, 0},  // and looks at the origin
                (vec3){0, 1, 0}
                // Head is up (set to 0,-1,0 to look upside-down)
