@@ -59,6 +59,13 @@ all: clean teapot_01 teapot_02 teapot_03 teapot_04 teapot_05 teapot_06 teapot_07
 gl_teapot:
 	$(CXX) $(COMPILER_FLAGS) -o bin/$@ gl/src/teapot.c $(INCLUDE) $(GL_LIBS)
 
+gl_teapot_diffuse:
+	$(CXX) $(COMPILER_FLAGS) -o bin/$@ gl/src/teapot_diffuse.c $(INCLUDE) $(GL_LIBS)
+
+gl_teapot_specular:
+	$(CXX) $(COMPILER_FLAGS) -o bin/$@ gl/src/teapot_spec.c $(INCLUDE) $(GL_LIBS)
+
+
 gl_cube:
 	$(CXX) $(COMPILER_FLAGS) -o bin/$@ gl/src/cube.c $(INCLUDE) $(GL_LIBS
 
