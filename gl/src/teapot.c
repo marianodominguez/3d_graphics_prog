@@ -1,5 +1,7 @@
 //#define CGLM_DEFINE_PRINTS 0
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <cglm/cglm.h>
@@ -29,6 +31,31 @@ static vec3 normals[nvertices];
 
 vec4 LightPosition = (vec4){20.0f, 25.0f, 30.0f, 1.0f};
 vec3 cameraPosition = (vec3){8, 7, 12};
+int nrChannels;
+unsigned int texture;
+
+void loadTexture() {
+
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    // set the texture wrapping/filtering options (on the currently bound texture object)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    unsigned char *data = stbi_load("textures/ceramic.jpg", &width, &height, &nrChannels, 0);
+    if (data) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else {
+        puts("unable to load texture");
+        exit(1);
+    }
+
+    stbi_image_free(data);
+}
 
 static void error_callback(int error, const char *description) {
     fprintf(stderr, "Error: %s\n", description);
@@ -162,7 +189,7 @@ void drawScene() {
 int main(void)
 {
     load_model("models/teapot_normals.txt");
-
+    loadTexture();
     glfwSetErrorCallback(error_callback);
 
     if (!glfwInit())
