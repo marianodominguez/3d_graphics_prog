@@ -63,6 +63,11 @@
             "cwd": "/home/mariano/3d_graphics_prog",
             "binaryPath": "/home/mariano/3d_graphics_prog/bin/gl_teapot",
             "binaryArgs": []
+        },
+        {
+            "cwd": "/Users/marianod/3d_graphics_prog",
+            "binaryPath": "/Users/marianod/3d_graphics_prog/bin/gl_teapot_specular",
+            "binaryArgs": []
         }
     ],
 }

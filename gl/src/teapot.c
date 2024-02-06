@@ -29,7 +29,7 @@ vec4 LightCameraPosition;
 static vec3 vertices[nvertices];
 static vec3 normals[nvertices];
 
-vec4 LightPosition = (vec4){20.0f, 25.0f, 30.0f, 1.0f};
+vec4 LightPosition = (vec4){20.0f, 5.0f, 40.0f, 1.0f};
 vec3 cameraPosition = (vec3){8, 7, 12};
 int nrChannels;
 unsigned int texture;
@@ -106,6 +106,9 @@ int load_shader(char *filename, GLuint type) {
 
         glDeleteShader(shader); // Don't leak the shader.
         puts("Shader compliation failed");
+        puts(filename);
+        puts(errorLog);
+
         exit(1);
     }
 
@@ -156,14 +159,14 @@ void drawScene() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glm_mat4_identity(m);
-    glm_scale(m, (vec3){2.0, 3.0, 2.0});
+    glm_scale(m, (vec3){1.5, 1.5, 1.5});
     glm_rotate_x(m, (float)glfwGetTime()/7.0, m);
     glm_rotate_y(m, (float) glfwGetTime(),m);
     //glm_rotate_z(m, (float)glfwGetTime()/5.0, m);
 
-    //glm_perspective(M_PI / 2, (float)width / (float)height, 0.1f, 50.0f, p);
+    glm_perspective(M_PI / 4, (float)width / (float)height, 5.0f, 30.0f, p);
 
-    glm_ortho( -15.0, 15.0, -15.0, 15.0, 0.1, 100,p);
+    //glm_ortho( -15.0, 15.0, -15.0, 15.0, 0.1, 100,p);
 
     glm_mat4_mul(v, m, mv);
 
@@ -196,6 +199,11 @@ int main(void)
         exit(EXIT_FAILURE);
 
     int Major, Minor, Rev;
+
+    // glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    // glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+    // glfwWindowHint (GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    // glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     glfwGetVersion(&Major, &Minor, &Rev);
     printf("GLFW %d.%d.%d initialized\n", Major, Minor, Rev);
