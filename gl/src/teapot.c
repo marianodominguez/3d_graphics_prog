@@ -223,13 +223,14 @@ int main(void)
 
     int Major, Minor, Rev;
 
-    // glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    // glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-    // glfwWindowHint (GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    // glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint (GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint (GLFW_CONTEXT_VERSION_MINOR, 1);
+    glfwWindowHint (GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     glfwGetVersion(&Major, &Minor, &Rev);
     printf("GLFW %d.%d.%d initialized\n", Major, Minor, Rev);
+   
 
     window = glfwCreateWindow(640, 480, "Simple example", NULL, NULL);
     if (!window) {
@@ -243,6 +244,7 @@ int main(void)
     glewInit();
     glfwSwapInterval(1);
 
+    puts(glGetString(GL_VERSION));
     glEnable(GL_DEPTH_TEST);
     loadTexture();
 
@@ -290,7 +292,6 @@ int main(void)
                // Head is up (set to 0,-1,0 to look upside-down)
                ,v);
 
-    puts(glGetString(GL_VERSION));
 
     while (!glfwWindowShouldClose(window)) {
         drawScene();
