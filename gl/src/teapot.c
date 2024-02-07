@@ -262,8 +262,6 @@ int main(void)
     glAttachShader(program, fragment_shader);
     glLinkProgram(program);
 
-    //lightingShader.setVec3("viewPos", camera.Position);
-
     m_location = glGetUniformLocation(program, "M");
     v_location = glGetUniformLocation(program, "V");
     p_location = glGetUniformLocation(program, "P");
@@ -291,7 +289,6 @@ int main(void)
                (vec3){0, 1, 0}
                // Head is up (set to 0,-1,0 to look upside-down)
                ,v);
-
 
     while (!glfwWindowShouldClose(window)) {
         drawScene();
