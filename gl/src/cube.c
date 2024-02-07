@@ -51,8 +51,8 @@ vec4 LightPosition = (vec4){2.0f, 12.0f, 5.0f, 1.0f};
 
 static const char *vertex_shader_text =
     "#version 330 core\n"
-    "attribute vec3 vNormal;\n"
-    "attribute vec3 vPos;\n"
+    "in vec3 vNormal;\n"
+    "in vec3 vPos;\n"
     "out vec3 FragPos;\n"
     "out vec3 Normal;\n"
     "uniform mat4 M;\n"
@@ -67,11 +67,12 @@ static const char *vertex_shader_text =
     "    gl_Position = P*V*M*vec4(vPos, 1.0);\n"
     "}\n";
 
-static const char *fragment_shader_text =
+static const char *fragment_shader_text_debug =
     "#version 330 core\n"
     "in vec3 Normal;\n"
     "in vec3 FragPos;\n"
     "uniform vec4 lightCamera;\n"
+    "out vec4 fragColor;\n"
     "\n"
     "void main()\n"
     "{\n"
@@ -80,7 +81,7 @@ static const char *fragment_shader_text =
     "    vec3 lightDir = normalize(vec3(lightCamera) - FragPos);\n"
     "    float diff = max(dot(norm, lightDir), 0.0);\n"
     "    vec3 color = diff+ambient*vec3(1.0,0.2,1.0);\n"
-    "    gl_FragColor = vec4(color, 1.0);\n"
+    "    fragColor = vec4(color, 1.0);\n"
     "}\n";
 
 static void error_callback(int error, const char *description) {
@@ -91,6 +92,26 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action,
                          int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
+}
+
+void check_shader(GLuint shader) {
+    GLint isCompiled = 0;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &isCompiled);
+    if(isCompiled == GL_FALSE)
+    {
+        GLint maxLength = 0;
+        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
+
+        // The maxLength includes the NULL character
+        GLchar errorLog[maxLength];
+        glGetShaderInfoLog(shader, maxLength, &maxLength, &errorLog[0]);
+
+        glDeleteShader(shader); // Don't leak the shader.
+        puts("Shader compliation failed");
+        puts(errorLog);
+
+        exit(1);
+    }
 }
 
 int main(void)
@@ -112,6 +133,11 @@ int main(void)
     if (!glfwInit())
         exit(EXIT_FAILURE);
 
+    glfwWindowHint (GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint (GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint (GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
     window = glfwCreateWindow(640, 480, "Simple example", NULL, NULL);
     if (!window) {
         glfwTerminate();
@@ -130,14 +156,21 @@ int main(void)
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices)+sizeof(normals), vertices, GL_STATIC_DRAW);
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices), sizeof(normals), normals);
+    
+    int Major, Minor, Rev;
+    glfwGetVersion(&Major, &Minor, &Rev);
+    printf("GLFW %d.%d.%d initialized\n", Major, Minor, Rev);
+    puts(glGetString(GL_VERSION));
 
     vertex_shader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertex_shader, 1, &vertex_shader_text, NULL);
     glCompileShader(vertex_shader);
+    check_shader(vertex_shader);
 
     fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragment_shader, 1, &fragment_shader_text, NULL);
     glCompileShader(fragment_shader);
+    check_shader(fragment_shader);
 
     program = glCreateProgram();
     glAttachShader(program, vertex_shader);
@@ -152,11 +185,13 @@ int main(void)
     normal_location = glGetUniformLocation(program, "normal_matrix");
     light_location = glGetUniformLocation(program, "lightCamera");
 
-    glEnableVertexAttribArray(vpos_location);
     glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
                           sizeof(vertices[0]), BUFFER_OFFSET(0) );
+
+    glEnableVertexAttribArray(vpos_location);
     glVertexAttribPointer(vnormal_location, 3, GL_FLOAT, GL_FALSE,
                           sizeof(normals[0]), BUFFER_OFFSET( sizeof(vertices) ) );
+
     glEnableVertexAttribArray(vnormal_location);
     glUseProgram(program);
 
