@@ -1,5 +1,7 @@
 //#define CGLM_DEFINE_PRINTS 0
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <cglm/cglm.h>
@@ -16,7 +18,7 @@ GLFWwindow *window;
 GLuint vertex_buffer, normal_buffer, vertex_shader, fragment_shader,
     program;
 GLint p_location, v_location, m_location, vpos_location, vnormal_location,
-    light_location, normal_location,camera_location;
+    light_location, normal_location,camera_location,texture_location;
 float ratio;
 int width, height;
 
@@ -26,9 +28,46 @@ vec4 LightCameraPosition;
 
 static vec3 vertices[nvertices];
 static vec3 normals[nvertices];
+static vec2 texture[nvertices];
 
 vec4 LightPosition = (vec4){20.0f, 5.0f, 40.0f, 1.0f};
 vec3 cameraPosition = (vec3){8, 7, 12};
+int nrChannels;
+unsigned int textureloc;
+
+void loadTexture() {
+    int w, h;
+    unsigned int internalFormat,dataFormat;
+    glGenTextures(1, &textureloc);
+    glBindTexture(GL_TEXTURE_2D, textureloc);
+    // set the texture wrapping/filtering options (on the currently bound texture object)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    unsigned char *data = stbi_load("textures/marble.jpg", &w, &h, &nrChannels, 0);
+    if (data) {
+
+        if(nrChannels == 4) {
+            internalFormat = GL_RGBA8;
+            dataFormat = GL_RGBA;
+        }
+        else if(nrChannels == 3) {
+            internalFormat = GL_RGB8;
+            dataFormat = GL_RGB;
+        }
+
+        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, w, h, 0, dataFormat, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else {
+        puts("unable to load texture");
+        exit(1);
+    }
+
+    stbi_image_free(data);
+}
 
 static void error_callback(int error, const char *description) {
     fprintf(stderr, "Error: %s\n", description);
@@ -93,7 +132,14 @@ int load_model(char *filename) {
     float x,y,z;
     FILE *fp;
     char line[255];
-
+    vec2 tpoint[6]={
+        {0.0f, 0.0f},
+        {1.0f, 0.0f},
+        {1.0f, 1.0f},
+        {0.0f, 0.0f},
+        {0.0f, 1.0f},
+        {1.0f, 1.0f}
+    };
     fp = fopen(filename, "r");
 
     if(fp == NULL) {
@@ -118,8 +164,12 @@ int load_model(char *filename) {
             memcpy (normals[i], (vec3){x,y,z}, sizeof ((vec3){x,y,z}));
             glm_vec3_print(vertices[i],stderr);
             glm_vec3_print(normals[i],stderr);
+
+            //set better coordinates for texture;
+            memcpy (texture[i], tpoint[i % 6], sizeof (tpoint[i % 4]));
             i++;
         }
+
     }
     fclose(fp);
 }
@@ -130,6 +180,7 @@ void drawScene() {
 
     glViewport(0, 0, width, height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glBindTexture(GL_TEXTURE_2D, textureloc);
 
     glm_mat4_identity(m);
     glm_scale(m, (vec3){1.5, 1.5, 1.5});
@@ -165,7 +216,6 @@ void drawScene() {
 int main(void)
 {
     load_model("models/teapot_normals.txt");
-
     glfwSetErrorCallback(error_callback);
 
     if (!glfwInit())
@@ -194,14 +244,16 @@ int main(void)
     glfwSwapInterval(1);
 
     glEnable(GL_DEPTH_TEST);
+    loadTexture();
 
     vertex_shader   =   load_shader("gl/src/vertex_shader.gsl", GL_VERTEX_SHADER);
     fragment_shader =   load_shader("gl/src/fragment_shader.gsl", GL_FRAGMENT_SHADER);
 
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices)+sizeof(normals), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices)+sizeof(normals)+sizeof(texture), vertices, GL_STATIC_DRAW);
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices), sizeof(normals), normals);
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices)+ sizeof(normals), sizeof(texture), texture);
 
     program = glCreateProgram();
     glAttachShader(program, vertex_shader);
@@ -218,6 +270,7 @@ int main(void)
     normal_location = glGetUniformLocation(program, "normal_matrix");
     light_location = glGetUniformLocation(program, "lightCamera");
     camera_location = glGetUniformLocation(program, "viewPos");
+    texture_location = glGetAttribLocation(program, "aTextCoord");
 
     glEnableVertexAttribArray(vpos_location);
     glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
@@ -225,6 +278,9 @@ int main(void)
     glVertexAttribPointer(vnormal_location, 3, GL_FLOAT, GL_FALSE,
                           sizeof(normals[0]), BUFFER_OFFSET(sizeof(vertices) ));
     glEnableVertexAttribArray(vnormal_location);
+    glVertexAttribPointer(texture_location, 2, GL_FLOAT, GL_FALSE,
+                          sizeof(normals[0]), BUFFER_OFFSET(sizeof(texture) ));
+    glEnableVertexAttribArray(texture_location);
     glUseProgram(program);
 
     // Camera matrix

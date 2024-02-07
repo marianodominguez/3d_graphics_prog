@@ -2,9 +2,11 @@
 
 attribute vec3 vNormal;
 attribute vec3 vPos;
+attribute vec2 aTextCoord;
 
 out vec3 FragPos;
 out vec3 Normal;
+out vec2 TexCoord;
 
 uniform mat4 M;
 uniform mat4 V;
@@ -16,5 +18,6 @@ void main()
     FragPos =vec3( M * vec4(vPos, 1.0) );
     Normal = normal_matrix * vNormal;
     gl_Position = P*V*M*vec4(vPos, 1.0);
+    TexCoord = vec2(aTextCoord.x, aTextCoord.y);
 }
 
