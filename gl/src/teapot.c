@@ -46,7 +46,7 @@ void loadTexture() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    unsigned char *data = stbi_load("textures/window.png", &w, &h, &nrChannels, 0);
+    unsigned char *data = stbi_load("textures/grid_1.png", &w, &h, &nrChannels, 0);
     if (data) {
 
         if(nrChannels == 4) {
@@ -225,7 +225,7 @@ int main(void)
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-    glfwWindowHint (GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    //glfwWindowHint (GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     //glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     glfwGetVersion(&Major, &Minor, &Rev);
