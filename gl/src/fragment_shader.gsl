@@ -1,5 +1,4 @@
-#version 300 es
-precision lowp float;
+#version 130
 
 in vec3 Normal;
 in vec3 FragPos;
@@ -24,7 +23,7 @@ void main()
     vec3 reflectDir = reflect(-lightDir, norm);
     vec3 viewDir = normalize(viewPos - FragPos);
 
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 128.0);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 128);
     vec3 specular = specularStrength * spec * vec3(1.0,1.0,1.0);
 
     vec3 color = (diff+specular+ambient)*objColor;
