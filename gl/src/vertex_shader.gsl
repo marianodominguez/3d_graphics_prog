@@ -1,4 +1,4 @@
-#version 410 core
+#version 130
 
 attribute vec3 vNormal;
 attribute vec3 vPos;
