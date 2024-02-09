@@ -46,7 +46,7 @@ void loadTexture() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    unsigned char *data = stbi_load("textures/squares.jpg", &w, &h, &nrChannels, 0);
+    unsigned char *data = stbi_load("textures/grid_1.png", &w, &h, &nrChannels, 0);
     if (data) {
 
         if(nrChannels == 4) {
@@ -137,8 +137,8 @@ int load_model(char *filename) {
         {0.0f, 1.0f},
         {1.0f, 1.0f},
         {0.0f, 0.0f},
-        {1.0f, 1.0f},
-        {1.0f, 0.0f}
+        {1.0f, 0.0f},
+        {1.0f, 1.0f}
     };
     fp = fopen(filename, "r");
 
@@ -158,15 +158,15 @@ int load_model(char *filename) {
         fgets(line,255,fp);
         if (strlen(line) >10 ) {
             sscanf(line, "%f %f %f", &x, &y, &z);
-            memcpy (vertices[i], (vec3){x,y,z}, sizeof ((vec3){x,y,z}));
+            memcpy(vertices[i], (vec3){x,y,z}, sizeof ((vec3){x,y,z}));
             fgets(line,255,fp);
             sscanf(line, "%f %f %f", &x, &y, &z);
-            memcpy (normals[i], (vec3){x,y,z}, sizeof ((vec3){x,y,z}));
+            memcpy(normals[i], (vec3){x,y,z}, sizeof ((vec3){x,y,z}));
             glm_vec3_print(vertices[i],stderr);
             glm_vec3_print(normals[i],stderr);
 
             //set better coordinates for texture;
-            memcpy (texture[i], tpoint[i % 6], sizeof (tpoint[i % 4]));
+            memcpy( texture[i], tpoint[i % 6], sizeof (tpoint[0]) );
             i++;
         }
 
