@@ -187,8 +187,8 @@ int main(void)
 
     glEnable(GL_DEPTH_TEST);
 
-    vertex_shader   =   load_shader("gl/src/vertex_shader.gsl", GL_VERTEX_SHADER);
-    fragment_shader =   load_shader("gl/src/fragment_shader_spec.gsl", GL_FRAGMENT_SHADER);
+    glGenVertexArrays( 1, &vpos_location );
+    glBindVertexArray( vpos_location ); 
 
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
@@ -196,6 +196,8 @@ int main(void)
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices), sizeof(normals), normals);
 
     program = glCreateProgram();
+    vertex_shader   =   load_shader("gl/src/vertex_shader.gsl", GL_VERTEX_SHADER);
+    fragment_shader =   load_shader("gl/src/fragment_shader_spec.gsl", GL_FRAGMENT_SHADER);
     glAttachShader(program, vertex_shader);
     glAttachShader(program, fragment_shader);
     glLinkProgram(program);

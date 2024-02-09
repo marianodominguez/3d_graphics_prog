@@ -192,6 +192,12 @@ int main(void)
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices), sizeof(normals), normals);
 
     program = glCreateProgram();
+    vertex_shader   =   load_shader("gl/src/vertex_shader.gsl", GL_VERTEX_SHADER);
+    fragment_shader =   load_shader("gl/src/fragment_shader_diff.gsl", GL_FRAGMENT_SHADER);
+    glAttachShader(program, vertex_shader);
+    glAttachShader(program, fragment_shader);
+    glLinkProgram(program);
+    
 
     m_location = glGetUniformLocation(program, "M");
     v_location = glGetUniformLocation(program, "V");
@@ -208,12 +214,6 @@ int main(void)
                           sizeof(normals[0]), BUFFER_OFFSET(sizeof(vertices)));
     glEnableVertexAttribArray(vnormal_location);
     glUseProgram(program);
-
-    vertex_shader   =   load_shader("gl/src/vertex_shader.gsl", GL_VERTEX_SHADER);
-    fragment_shader =   load_shader("gl/src/fragment_shader_diff.gsl", GL_FRAGMENT_SHADER);
-    glAttachShader(program, vertex_shader);
-    glAttachShader(program, fragment_shader);
-    glLinkProgram(program);
 
     // Camera matrix
     glm_lookat((vec3){10, 10, 10},  // Camera in World Space
