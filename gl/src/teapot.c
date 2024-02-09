@@ -46,7 +46,7 @@ void loadTexture() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    unsigned char *data = stbi_load("textures/grid_1.png", &w, &h, &nrChannels, 0);
+    unsigned char *data = stbi_load("textures/squares.jpg", &w, &h, &nrChannels, 0);
     if (data) {
 
         if(nrChannels == 4) {
@@ -134,11 +134,11 @@ int load_model(char *filename) {
     char line[255];
     vec2 tpoint[6]={
         {0.0f, 0.0f},
-        {1.0f, 0.0f},
+        {0.0f, 1.0f},
         {1.0f, 1.0f},
         {0.0f, 0.0f},
-        {0.0f, 1.0f},
-        {1.0f, 1.0f}
+        {1.0f, 1.0f},
+        {1.0f, 0.0f}
     };
     fp = fopen(filename, "r");
 
@@ -280,7 +280,7 @@ int main(void)
                           sizeof(normals[0]), BUFFER_OFFSET(sizeof(vertices) ));
     glEnableVertexAttribArray(vnormal_location);
     glVertexAttribPointer(texture_location, 2, GL_FLOAT, GL_FALSE,
-                          sizeof(normals[0]), BUFFER_OFFSET(sizeof(texture) ));
+                          sizeof(texture[0]), BUFFER_OFFSET(sizeof(texture) ));
     glEnableVertexAttribArray(texture_location);
     glUseProgram(program);
 
