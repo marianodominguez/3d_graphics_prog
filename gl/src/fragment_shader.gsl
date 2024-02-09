@@ -1,4 +1,4 @@
-#version 330
+#version 150 core
 
 in vec3 Normal;
 in vec3 FragPos;
@@ -6,8 +6,10 @@ in vec2 TexCoord;
 
 uniform vec4 lightCamera;
 uniform vec3 viewPos;
+
 // texture sampler
 uniform sampler2D texture1;
+
 out vec4 fragColor;
 
 void main()
@@ -30,6 +32,6 @@ void main()
     vec3 color = (diff+specular+ambient)*objColor;
 
     //fragColor = mix(vec4(color, 1.0),texture(texture1, TexCoord),0.7);
-    fragColor = vec4(color, 1.0)+texture(texture1, TexCoord);
+    fragColor = vec4(color, 1.0)*texture(texture1, TexCoord);
     //fragColor = vec4(1.0,1.0,1.0,1.0);
 }

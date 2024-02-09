@@ -50,7 +50,7 @@ static vec3 normals[nvertices] = {
 vec4 LightPosition = (vec4){2.0f, 12.0f, 5.0f, 1.0f};
 
 static const char *vertex_shader_text =
-    "#version 330 core\n"
+    "#version 150 core\n"
     "in vec3 vNormal;\n"
     "in vec3 vPos;\n"
     "out vec3 FragPos;\n"
@@ -67,8 +67,8 @@ static const char *vertex_shader_text =
     "    gl_Position = P*V*M*vec4(vPos, 1.0);\n"
     "}\n";
 
-static const char *fragment_shader_text_debug =
-    "#version 330 core\n"
+static const char *fragment_shader_text =
+    "#version 150 core\n"
     "in vec3 Normal;\n"
     "in vec3 FragPos;\n"
     "uniform vec4 lightCamera;\n"
@@ -83,6 +83,7 @@ static const char *fragment_shader_text_debug =
     "    vec3 color = diff+ambient*vec3(1.0,0.2,1.0);\n"
     "    fragColor = vec4(color, 1.0);\n"
     "}\n";
+
 
 static void error_callback(int error, const char *description) {
     fprintf(stderr, "Error: %s\n", description);
@@ -151,6 +152,9 @@ int main(void)
     glfwSwapInterval(1);
 
     glEnable(GL_DEPTH_TEST);
+    //unsigned int vao;
+    glGenVertexArrays( 1, &vpos_location );
+    glBindVertexArray( vpos_location ); 
 
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);

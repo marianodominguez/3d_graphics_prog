@@ -78,13 +78,15 @@ int load_shader(char *filename, GLuint type) {
 
         glDeleteShader(shader); // Don't leak the shader.
         puts("Shader compliation failed");
+        puts(filename);
+        puts(errorLog);
         exit(1);
     }
 
     return shader;
 }
 
-int load_model(char *filename) {
+void load_model(char *filename) {
     int size;
     float x,y,z;
     FILE *fp;
@@ -164,26 +166,25 @@ int main(void)
     if (!glfwInit())
         exit(EXIT_FAILURE);
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,1);
+    glfwWindowHint (GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint (GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint (GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     window = glfwCreateWindow(640, 480, "Simple example", NULL, NULL);
     if (!window) {
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
-
     glfwSetKeyCallback(window, key_callback);
-
     glfwMakeContextCurrent(window);
     glewInit();
     glfwSwapInterval(1);
-
-
+    
     glEnable(GL_DEPTH_TEST);
-
-    vertex_shader   =   load_shader("gl/src/vertex_shader.gsl", GL_VERTEX_SHADER);
-    fragment_shader =   load_shader("gl/src/fragment_shader_diff.gsl", GL_FRAGMENT_SHADER);
+    
+    glGenVertexArrays( 1, &vpos_location );
+    glBindVertexArray( vpos_location ); 
 
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
@@ -191,9 +192,6 @@ int main(void)
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices), sizeof(normals), normals);
 
     program = glCreateProgram();
-    glAttachShader(program, vertex_shader);
-    glAttachShader(program, fragment_shader);
-    glLinkProgram(program);
 
     m_location = glGetUniformLocation(program, "M");
     v_location = glGetUniformLocation(program, "V");
@@ -210,6 +208,12 @@ int main(void)
                           sizeof(normals[0]), BUFFER_OFFSET(sizeof(vertices)));
     glEnableVertexAttribArray(vnormal_location);
     glUseProgram(program);
+
+    vertex_shader   =   load_shader("gl/src/vertex_shader.gsl", GL_VERTEX_SHADER);
+    fragment_shader =   load_shader("gl/src/fragment_shader_diff.gsl", GL_FRAGMENT_SHADER);
+    glAttachShader(program, vertex_shader);
+    glAttachShader(program, fragment_shader);
+    glLinkProgram(program);
 
     // Camera matrix
     glm_lookat((vec3){10, 10, 10},  // Camera in World Space
