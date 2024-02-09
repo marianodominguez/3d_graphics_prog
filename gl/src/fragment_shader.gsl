@@ -10,7 +10,7 @@ uniform vec3 viewPos;
 // texture sampler
 uniform sampler2D texture1;
 
-out vec4 fragColor;
+out vec4 FragColor;
 
 void main()
 {
@@ -30,8 +30,9 @@ void main()
     vec3 specular = specularStrength * spec * vec3(1.0,1.0,1.0);
 
     vec3 color = (diff+specular+ambient)*objColor;
+    //FragColor = vec4(color, 1.0);
 
-    //fragColor = mix(vec4(color, 1.0),texture(texture1, TexCoord),0.7);
-    fragColor = vec4(color, 1.0)*texture(texture1, TexCoord);
-    //fragColor = vec4(1.0,1.0,1.0,1.0);
+    FragColor = mix(vec4(color, 1.0),texture(texture1, TexCoord),0.7);
+    //FragColor = vec4(color, 1.0)*texture(texture1, TexCoord);
+    //FragColor = vec4(1.0,1.0,1.0,1.0);
 }

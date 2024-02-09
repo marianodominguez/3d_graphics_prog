@@ -17,8 +17,8 @@
 GLFWwindow *window;
 GLuint vertex_buffer, normal_buffer, vertex_shader, fragment_shader,
     program;
-GLint p_location, v_location, m_location, vpos_location, vnormal_location,
-    light_location, normal_location,camera_location,texture_location;
+GLuint p_location, v_location, m_location, vpos_location, vnormal_location,
+    light_location, normal_location,camera_location,texture_location,textureloc;
 float ratio;
 int width, height;
 
@@ -33,7 +33,6 @@ static vec2 texture[nvertices];
 vec4 LightPosition = (vec4){20.0f, 5.0f, 40.0f, 1.0f};
 vec3 cameraPosition = (vec3){8, 7, 12};
 int nrChannels;
-unsigned int textureloc;
 
 void loadTexture() {
     int w, h;
@@ -59,13 +58,13 @@ void loadTexture() {
         }
 
         glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, w, h, 0, dataFormat, GL_UNSIGNED_BYTE, data);
+        glBindTexture(GL_TEXTURE_2D, textureloc);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else {
         puts("unable to load texture");
         exit(1);
     }
-
     stbi_image_free(data);
 }
 
@@ -77,6 +76,10 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action,
                          int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
+}
+
+void GLAPIENTRY debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
+    puts(message);
 }
 
 int load_shader(char *filename, GLuint type) {
@@ -123,11 +126,10 @@ int load_shader(char *filename, GLuint type) {
 
         exit(1);
     }
-
     return shader;
 }
 
-int load_model(char *filename) {
+void load_model(char *filename) {
     int size;
     float x,y,z;
     FILE *fp;
@@ -167,10 +169,8 @@ int load_model(char *filename) {
             glm_vec3_print(normals[i],stderr);
             glm_vec2_copy(texture[i], tpoint[i % 6]);
             //set better coordinates for texture;
-
             i++;
         }
-
     }
     fclose(fp);
 }
@@ -181,8 +181,9 @@ void drawScene() {
 
     glViewport(0, 0, width, height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textureloc);
-
+    
     glm_mat4_identity(m);
     glm_scale(m, (vec3){1.5, 1.5, 1.5});
     glm_rotate_x(m, (float)glfwGetTime()/7.0, m);
@@ -228,6 +229,7 @@ int main(void)
     glfwWindowHint (GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint (GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
     glfwGetVersion(&Major, &Minor, &Rev);
     printf("GLFW %d.%d.%d initialized\n", Major, Minor, Rev);
@@ -243,21 +245,33 @@ int main(void)
     glfwMakeContextCurrent(window);
     glewInit();
     glfwSwapInterval(1);
+    
+    glEnable( GL_DEBUG_OUTPUT );
+    glDebugMessageCallback( debug_callback, 0 );
 
     puts(glGetString(GL_VERSION));
     glEnable(GL_DEPTH_TEST);
-    loadTexture();
 
     glGenVertexArrays( 1, &vpos_location );
     glBindVertexArray( vpos_location ); 
 
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+    
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices)+sizeof(normals)+sizeof(texture), vertices, GL_STATIC_DRAW);
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices), sizeof(normals), normals);
+
+    loadTexture();
+
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices)+ sizeof(normals), sizeof(texture), texture);
 
     program = glCreateProgram();
+    vertex_shader   =   load_shader("gl/src/vertex_shader.gsl", GL_VERTEX_SHADER);
+    fragment_shader =   load_shader("gl/src/fragment_shader.gsl", GL_FRAGMENT_SHADER);
+    glAttachShader(program, vertex_shader);
+    glAttachShader(program, fragment_shader);
+    glLinkProgram(program);
+
     m_location = glGetUniformLocation(program, "M");
     v_location = glGetUniformLocation(program, "V");
     p_location = glGetUniformLocation(program, "P");
@@ -275,16 +289,9 @@ int main(void)
                           sizeof(normals[0]), BUFFER_OFFSET(sizeof(vertices) ));
     glEnableVertexAttribArray(vnormal_location);
     glVertexAttribPointer(texture_location, 2, GL_FLOAT, GL_FALSE,
-                          sizeof(normals[0]), BUFFER_OFFSET(sizeof(texture) ));
+                          sizeof(texture[0]), BUFFER_OFFSET(sizeof(texture) ));
     glEnableVertexAttribArray(texture_location);
     glUseProgram(program);
-
-    vertex_shader   =   load_shader("gl/src/vertex_shader.gsl", GL_VERTEX_SHADER);
-    fragment_shader =   load_shader("gl/src/fragment_shader.gsl", GL_FRAGMENT_SHADER);
-
-    glAttachShader(program, vertex_shader);
-    glAttachShader(program, fragment_shader);
-    glLinkProgram(program);
 
     // Camera matrix
     glm_lookat(cameraPosition,  // Camera in World Space

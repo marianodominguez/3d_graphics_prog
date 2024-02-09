@@ -162,7 +162,6 @@ void drawScene() {
 int main(void)
 {
     load_model("models/teapot_normals.txt");
-
     glfwSetErrorCallback(error_callback);
 
     if (!glfwInit())
