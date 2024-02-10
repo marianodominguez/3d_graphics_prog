@@ -1,4 +1,4 @@
-#define CGLM_DEFINE_PRINTS 1
+//#define CGLM_DEFINE_PRINTS 1
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -47,7 +47,7 @@ void loadTexture() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    unsigned char *data = stbi_load("textures/squares.jpg", &w, &h, &nrChannels, 0);
+    unsigned char *data = stbi_load("textures/ceramic_sm.jpg", &w, &h, &nrChannels, 0);
     if (data) {
 
         if(nrChannels == 4) {
@@ -140,11 +140,11 @@ int load_model(char *filename) {
     char line[255];
     vec2 tpoint[6]={
         {0.0f, 0.0f},
-        {1.0f, 1.0f},
         {1.0f, 0.0f},
         {1.0f, 1.0f},
-        {0.0f, 1.0f},
-        {0.0f, 0.0f}
+        {0.0f, 0.0f},
+        {0.0f, 0.9f},
+        {0.9f, 0.9f}
     };
     fp = fopen(filename, "r");
 
@@ -264,8 +264,8 @@ int main(void)
     loadTexture();
 
     program = glCreateProgram();
-    vertex_shader   =   load_shader("gl/src/vertex_shader.gsl", GL_VERTEX_SHADER);
-    fragment_shader =   load_shader("gl/src/fragment_shader.gsl", GL_FRAGMENT_SHADER);
+    vertex_shader   =   load_shader("gl/src/vertex_shader_texture.gsl", GL_VERTEX_SHADER);
+    fragment_shader =   load_shader("gl/src/fragment_shader_texture.gsl", GL_FRAGMENT_SHADER);
     glAttachShader(program, vertex_shader);
     glAttachShader(program, fragment_shader);
     glLinkProgram(program);

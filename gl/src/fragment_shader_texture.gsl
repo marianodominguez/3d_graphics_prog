@@ -28,6 +28,6 @@ void main()
 
     vec3 color = (diff+specular+ambient)*objColor;
 
-    FragColor = mix(vec4(color, 1.0),texture(texture1, TexCoord),0.7);
-    //FragColor = vec4(color, 1.0)*texture(texture1, TexCoord);
+    //FragColor = mix(vec4(color, 1.0),texture(texture1, TexCoord),0.7);
+    FragColor = vec4(color, 1.0)*texture(texture1, TexCoord);
 }
