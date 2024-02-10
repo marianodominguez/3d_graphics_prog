@@ -141,10 +141,10 @@ int load_model(char *filename) {
     vec2 tpoint[6]={
         {0.0f, 0.0f},
         {1.0f, 1.0f},
-        {0.0f, 1.0f},
-        {0.0f, 0.0f},
+        {1.0f, 0.0f},
         {1.0f, 1.0f},
-        {1.0f, 0.0f}
+        {0.0f, 1.0f},
+        {0.0f, 0.0f}
     };
     fp = fopen(filename, "r");
 
@@ -295,7 +295,7 @@ int main(void)
                           sizeof(normals[0]), BUFFER_OFFSET(sizeof(vertices) ));
     glEnableVertexAttribArray(vnormal_location);
     glVertexAttribPointer(texture_location, 2, GL_FLOAT, GL_FALSE,
-                          sizeof(texture[0]), BUFFER_OFFSET(sizeof(texture) ));
+                          sizeof(texture[0]), BUFFER_OFFSET( sizeof(vertices)+sizeof(normals) ));
     glEnableVertexAttribArray(texture_location);
     glUseProgram(program);
 
