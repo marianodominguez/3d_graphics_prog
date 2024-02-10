@@ -47,7 +47,7 @@ void loadTexture() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    unsigned char *data = stbi_load("textures/grid_3_3.png", &w, &h, &nrChannels, 0);
+    unsigned char *data = stbi_load("textures/squares.jpg", &w, &h, &nrChannels, 0);
     if (data) {
 
         if(nrChannels == 4) {
@@ -134,7 +134,7 @@ int load_shader(char *filename, GLuint type) {
 }
 
 int load_model(char *filename) {
-    int npatches;
+    int size;
     float x,y,z;
     FILE *fp;
     char line[255];
@@ -153,14 +153,14 @@ int load_model(char *filename) {
         exit(1);
     }
 
-    fscanf(fp, "%d",&npatches);
+    fscanf(fp, "%d",&size);
 
-    if (npatches != 32) {
+    if (size*3 != nvertices) {
         printf("%s", "Wrong model");
         exit(1);
     }
     int i=0;
-    while (i<npatches) {
+    while (i<nvertices) {
         fgets(line,255,fp);
         if (strlen(line) >10 ) {
             sscanf(line, "%f %f %f", &x, &y, &z);
@@ -224,7 +224,7 @@ void drawScene() {
 
 int main(void)
 {
-    load_model("models/teapot");
+    load_model("models/teapot_normals.txt");
     glfwSetErrorCallback(error_callback);
 
     if (!glfwInit())
