@@ -1,0 +1,4 @@
+PyOpenGL==3.1.7
+PyOpenGL_accelerate>=3.1.7
+glfw>=2.6.5
+numpy>=1.26.0
