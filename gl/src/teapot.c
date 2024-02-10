@@ -1,4 +1,4 @@
-//#define CGLM_DEFINE_PRINTS 0
+#define CGLM_DEFINE_PRINTS 1
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -40,13 +40,14 @@ void loadTexture() {
     unsigned int internalFormat,dataFormat;
     glGenTextures(1, &textureloc);
     glBindTexture(GL_TEXTURE_2D, textureloc);
+
     // set the texture wrapping/filtering options (on the currently bound texture object)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    unsigned char *data = stbi_load("textures/grid_1.png", &w, &h, &nrChannels, 0);
+    unsigned char *data = stbi_load("textures/grid_3_3.png", &w, &h, &nrChannels, 0);
     if (data) {
 
         if(nrChannels == 4) {
@@ -139,11 +140,11 @@ int load_model(char *filename) {
     char line[255];
     vec2 tpoint[6]={
         {0.0f, 0.0f},
-        {0.0f, 1.0f},
         {1.0f, 1.0f},
+        {0.0f, 1.0f},
         {0.0f, 0.0f},
-        {1.0f, 0.0f},
-        {1.0f, 1.0f}
+        {1.0f, 1.0f},
+        {1.0f, 0.0f}
     };
     fp = fopen(filename, "r");
 
@@ -163,15 +164,17 @@ int load_model(char *filename) {
         fgets(line,255,fp);
         if (strlen(line) >10 ) {
             sscanf(line, "%f %f %f", &x, &y, &z);
-            memcpy(vertices[i], (vec3){x,y,z}, sizeof ((vec3){x,y,z}));
+            glm_vec3_copy((vec3){x,y,z},vertices[i]);
             fgets(line,255,fp);
             sscanf(line, "%f %f %f", &x, &y, &z);
-            memcpy(normals[i], (vec3){x,y,z}, sizeof ((vec3){x,y,z}));
-            glm_vec3_print(vertices[i],stderr);
-            glm_vec3_print(normals[i],stderr);
-
+            glm_vec3_copy((vec3){x,y,z},normals[i]);
             //set better coordinates for texture;
-            memcpy( texture[i], tpoint[i % 6], sizeof (tpoint[0]) );
+            glm_vec2_copy(tpoint[i % 6],texture[i]);
+            if (i>=1600*3 && i<=1650*3) {
+                glm_vec3_print(vertices[i],stderr);
+                glm_vec3_print(normals[i],stderr);
+                glm_vec2_print(texture[i],stderr);
+            }
             i++;
         }
 
@@ -185,6 +188,7 @@ void drawScene() {
 
     glViewport(0, 0, width, height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textureloc);
 
     glm_mat4_identity(m);
@@ -259,19 +263,18 @@ int main(void)
 
     loadTexture();
 
+    program = glCreateProgram();
     vertex_shader   =   load_shader("gl/src/vertex_shader.gsl", GL_VERTEX_SHADER);
     fragment_shader =   load_shader("gl/src/fragment_shader.gsl", GL_FRAGMENT_SHADER);
+    glAttachShader(program, vertex_shader);
+    glAttachShader(program, fragment_shader);
+    glLinkProgram(program);
 
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices)+sizeof(normals)+sizeof(texture), vertices, GL_STATIC_DRAW);
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices), sizeof(normals), normals);
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices)+ sizeof(normals), sizeof(texture), texture);
-
-    program = glCreateProgram();
-    glAttachShader(program, vertex_shader);
-    glAttachShader(program, fragment_shader);
-    glLinkProgram(program);
 
     //lightingShader.setVec3("viewPos", camera.Position);
 
