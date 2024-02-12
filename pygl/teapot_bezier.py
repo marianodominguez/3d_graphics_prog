@@ -11,9 +11,14 @@ strVertexShader = """
 #version 330
 
 layout(location = 0) in vec4 position;
+
+uniform mat4 M;
+uniform mat4 V;
+uniform mat4 P;
+
 void main()
 {
-   gl_Position = position;
+    gl_Position = P*V*M*vec4(position, 1.0);
 }
 """
 
@@ -34,6 +39,9 @@ vp_size_changed=False
 
 #TODO use model
 nvertices=16*32
+m=glm.mat4()
+v=glm.mat4()
+p=glm.mat4()
 
 
 def createShader(shaderType, shaderFile):
@@ -84,17 +92,16 @@ def draw():
     ratio = width / height;
 
     glViewport(0, 0, width, height);
+    m=glm.identity(glm.mat4)
+    m=glm.scale([2.5, 2.5, 2.5]);
 
     glClearColor(0.0, 0.0, 0.0, 0.0)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-    glUseProgram(program)
-
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
-    glEnableVertexAttribArray(0)
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, None)
 
     p=glm.perspective(math.pi / 2, ratio, 0.1, 50.0)
-
+    glUniformMatrix4fv(m_location, 1, GL_FALSE,  glm.value_ptr(m))
+    glUniformMatrix4fv(v_location, 1, GL_FALSE, glm.value_ptr(v))
+    glUniformMatrix4fv(p_location, 1, GL_FALSE, glm.value_ptr(p))
     glDrawArrays(GL_TRIANGLES, 0, nvertices)
 
 
@@ -143,6 +150,7 @@ shaderList.append(createShader(GL_VERTEX_SHADER, strVertexShader))
 shaderList.append(createShader(GL_FRAGMENT_SHADER, strFragmentShader))
 
 program = glCreateProgram()
+glUseProgram(program)
 
 for shader in shaderList:
     glAttachShader(program, shader)
@@ -161,12 +169,21 @@ glBufferData( # PyOpenGL allows for the omission of the size parameter
     GL_STATIC_DRAW
 )
 
+m_location = glGetUniformLocation(program, "M")
+v_location = glGetUniformLocation(program, "V")
+p_location = glGetUniformLocation(program, "P")
+
 vpos_location=glGetAttribLocation(program, 'position')
 glEnableVertexAttribArray(vpos_location);
 glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
                            0,  None)
 glBindBuffer(GL_ARRAY_BUFFER, vpos_location)
 glBindVertexArray(glGenVertexArrays(1))
+
+
+glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
+glEnableVertexAttribArray(0)
+glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, None)
 
 
 #setup camera
