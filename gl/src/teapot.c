@@ -211,6 +211,8 @@ void drawScene() {
                         (const GLfloat *)normal_matrix);
     glUniform4fv(light_location, 1, (const GLfloat *)LightCameraPosition);
     glUniform3fv(camera_location, 1, (const GLfloat *)cameraPosition);
+    //glPolygonMode ( GL_FRONT_AND_BACK, GL_LINE ) ;
+
     glDrawArrays(GL_TRIANGLES, 0, nvertices);
 
     glfwSwapBuffers(window);
@@ -291,7 +293,7 @@ int main(void)
                           sizeof(normals[0]), BUFFER_OFFSET(sizeof(vertices) ));
     glEnableVertexAttribArray(vnormal_location);
     glVertexAttribPointer(texture_location, 2, GL_FLOAT, GL_FALSE,
-                          sizeof(texture[0]), BUFFER_OFFSET(sizeof(texture) ));
+                          sizeof(texture[0]), BUFFER_OFFSET(sizeof(normals) + sizeof(vertices)));
     glEnableVertexAttribArray(texture_location);
     glUseProgram(program);
 
