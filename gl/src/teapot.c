@@ -79,7 +79,7 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action,
 }
 
 void GLAPIENTRY debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
-    fprintf( "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+    printf( "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
            ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ),
             type, severity, message );
 }
@@ -264,9 +264,7 @@ int main(void)
     
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices)+sizeof(normals)+sizeof(texture), vertices, GL_STATIC_DRAW);
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices), sizeof(normals), normals);
-
     loadTexture();
-
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices)+ sizeof(normals), sizeof(texture), texture);
 
     program = glCreateProgram();
@@ -289,12 +287,13 @@ int main(void)
     glEnableVertexAttribArray(vpos_location);
     glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
                           sizeof(vertices[0]), BUFFER_OFFSET(0));
+    glEnableVertexAttribArray(vnormal_location);
     glVertexAttribPointer(vnormal_location, 3, GL_FLOAT, GL_FALSE,
                           sizeof(normals[0]), BUFFER_OFFSET(sizeof(vertices) ));
-    glEnableVertexAttribArray(vnormal_location);
+    glEnableVertexAttribArray(texture_location);
     glVertexAttribPointer(texture_location, 2, GL_FLOAT, GL_FALSE,
                           sizeof(texture[0]), BUFFER_OFFSET(sizeof(normals) + sizeof(vertices)));
-    glEnableVertexAttribArray(texture_location);
+
     glUseProgram(program);
 
     // Camera matrix
