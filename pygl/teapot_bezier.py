@@ -114,6 +114,10 @@ def init():
         print("Unable to get window")
         sys.exit(1)
     # Create a windowed mode window and its OpenGL context
+
+    glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
+    glfw.window_hint(glfw.CONTEXT_VERSION_MINOR,3)
+
     window = glfw.create_window(640, 480, "Hello World", None, None)
     if not window:
         glfw.terminate()
@@ -149,19 +153,7 @@ shaderList = []
 shaderList.append(createShader(GL_VERTEX_SHADER, strVertexShader))
 shaderList.append(createShader(GL_FRAGMENT_SHADER, strFragmentShader))
 
-program = glCreateProgram()
-glUseProgram(program)
-
-for shader in shaderList:
-    glAttachShader(program, shader)
-    glLinkProgram(program)
-
-
-for shader in shaderList:
-    glDeleteShader(shader)
-
 vertex_buffer = glGenBuffers(1)
-
 glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
 glBufferData( # PyOpenGL allows for the omission of the size parameter
     GL_ARRAY_BUFFER,
@@ -169,9 +161,15 @@ glBufferData( # PyOpenGL allows for the omission of the size parameter
     GL_STATIC_DRAW
 )
 
-m_location = glGetUniformLocation(program, "M")
-v_location = glGetUniformLocation(program, "V")
-p_location = glGetUniformLocation(program, "P")
+program = glCreateProgram()
+
+for shader in shaderList:
+    glAttachShader(program, shader)
+    glLinkProgram(program)
+
+m_location = glGetUniformLocation(program, 'M')
+v_location = glGetUniformLocation(program, 'V')
+p_location = glGetUniformLocation(program, 'P')
 
 vpos_location=glGetAttribLocation(program, 'position')
 glEnableVertexAttribArray(vpos_location);
@@ -185,6 +183,7 @@ glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
 glEnableVertexAttribArray(0)
 glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, None)
 
+glUseProgram(program)
 
 #setup camera
 # Camera matrix
