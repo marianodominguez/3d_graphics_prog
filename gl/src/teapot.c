@@ -79,7 +79,9 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action,
 }
 
 void GLAPIENTRY debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
-    puts(message);
+    fprintf( "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+           ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ),
+            type, severity, message );
 }
 
 int load_shader(char *filename, GLuint type) {
@@ -245,11 +247,11 @@ int main(void)
     glfwMakeContextCurrent(window);
     glewInit();
     glfwSwapInterval(1);
-    
-    glEnable( GL_DEBUG_OUTPUT );
-    glDebugMessageCallback( debug_callback, 0 );
-
     puts(glGetString(GL_VERSION));
+
+    glEnable( GL_DEBUG_OUTPUT );
+    //glDebugMessageCallback( debug_callback, 0 );
+
     glEnable(GL_DEPTH_TEST);
 
     glGenVertexArrays( 1, &vpos_location );
