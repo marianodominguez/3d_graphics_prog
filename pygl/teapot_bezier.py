@@ -10,7 +10,7 @@ import math
 strVertexShader = """
 #version 330
 
-layout(location = 0) in vec4 position;
+in vec3 vpos;
 
 uniform mat4 M;
 uniform mat4 V;
@@ -18,7 +18,20 @@ uniform mat4 P;
 
 void main()
 {
-    gl_Position = P*V*M*vec4(position, 1.0);
+    gl_Position = P*V*M*vec4(vpos, 1.0);
+}
+"""
+
+strGeometryShader = """
+#version 330
+
+layout (points) in;
+layout (triangle_strip, max_vertices = 16*100) out;
+
+void main() {
+    gl_Position = gl_in[0].gl_Position;
+    EmitVertex();
+    EndPrimitive();
 }
 """
 
@@ -36,13 +49,16 @@ void main()
 program=None
 vertex_buffer=None
 vp_size_changed=False
+v_location=None
+m_location=None
+p_location=None
+vpos_location=None
 
 #TODO use model
 nvertices=16*32
 m=glm.mat4()
 v=glm.mat4()
 p=glm.mat4()
-
 
 def createShader(shaderType, shaderFile):
     shader = glCreateShader(shaderType)
@@ -117,8 +133,11 @@ def init():
 
     glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
     glfw.window_hint(glfw.CONTEXT_VERSION_MINOR,3)
+    #glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, GL_TRUE)
+    glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
+    glfw.window_hint(glfw.OPENGL_DEBUG_CONTEXT, GL_TRUE)
 
-    window = glfw.create_window(640, 480, "Hello World", None, None)
+    window = glfw.create_window(640, 480, "Utah teapot", None, None)
     if not window:
         glfw.terminate()
         sys.exit(1)
@@ -137,27 +156,29 @@ def generate_patches(model):
         #result.append(v)
     return np.array(result)
 
-m=load_model("../models/teapot")
-#print(m['patches'])
+model=load_model("../models/teapot")
+patches=model['patches']
 #print(m['vertices'])
 
-patches = generate_patches(m)
+control_points = generate_patches(model)
 np.set_printoptions(floatmode="maxprec", precision=4)
-for p in patches:
-    print(p)
+
+print(control_points)
 
 window=init()
 
 shaderList = []
 
 shaderList.append(createShader(GL_VERTEX_SHADER, strVertexShader))
+#shaderList.append(createShader(GL_GEOMETRY_SHADER, strGeometryShader))
 shaderList.append(createShader(GL_FRAGMENT_SHADER, strFragmentShader))
 
 vertex_buffer = glGenBuffers(1)
 glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
+
 glBufferData( # PyOpenGL allows for the omission of the size parameter
     GL_ARRAY_BUFFER,
-    patches,
+    control_points,
     GL_STATIC_DRAW
 )
 
@@ -166,22 +187,18 @@ program = glCreateProgram()
 for shader in shaderList:
     glAttachShader(program, shader)
     glLinkProgram(program)
+    if not glGetProgramiv( program, GL_LINK_STATUS ):
+        print( 'link error:' )
+        print( glGetProgramInfoLog( program ) )
 
 m_location = glGetUniformLocation(program, 'M')
 v_location = glGetUniformLocation(program, 'V')
 p_location = glGetUniformLocation(program, 'P')
+vpos_location = glGetAttribLocation(program, "vpos")
 
-vpos_location=glGetAttribLocation(program, 'position')
-glEnableVertexAttribArray(vpos_location);
+glEnableVertexAttribArray(vpos_location)
 glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
-                           0,  None)
-glBindBuffer(GL_ARRAY_BUFFER, vpos_location)
-glBindVertexArray(glGenVertexArrays(1))
-
-
-glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
-glEnableVertexAttribArray(0)
-glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, None)
+            0, None)
 
 glUseProgram(program)
 
