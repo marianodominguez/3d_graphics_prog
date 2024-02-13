@@ -118,7 +118,7 @@ def draw():
     glUniformMatrix4fv(m_location, 1, GL_FALSE,  glm.value_ptr(m))
     glUniformMatrix4fv(v_location, 1, GL_FALSE, glm.value_ptr(v))
     glUniformMatrix4fv(p_location, 1, GL_FALSE, glm.value_ptr(p))
-    glDrawArrays(GL_TRIANGLES, 0, nvertices)
+    glDrawArrays(GL_POINTS, 0, nvertices)
 
 
 def resize_cb(window, w, h):
@@ -131,10 +131,10 @@ def init():
         sys.exit(1)
     # Create a windowed mode window and its OpenGL context
 
-    glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
-    glfw.window_hint(glfw.CONTEXT_VERSION_MINOR,3)
+    glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 4)
+    glfw.window_hint(glfw.CONTEXT_VERSION_MINOR,5)
     #glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, GL_TRUE)
-    glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
+    #glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
     glfw.window_hint(glfw.OPENGL_DEBUG_CONTEXT, GL_TRUE)
 
     window = glfw.create_window(640, 480, "Utah teapot", None, None)
@@ -173,8 +173,13 @@ shaderList.append(createShader(GL_VERTEX_SHADER, strVertexShader))
 #shaderList.append(createShader(GL_GEOMETRY_SHADER, strGeometryShader))
 shaderList.append(createShader(GL_FRAGMENT_SHADER, strFragmentShader))
 
+vertex_attributes=None
+vertex_attributes=glGenVertexArrays(1)
+glBindVertexArray(vertex_attributes)
+
 vertex_buffer = glGenBuffers(1)
 glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
+
 
 glBufferData( # PyOpenGL allows for the omission of the size parameter
     GL_ARRAY_BUFFER,
