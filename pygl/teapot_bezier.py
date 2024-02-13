@@ -118,7 +118,8 @@ def draw():
     glUniformMatrix4fv(m_location, 1, GL_FALSE,  glm.value_ptr(m))
     glUniformMatrix4fv(v_location, 1, GL_FALSE, glm.value_ptr(v))
     glUniformMatrix4fv(p_location, 1, GL_FALSE, glm.value_ptr(p))
-    glDrawArrays(GL_POINTS, 0, nvertices)
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+    glDrawArrays(GL_QUAD_STRIP, 0, nvertices)
 
 
 def resize_cb(window, w, h):
@@ -131,8 +132,8 @@ def init():
         sys.exit(1)
     # Create a windowed mode window and its OpenGL context
 
-    glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 4)
-    glfw.window_hint(glfw.CONTEXT_VERSION_MINOR,5)
+    glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
+    glfw.window_hint(glfw.CONTEXT_VERSION_MINOR,0)
     #glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, GL_TRUE)
     #glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
     glfw.window_hint(glfw.OPENGL_DEBUG_CONTEXT, GL_TRUE)
