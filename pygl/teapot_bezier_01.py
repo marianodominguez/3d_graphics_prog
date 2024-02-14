@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+'''
+Load and display the bezier patches as points
+'''
+
 import numpy as np
 import glfw
 import sys
@@ -10,8 +14,8 @@ import math
 strVertexShader = """
 #version 330
 
-in mat4 control_points;
 in vec3 vpos;
+
 uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
@@ -22,26 +26,6 @@ void main()
 }
 """
 
-strGeometryShader = """
-#version 330
-
-layout (points) in;
-layout (triangle_strip, max_vertices = 16*100) out;
-uniform mat4 M;
-uniform mat4 V;
-uniform mat4 P;
-
-void main() {
-
-    mat4 control_points = gl_in[0].control_points;
-
-    for (int i=0 ; i<6;i++) {
-         gl_Position = P*V*M*vec4(vpos+vec3(i,0,0), 1.0);
-        EmitVertex();
-    }
-    EndPrimitive();
-}
-"""
 
 # String containing fragment shader program written in GLSL
 strFragmentShader = """
@@ -60,7 +44,7 @@ vp_size_changed=False
 v_location=None
 m_location=None
 p_location=None
-cp_location=None
+vpos_location=None
 
 #TODO use model
 nvertices=16*32
@@ -129,6 +113,7 @@ def draw():
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
     glDrawArrays(GL_POINTS, 0, nvertices)
 
+
 def resize_cb(window, w, h):
     global vp_size_changed
     vp_size_changed = True
@@ -158,18 +143,24 @@ def init():
 def generate_patches(model):
     result=[]
     for p in model['patches']:
-        v=[]
+        #print(p)
         for i in range(16):
-            v.append(model['vertices'][p[i]-1])
-        result.append(v)
+            result.append(model['vertices'][p[i]-1])
+        #result.append(v)
     return np.array(result)
 
 def load_shaders():
     shaderList = []
 
     shaderList.append(createShader(GL_VERTEX_SHADER, strVertexShader))
-    shaderList.append(createShader(GL_GEOMETRY_SHADER, strGeometryShader))
     shaderList.append(createShader(GL_FRAGMENT_SHADER, strFragmentShader))
+
+    glBufferData( # PyOpenGL allows for the omission of the size parameter
+        GL_ARRAY_BUFFER,
+        control_points,
+        GL_STATIC_DRAW
+    )
+
     program = glCreateProgram()
 
     for shader in shaderList:
@@ -181,22 +172,12 @@ def load_shaders():
         glDeleteShader(shader)
     return program
 
-np.set_printoptions(floatmode="maxprec", precision=4)
-
 model=load_model("../models/teapot")
 patches=model['patches']
 #print(m['vertices'])
 
 control_points = generate_patches(model)
-dummy_vertices=[]
-for p in patches:
-    dummy_vertices.append( p[0] )
-
-glBufferData( # PyOpenGL allows for the omission of the size parameter()
-        GL_ARRAY_BUFFER,
-        np.array(dummy_vertices),
-        GL_STATIC_DRAW
-    )
+np.set_printoptions(floatmode="maxprec", precision=4)
 
 print(control_points)
 
@@ -213,8 +194,11 @@ program= load_shaders()
 m_location = glGetUniformLocation(program, 'M')
 v_location = glGetUniformLocation(program, 'V')
 p_location = glGetUniformLocation(program, 'P')
-cp_location = glGetAttribLocation(program, "control_points")
+vpos_location = glGetAttribLocation(program, "vpos")
 
+glEnableVertexAttribArray(vpos_location)
+glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
+            0, None)
 
 glUseProgram(program)
 
@@ -236,5 +220,6 @@ while not glfw.window_should_close(window):
         vp_size_changed = False
         w, h = glfw.get_framebuffer_size(window)
         glViewport(0, 0, w, h)
+        #print("new viewport size:", w, h)
 
 glfw.terminate()
