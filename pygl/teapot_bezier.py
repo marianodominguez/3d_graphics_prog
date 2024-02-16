@@ -8,35 +8,32 @@ import glm
 import math
 
 strVertexShader = """
-#version 330
+#version 330 core
 
-in mat4 control_points;
-in vec3 vpos;
-uniform mat4 M;
-uniform mat4 V;
-uniform mat4 P;
+layout (location = 0) in vec3 vpos;
 
 void main()
 {
-    gl_Position = P*V*M*vec4(vpos, 1.0);
+    gl_Position = vec4(vpos, 1.0);
 }
 """
 
 strGeometryShader = """
-#version 330
+#version 330 core
 
-layout (points) in;
-layout (triangle_strip, max_vertices = 16*100) out;
+layout (triangles) in;
+layout (triangle_strip, max_vertices = 16) out;
+
 uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
 
 void main() {
 
-    mat4 control_points = gl_in[0].control_points;
-
-    for (int i=0 ; i<6;i++) {
-         gl_Position = P*V*M*vec4(vpos+vec3(i,0,0), 1.0);
+    vec4 position;
+    for (int i=0;i<3;i++) {
+        position=gl_in[i].gl_Position;
+        gl_Position = P*V*M*vec4(position+vec4(i,0.0,i,0.0) );
         EmitVertex();
     }
     EndPrimitive();
@@ -45,7 +42,7 @@ void main() {
 
 # String containing fragment shader program written in GLSL
 strFragmentShader = """
-#version 330
+#version 330 core
 
 out vec4 outputColor;
 void main()
@@ -127,7 +124,10 @@ def draw():
     glUniformMatrix4fv(v_location, 1, GL_FALSE, glm.value_ptr(v))
     glUniformMatrix4fv(p_location, 1, GL_FALSE, glm.value_ptr(p))
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
-    glDrawArrays(GL_POINTS, 0, nvertices)
+
+    for npatch in range(32):
+        #print(control_points[npatch*16])
+        glDrawArrays(GL_TRIANGLES, npatch*16, 16)
 
 def resize_cb(window, w, h):
     global vp_size_changed
@@ -158,10 +158,8 @@ def init():
 def generate_patches(model):
     result=[]
     for p in model['patches']:
-        v=[]
-        for i in range(16):
-            v.append(model['vertices'][p[i]-1])
-        result.append(v)
+        for i in range(len(p)):
+            result.append(glm.vec3(model['vertices'][p[i]-1]))
     return np.array(result)
 
 def load_shaders():
@@ -188,17 +186,12 @@ patches=model['patches']
 #print(m['vertices'])
 
 control_points = generate_patches(model)
-dummy_vertices=[]
-for p in patches:
-    dummy_vertices.append( p[0] )
 
 glBufferData( # PyOpenGL allows for the omission of the size parameter()
         GL_ARRAY_BUFFER,
-        np.array(dummy_vertices),
+        np.array(control_points),
         GL_STATIC_DRAW
     )
-
-print(control_points)
 
 window=init()
 vertex_attributes=None
@@ -214,7 +207,6 @@ m_location = glGetUniformLocation(program, 'M')
 v_location = glGetUniformLocation(program, 'V')
 p_location = glGetUniformLocation(program, 'P')
 cp_location = glGetAttribLocation(program, "control_points")
-
 
 glUseProgram(program)
 
@@ -236,5 +228,4 @@ while not glfw.window_should_close(window):
         vp_size_changed = False
         w, h = glfw.get_framebuffer_size(window)
         glViewport(0, 0, w, h)
-
 glfw.terminate()
