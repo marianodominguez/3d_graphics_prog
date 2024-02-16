@@ -1,10 +1,11 @@
-#version 410 core
+#version 150 core
 
 in vec3 Normal;
 in vec3 FragPos;
 
 uniform vec4 lightCamera;
 uniform vec3 viewPos;
+out vec4 FragColor;
 
 void main()
 {
@@ -25,5 +26,5 @@ void main()
 
     vec3 color = (diff+specular+ambient)*objColor;
 
-    gl_FragColor = vec4(color, 1.0);
+    FragColor = vec4(color, 1.0);
 }

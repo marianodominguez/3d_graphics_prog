@@ -162,16 +162,15 @@ void drawScene() {
 int main(void)
 {
     load_model("models/teapot_normals.txt");
-
     glfwSetErrorCallback(error_callback);
 
     if (!glfwInit())
         exit(EXIT_FAILURE);
 
-    // glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    // glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-    // glfwWindowHint (GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    // glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint (GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     window = glfwCreateWindow(640, 480, "Simple example", NULL, NULL);
     if (!window) {
@@ -187,8 +186,8 @@ int main(void)
 
     glEnable(GL_DEPTH_TEST);
 
-    vertex_shader   =   load_shader("gl/src/vertex_shader.gsl", GL_VERTEX_SHADER);
-    fragment_shader =   load_shader("gl/src/fragment_shader_spec.gsl", GL_FRAGMENT_SHADER);
+    glGenVertexArrays( 1, &vpos_location );
+    glBindVertexArray( vpos_location ); 
 
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
@@ -196,6 +195,8 @@ int main(void)
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices), sizeof(normals), normals);
 
     program = glCreateProgram();
+    vertex_shader   =   load_shader("gl/src/vertex_shader.gsl", GL_VERTEX_SHADER);
+    fragment_shader =   load_shader("gl/src/fragment_shader_spec.gsl", GL_FRAGMENT_SHADER);
     glAttachShader(program, vertex_shader);
     glAttachShader(program, fragment_shader);
     glLinkProgram(program);
