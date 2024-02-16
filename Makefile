@@ -64,6 +64,9 @@ gl_teapot_diffuse:
 gl_teapot_specular:
 	$(CXX) $(COMPILER_FLAGS) -o bin/$@ gl/src/teapot_spec.c $(INCLUDE) $(GL_LIBS)
 
+gl_teapot_texture:
+	$(CXX) $(COMPILER_FLAGS) -o bin/$@ gl/src/teapot_texture.c $(INCLUDE) $(GL_LIBS)
+
 gl_cube:
 	$(CXX) $(COMPILER_FLAGS) -o bin/$@ gl/src/cube.c $(INCLUDE) $(GL_LIBS)
 

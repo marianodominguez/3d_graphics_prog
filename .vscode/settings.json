@@ -10,7 +10,11 @@
         "math.h": "c",
         "stdlib.h": "c",
         "linmath.h": "c",
-        "glfw3.h": "c"
+        "glfw3.h": "c",
+        "array": "c",
+        "string_view": "c",
+        "initializer_list": "c",
+        "utility": "c"
     },
     "makefile.configurations": [
         {
