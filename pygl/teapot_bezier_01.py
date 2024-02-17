@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+'''
+Load and display the bezier patches as points
+'''
+
 import numpy as np
 import glfw
 import sys
@@ -8,7 +12,7 @@ import glm
 import math
 
 strVertexShader = """
-#version 330 core
+#version 330
 
 in vec3 vpos;
 
@@ -18,36 +22,14 @@ uniform mat4 P;
 
 void main()
 {
-    //gl_Position = vec4(vpos, 1.0);
     gl_Position = P*V*M*vec4(vpos, 1.0);
 }
 """
 
-strGeometryShader = """
-#version 330 core
-
-layout (triangles) in;
-layout (triangle_strip, max_vertices = 16) out;
-
-uniform mat4 M;
-uniform mat4 V;
-uniform mat4 P;
-
-void main() {
-
-    vec4 position;
-    for (int i=0;i<3;i++) {
-        position=gl_in[i].gl_Position;
-        gl_Position = P*V*M*vec4(position+vec4(i,0.0,i,0.0) );
-        EmitVertex();
-    }
-    EndPrimitive();
-}
-"""
 
 # String containing fragment shader program written in GLSL
 strFragmentShader = """
-#version 330 core
+#version 330
 
 out vec4 outputColor;
 void main()
@@ -62,7 +44,7 @@ vp_size_changed=False
 v_location=None
 m_location=None
 p_location=None
-cp_location=None
+vpos_location=None
 
 #TODO use model
 nvertices=16*32
@@ -125,12 +107,12 @@ def draw():
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
     p=glm.perspective(math.pi / 2, ratio, 0.1, 50.0)
-    glUniformMatrix4fv(m_location, 1, GL_FALSE, glm.value_ptr(m))
+    glUniformMatrix4fv(m_location, 1, GL_FALSE,  glm.value_ptr(m))
     glUniformMatrix4fv(v_location, 1, GL_FALSE, glm.value_ptr(v))
     glUniformMatrix4fv(p_location, 1, GL_FALSE, glm.value_ptr(p))
-    #glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+    glDrawArrays(GL_POINTS, 0, nvertices)
 
-    glDrawArrays(GL_POINTS, 0, len(dummy_vertices))
 
 def resize_cb(window, w, h):
     global vp_size_changed
@@ -161,17 +143,24 @@ def init():
 def generate_patches(model):
     result=[]
     for p in model['patches']:
-        for i in range(len(p)):
+        #print(p)
+        for i in range(16):
             result.append(model['vertices'][p[i]-1])
+        #result.append(v)
     return np.array(result)
 
 def load_shaders():
-
     shaderList = []
 
     shaderList.append(createShader(GL_VERTEX_SHADER, strVertexShader))
-    #shaderList.append(createShader(GL_GEOMETRY_SHADER, strGeometryShader))
     shaderList.append(createShader(GL_FRAGMENT_SHADER, strFragmentShader))
+
+    glBufferData( # PyOpenGL allows for the omission of the size parameter
+        GL_ARRAY_BUFFER,
+        control_points,
+        GL_STATIC_DRAW
+    )
+
     program = glCreateProgram()
 
     for shader in shaderList:
@@ -183,20 +172,14 @@ def load_shaders():
         glDeleteShader(shader)
     return program
 
-np.set_printoptions(floatmode="maxprec", precision=4)
-
 model=load_model("../models/teapot")
 patches=model['patches']
 #print(m['vertices'])
 
-dummy_vertices=[]
 control_points = generate_patches(model)
+np.set_printoptions(floatmode="maxprec", precision=4)
 
-#add a point for each control matrix
-for i,p in enumerate(control_points):
-    if i % 16 == 0: dummy_vertices.append(p)
-
-print(dummy_vertices)
+print(control_points)
 
 window=init()
 vertex_attributes=None
@@ -206,18 +189,13 @@ glBindVertexArray(vertex_attributes)
 vertex_buffer = glGenBuffers(1)
 glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
 
-glBufferData( # PyOpenGL allows for the omission of the size parameter()
-        GL_ARRAY_BUFFER,
-        np.array(dummy_vertices),
-        GL_STATIC_DRAW
-    )
-
 program= load_shaders()
 
 m_location = glGetUniformLocation(program, 'M')
 v_location = glGetUniformLocation(program, 'V')
 p_location = glGetUniformLocation(program, 'P')
 vpos_location = glGetAttribLocation(program, "vpos")
+
 glEnableVertexAttribArray(vpos_location)
 glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
             0, None)
@@ -228,7 +206,7 @@ glUseProgram(program)
 # Camera matrix
 v =glm.lookAt(glm.vec3(10, 10, 10), # Camera in World Space
             glm.vec3(0, 0, 0),  # and looks at the origin
-            glm.vec3(0, 1, 0))
+            glm.vec3(0, 1, 0));
 
 while not glfw.window_should_close(window):
     # Render here, e.g. using pyOpenGL
@@ -242,4 +220,6 @@ while not glfw.window_should_close(window):
         vp_size_changed = False
         w, h = glfw.get_framebuffer_size(window)
         glViewport(0, 0, w, h)
+        #print("new viewport size:", w, h)
+
 glfw.terminate()
