@@ -185,11 +185,17 @@ model=load_model("../models/teapot")
 patches=model['patches']
 #print(m['vertices'])
 
+dummy_vertices=[]
 control_points = generate_patches(model)
+
+#add a point for each control matrix
+for p in control_points:
+    dummy_vertices.append(p[0])
+
 
 glBufferData( # PyOpenGL allows for the omission of the size parameter()
         GL_ARRAY_BUFFER,
-        np.array(control_points),
+        np.array(dummy_vertices),
         GL_STATIC_DRAW
     )
 
