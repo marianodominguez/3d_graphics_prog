@@ -10,37 +10,32 @@ import math
 strVertexShader = """
 #version 330 core
 
-in vec3 vpos;
-
-uniform mat4 M;
-uniform mat4 V;
-uniform mat4 P;
+layout (location = 0) in vec3 vpos;
 
 void main()
 {
-    //gl_Position = vec4(vpos, 1.0);
-    gl_Position = P*V*M*vec4(vpos, 1.0);
+    gl_Position = vec4(vpos, 1.0);
+    //gl_Position = P*V*M*vec4(vpos, 1.0);
 }
 """
 
 strGeometryShader = """
 #version 330 core
 
-layout (triangles) in;
-layout (triangle_strip, max_vertices = 16) out;
+layout (triangles_adjacency) in;
+layout (triangle_strip, max_vertices = 100) out;
 
 uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
 
 void main() {
-
-    vec4 position;
-    for (int i=0;i<3;i++) {
-        position=gl_in[i].gl_Position;
-        gl_Position = P*V*M*vec4(position+vec4(i,0.0,i,0.0) );
+    for (int i=0; i<16 ; i++) {
+        vec4 position=gl_in[i].gl_Position;
+        gl_Position = P*V*M*vec4(position);
         EmitVertex();
     }
+
     EndPrimitive();
 }
 """
@@ -73,7 +68,6 @@ p=glm.mat4()
 def createShader(shaderType, shaderFile):
     shader = glCreateShader(shaderType)
     glShaderSource(shader, shaderFile) # note that this is a simpler function call than in C
-
     glCompileShader(shader)
 
     status = None
@@ -89,9 +83,7 @@ def createShader(shaderType, shaderFile):
             strShaderType = "geometry"
         elif shaderType is GL_FRAGMENT_SHADER:
             strShaderType = "fragment"
-
         print("Compilation failure for " + strShaderType + " shader:\n" + strInfoLog)
-
     return shader
 
 def load_model(filename):
@@ -129,8 +121,8 @@ def draw():
     glUniformMatrix4fv(v_location, 1, GL_FALSE, glm.value_ptr(v))
     glUniformMatrix4fv(p_location, 1, GL_FALSE, glm.value_ptr(p))
     #glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
-
-    glDrawArrays(GL_POINTS, 0, len(dummy_vertices))
+    for i in range(0,len(control_points),16):
+        glDrawArrays(GL_TRIANGLE_STRIP_ADJACENCY, i, 16)
 
 def resize_cb(window, w, h):
     global vp_size_changed
@@ -163,14 +155,12 @@ def generate_patches(model):
     for p in model['patches']:
         for i in range(len(p)):
             result.append(model['vertices'][p[i]-1])
-    return np.array(result)
+    return result
 
 def load_shaders():
-
     shaderList = []
-
     shaderList.append(createShader(GL_VERTEX_SHADER, strVertexShader))
-    #shaderList.append(createShader(GL_GEOMETRY_SHADER, strGeometryShader))
+    shaderList.append(createShader(GL_GEOMETRY_SHADER, strGeometryShader))
     shaderList.append(createShader(GL_FRAGMENT_SHADER, strFragmentShader))
     program = glCreateProgram()
 
@@ -189,14 +179,9 @@ model=load_model("../models/teapot")
 patches=model['patches']
 #print(m['vertices'])
 
-dummy_vertices=[]
-control_points = generate_patches(model)
-
-#add a point for each control matrix
-for i,p in enumerate(control_points):
-    if i % 16 == 0: dummy_vertices.append(p)
-
-print(dummy_vertices)
+#dummy_vertices=[]
+control_points = np.array(generate_patches(model))
+print(control_points)
 
 window=init()
 vertex_attributes=None
@@ -208,9 +193,9 @@ glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
 
 glBufferData( # PyOpenGL allows for the omission of the size parameter()
         GL_ARRAY_BUFFER,
-        np.array(dummy_vertices),
-        GL_STATIC_DRAW
-    )
+        control_points.nbytes,
+        control_points,
+        GL_STATIC_DRAW)
 
 program= load_shaders()
 
@@ -219,9 +204,9 @@ v_location = glGetUniformLocation(program, 'V')
 p_location = glGetUniformLocation(program, 'P')
 vpos_location = glGetAttribLocation(program, "vpos")
 glEnableVertexAttribArray(vpos_location)
-glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
-            0, None)
 
+glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
+            glm.sizeof(glm.vec3), None)
 glUseProgram(program)
 
 #setup camera
