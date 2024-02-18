@@ -23,21 +23,71 @@ strGeometryShader = """
 #version 330 core
 
 layout (triangles_adjacency) in;
-layout (triangle_strip, max_vertices = 100) out;
+layout (triangle_strip, max_vertices = 256) out;
 
 uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
+const int numdiv=16;
+vec3 CP[16];
+
+vec4 evaluateBezier(float s,float t) {
+    vec3 p= vec3(0, 0, 0);
+    float b[4], c[4];
+    b[0] = (1 - t) * (1 - t) * (1 - t);
+    b[1] = 3 * t * (1 - t) * (1 - t);
+    b[2] = 3 * t * t * (1 - t);
+    b[3] = t * t * t;
+
+    c[0] = (1 - s) * (1 - s) * (1 - s);
+    c[1] = 3 * s * (1 - s) * (1 - s);
+    c[2] = 3 * s * s * (1 - s);
+    c[3] = s * s * s;
+
+    int idx=0;
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            p = p+ b[i] * c[j] * CP[idx];
+            idx++;
+        }
+    }
+    return vec4(p,1.0);
+}
+
 
 void main() {
-    for (int i=0; i<16 ; i++) {
-        vec4 position=gl_in[i].gl_Position;
-        gl_Position = P*V*M*vec4(position);
-        EmitVertex();
+    float dt=1.0/float(numdiv);
+    float s=1,t=0;
+    vec4 position;
+    int idx=0;
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            CP[idx]=gl_in[idx].gl_Position.xyz;
+            idx++;
+        }
     }
 
-    EndPrimitive();
+    for (int i=0; i<numdiv ; i++) {
+        for (int j=0; j<numdiv;j++ ) {
+            position=evaluateBezier(s,t);
+            gl_Position = P*V*M*position;
+            EmitVertex();
+            position=evaluateBezier(s,t+dt);
+            gl_Position = P*V*M*position;
+            EmitVertex();
+            position=evaluateBezier(s+dt,t);
+            gl_Position = P*V*M*position;
+            EmitVertex();
+            EndPrimitive();
+            t+=dt;
+        }
+        s-=dt;
+    }
+
+
 }
+
+
 """
 
 # String containing fragment shader program written in GLSL
