@@ -155,12 +155,6 @@ def load_shaders():
     shaderList.append(createShader(GL_VERTEX_SHADER, strVertexShader))
     shaderList.append(createShader(GL_FRAGMENT_SHADER, strFragmentShader))
 
-    glBufferData( # PyOpenGL allows for the omission of the size parameter
-        GL_ARRAY_BUFFER,
-        control_points,
-        GL_STATIC_DRAW
-    )
-
     program = glCreateProgram()
 
     for shader in shaderList:
@@ -182,12 +176,17 @@ np.set_printoptions(floatmode="maxprec", precision=4)
 print(control_points)
 
 window=init()
-vertex_attributes=None
 vertex_attributes=glGenVertexArrays(1)
 glBindVertexArray(vertex_attributes)
 
 vertex_buffer = glGenBuffers(1)
 glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
+
+glBufferData( # PyOpenGL allows for the omission of the size parameter
+        GL_ARRAY_BUFFER,
+        control_points,
+        GL_STATIC_DRAW
+    )
 
 program= load_shaders()
 
@@ -195,11 +194,10 @@ m_location = glGetUniformLocation(program, 'M')
 v_location = glGetUniformLocation(program, 'V')
 p_location = glGetUniformLocation(program, 'P')
 vpos_location = glGetAttribLocation(program, "vpos")
-
 glEnableVertexAttribArray(vpos_location)
+
 glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
             0, None)
-
 glUseProgram(program)
 
 #setup camera
@@ -221,5 +219,4 @@ while not glfw.window_should_close(window):
         w, h = glfw.get_framebuffer_size(window)
         glViewport(0, 0, w, h)
         #print("new viewport size:", w, h)
-
 glfw.terminate()

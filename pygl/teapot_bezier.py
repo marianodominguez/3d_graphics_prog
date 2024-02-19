@@ -21,7 +21,7 @@ void main()
 strGeometryShader = """
 #version 330 core
 
-layout (triangles_adjacency) in;
+layout (lines_adjacency) in;
 layout (triangle_strip, max_vertices = 256) out;
 
 uniform mat4 M;
@@ -56,6 +56,7 @@ void main() {
     float s=0,t=0;
     vec4 position;
     int idx=0;
+
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
             CP[4*i+j]=gl_in[4*i+j].gl_Position.xyz;
@@ -67,20 +68,13 @@ void main() {
             position=evaluateBezier(s,t);
             gl_Position = P*V*M*position;
             EmitVertex();
-            position=evaluateBezier(s+dt,t+dt);
-            gl_Position = P*V*M*position;
-            EmitVertex();
             position=evaluateBezier(s,t+dt);
             gl_Position = P*V*M*position;
             EmitVertex();
-            EndPrimitive();
-            position=evaluateBezier(s,t);
+            position=evaluateBezier(s+dt,t);
             gl_Position = P*V*M*position;
             EmitVertex();
             position=evaluateBezier(s+dt,t+dt);
-            gl_Position = P*V*M*position;
-            EmitVertex();
-            position=evaluateBezier(s+dt,t);
             gl_Position = P*V*M*position;
             EmitVertex();
             EndPrimitive();
@@ -173,7 +167,7 @@ def draw():
     glUniformMatrix4fv(p_location, 1, GL_FALSE, glm.value_ptr(p))
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
     for i in range(0,len(control_points),16):
-        glDrawArrays(GL_TRIANGLE_STRIP_ADJACENCY, i, 16)
+        glDrawArrays( GL_LINES_ADJACENCY, i, 16)
 
 def resize_cb(window, w, h):
     global vp_size_changed
@@ -235,7 +229,6 @@ control_points = np.array(generate_patches(model))
 print(control_points)
 
 window=init()
-vertex_attributes=None
 vertex_attributes=glGenVertexArrays(1)
 glBindVertexArray(vertex_attributes)
 
@@ -244,7 +237,6 @@ glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
 
 glBufferData( # PyOpenGL allows for the omission of the size parameter()
         GL_ARRAY_BUFFER,
-        control_points.nbytes,
         control_points,
         GL_STATIC_DRAW)
 
