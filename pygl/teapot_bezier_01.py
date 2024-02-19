@@ -111,7 +111,7 @@ def draw():
     glUniformMatrix4fv(v_location, 1, GL_FALSE, glm.value_ptr(v))
     glUniformMatrix4fv(p_location, 1, GL_FALSE, glm.value_ptr(p))
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
-    glDrawArrays(GL_POINTS, 0, nvertices)
+    glDrawArrays(GL_LINES_ADJACENCY, 0, nvertices)
 
 
 def resize_cb(window, w, h):

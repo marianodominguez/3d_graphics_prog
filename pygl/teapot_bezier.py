@@ -10,7 +10,7 @@ import math
 strVertexShader = """
 #version 330 core
 
-layout (location = 0) in vec3 vpos;
+in vec3 vpos;
 
 void main()
 {
@@ -27,7 +27,7 @@ layout (triangle_strip, max_vertices = 256) out;
 uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
-const int numdiv=32;
+const int numdiv=8;
 vec3 CP[16];
 
 vec4 evaluateBezier(float s,float t) {
