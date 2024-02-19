@@ -15,7 +15,6 @@ layout (location = 0) in vec3 vpos;
 void main()
 {
     gl_Position = vec4(vpos, 1.0);
-    //gl_Position = P*V*M*vec4(vpos, 1.0);
 }
 """
 
@@ -28,42 +27,38 @@ layout (triangle_strip, max_vertices = 256) out;
 uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
-const int numdiv=16;
+const int numdiv=32;
 vec3 CP[16];
 
 vec4 evaluateBezier(float s,float t) {
-    vec3 p= vec3(0, 0, 0);
+    vec3 p= vec3(0.0, 0.0, 0.0);
     float b[4], c[4];
-    b[0] = (1 - t) * (1 - t) * (1 - t);
-    b[1] = 3 * t * (1 - t) * (1 - t);
-    b[2] = 3 * t * t * (1 - t);
+    b[0] = (1.0 - t) * (1.0 - t) * (1.0 - t);
+    b[1] = 3.0 * t * (1.0 - t) * (1.0 - t);
+    b[2] = 3.0 * t * t * (1.0 - t);
     b[3] = t * t * t;
 
-    c[0] = (1 - s) * (1 - s) * (1 - s);
-    c[1] = 3 * s * (1 - s) * (1 - s);
-    c[2] = 3 * s * s * (1 - s);
+    c[0] = (1.0 - s) * (1.0 - s) * (1.0 - s);
+    c[1] = 3.0 * s * (1.0 - s) * (1.0 - s);
+    c[2] = 3.0 * s * s * (1.0 - s);
     c[3] = s * s * s;
 
-    int idx=0;
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            p = p+ b[i] * c[j] * CP[idx];
-            idx++;
+            p = p+ b[i] * c[j] * CP[4*i+j];
         }
     }
     return vec4(p,1.0);
 }
 
-
 void main() {
     float dt=1.0/float(numdiv);
-    float s=1,t=0;
+    float s=0,t=0;
     vec4 position;
     int idx=0;
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            CP[idx]=gl_in[idx].gl_Position.xyz;
-            idx++;
+            CP[4*i+j]=gl_in[4*i+j].gl_Position.xyz;
         }
     }
 
@@ -72,7 +67,17 @@ void main() {
             position=evaluateBezier(s,t);
             gl_Position = P*V*M*position;
             EmitVertex();
+            position=evaluateBezier(s+dt,t+dt);
+            gl_Position = P*V*M*position;
+            EmitVertex();
             position=evaluateBezier(s,t+dt);
+            gl_Position = P*V*M*position;
+            EmitVertex();
+            EndPrimitive();
+            position=evaluateBezier(s,t);
+            gl_Position = P*V*M*position;
+            EmitVertex();
+            position=evaluateBezier(s+dt,t+dt);
             gl_Position = P*V*M*position;
             EmitVertex();
             position=evaluateBezier(s+dt,t);
@@ -81,13 +86,9 @@ void main() {
             EndPrimitive();
             t+=dt;
         }
-        s-=dt;
+        s+=dt;
     }
-
-
 }
-
-
 """
 
 # String containing fragment shader program written in GLSL
@@ -170,7 +171,7 @@ def draw():
     glUniformMatrix4fv(m_location, 1, GL_FALSE, glm.value_ptr(m))
     glUniformMatrix4fv(v_location, 1, GL_FALSE, glm.value_ptr(v))
     glUniformMatrix4fv(p_location, 1, GL_FALSE, glm.value_ptr(p))
-    #glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
     for i in range(0,len(control_points),16):
         glDrawArrays(GL_TRIANGLE_STRIP_ADJACENCY, i, 16)
 
