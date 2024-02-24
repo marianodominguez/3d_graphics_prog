@@ -11,77 +11,13 @@ strVertexShader = """
 #version 330 core
 
 in vec3 vpos;
-
-void main()
-{
-    gl_Position = vec4(vpos, 1.0);
-}
-"""
-
-strGeometryShader = """
-#version 330 core
-
-layout (lines_adjacency) in;
-layout (triangle_strip, max_vertices = 256) out;
-
 uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
-const int numdiv=8;
-vec3 CP[16];
 
-vec4 evaluateBezier(float s,float t) {
-    vec3 p= vec3(0.0, 0.0, 0.0);
-    float b[4], c[4];
-    b[0] = (1.0 - t) * (1.0 - t) * (1.0 - t);
-    b[1] = 3.0 * t * (1.0 - t) * (1.0 - t);
-    b[2] = 3.0 * t * t * (1.0 - t);
-    b[3] = t * t * t;
-
-    c[0] = (1.0 - s) * (1.0 - s) * (1.0 - s);
-    c[1] = 3.0 * s * (1.0 - s) * (1.0 - s);
-    c[2] = 3.0 * s * s * (1.0 - s);
-    c[3] = s * s * s;
-
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            p = p+ b[i] * c[j] * CP[4*i+j];
-        }
-    }
-    return vec4(p,1.0);
-}
-
-void main() {
-    float dt=1.0/float(numdiv);
-    float s=0,t=0;
-    vec4 position;
-    int idx=0;
-
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            CP[4*i+j]=gl_in[4*i+j].gl_Position.xyz;
-        }
-    }
-
-    for (int i=0; i<numdiv ; i++) {
-        for (int j=0; j<numdiv;j++ ) {
-            position=evaluateBezier(s,t);
-            gl_Position = P*V*M*position;
-            EmitVertex();
-            position=evaluateBezier(s,t+dt);
-            gl_Position = P*V*M*position;
-            EmitVertex();
-            position=evaluateBezier(s+dt,t);
-            gl_Position = P*V*M*position;
-            EmitVertex();
-            position=evaluateBezier(s+dt,t+dt);
-            gl_Position = P*V*M*position;
-            EmitVertex();
-            EndPrimitive();
-            t+=dt;
-        }
-        s+=dt;
-    }
+void main()
+{
+    gl_Position = P*V*M*vec4(vpos, 1.0);
 }
 """
 
@@ -109,6 +45,7 @@ nvertices=16*32
 m=glm.mat4()
 v=glm.mat4()
 p=glm.mat4()
+vertices = []
 
 def createShader(shaderType, shaderFile):
     shader = glCreateShader(shaderType)
@@ -124,8 +61,6 @@ def createShader(shaderType, shaderFile):
         strShaderType = ""
         if shaderType is GL_VERTEX_SHADER:
             strShaderType = "vertex"
-        elif shaderType is GL_GEOMETRY_SHADER:
-            strShaderType = "geometry"
         elif shaderType is GL_FRAGMENT_SHADER:
             strShaderType = "fragment"
         print("Compilation failure for " + strShaderType + " shader:\n" + strInfoLog)
@@ -166,8 +101,7 @@ def draw():
     glUniformMatrix4fv(v_location, 1, GL_FALSE, glm.value_ptr(v))
     glUniformMatrix4fv(p_location, 1, GL_FALSE, glm.value_ptr(p))
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
-    for i in range(0,len(control_points),16):
-        glDrawArrays( GL_LINES_ADJACENCY, i, 16)
+    glDrawArrays( GL_TRIANGLES, 0, len(vertices) )
 
 def resize_cb(window, w, h):
     global vp_size_changed
@@ -198,14 +132,22 @@ def init():
 def generate_patches(model):
     result=[]
     for p in model['patches']:
-        for i in range(len(p)):
-            result.append(model['vertices'][p[i]-1])
+        v=[]
+        for i in range(16):
+            v.append( model['vertices'][p[i]-1] )
+        
+        m=[[glm.vec3(0,0,0)]*4]*4
+        idx=0
+        for i in range(4):
+            for j in range(4):
+                m[i][j]=v[idx]
+                idx+=1
+        result.append(m)
     return result
 
 def load_shaders():
     shaderList = []
     shaderList.append(createShader(GL_VERTEX_SHADER, strVertexShader))
-    shaderList.append(createShader(GL_GEOMETRY_SHADER, strGeometryShader))
     shaderList.append(createShader(GL_FRAGMENT_SHADER, strFragmentShader))
     program = glCreateProgram()
 
@@ -218,15 +160,63 @@ def load_shaders():
         glDeleteShader(shader)
     return program
 
+def evaluate_bezier(s,t,CP):
+    p = glm.vec3(0, 0, 0)
+    b=[0]*4
+    c=[0]*4
+
+    b[0] = (1 - t) * (1 - t) * (1 - t)
+    b[1] = 3 * t * (1 - t) * (1 - t)
+    b[2] = 3 * t * t * (1 - t)
+    b[3] = t * t * t
+
+    c[0] = (1 - s) * (1 - s) * (1 - s)
+    c[1] = 3 * s * (1 - s) * (1 - s)
+    c[2] = 3 * s * s * (1 - s)
+    c[3] = s * s * s
+
+    for i in range(4):
+        for j in range(4):
+            p = p + b[i] * c[j] * CP[i][j]
+    return p
+
+
+def generate_bezier(CP):
+    result = []
+    s=0.0
+    t=0.0
+    ndiv=16
+    dt = 1.0/ndiv
+    for i in range(ndiv):
+        for j in range(ndiv):
+            p = evaluate_bezier(s,t,CP)
+            result.append(p)
+            p = evaluate_bezier(s+dt,t,CP)
+            result.append(p)
+            p = evaluate_bezier(s+dt,t+dt,CP)
+            result.append(p)
+            p = evaluate_bezier(s,t,CP)
+            result.append(p)
+            p = evaluate_bezier(s,t+dt,CP)
+            result.append(p)
+            p = evaluate_bezier(s+dt,t+dt,CP)
+            result.append(p)
+            s+=dt
+        t+=dt
+    return result
+
 np.set_printoptions(floatmode="maxprec", precision=4)
 
 model=load_model("../models/teapot")
-patches=model['patches']
+#patches=model['patches']
 #print(m['vertices'])
 
 #dummy_vertices=[]
-control_points = np.array(generate_patches(model))
-print(control_points)
+patchlist = np.array(generate_patches(model))
+
+for control_points in patchlist:
+    print(control_points)
+    vertices.extend(generate_bezier(control_points))
 
 window=init()
 vertex_attributes=glGenVertexArrays(1)
@@ -237,7 +227,7 @@ glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
 
 glBufferData( # PyOpenGL allows for the omission of the size parameter()
         GL_ARRAY_BUFFER,
-        control_points,
+        np.array(vertices),
         GL_STATIC_DRAW)
 
 program= load_shaders()
