@@ -136,11 +136,12 @@ def generate_patches(model):
         for i in range(16):
             v.append( model['vertices'][p[i]-1] )
         
-        m=[[glm.vec3(0,0,0)]*4]*4
+        m=[]
         idx=0
         for i in range(4):
+            m.append([])
             for j in range(4):
-                m[i][j]=v[idx]
+                m[i].append(v[idx])
                 idx+=1
         result.append(m)
     return result
@@ -162,8 +163,8 @@ def load_shaders():
 
 def evaluate_bezier(s,t,CP):
     p = glm.vec3(0, 0, 0)
-    b=[0]*4
-    c=[0]*4
+    b=[0.0 for i in range(4)]
+    c=[0.0 for i in range(4)]
 
     b[0] = (1 - t) * (1 - t) * (1 - t)
     b[1] = 3 * t * (1 - t) * (1 - t)
@@ -179,7 +180,6 @@ def evaluate_bezier(s,t,CP):
         for j in range(4):
             p = p + b[i] * c[j] * CP[i][j]
     return p
-
 
 def generate_bezier(CP):
     result = []
@@ -197,9 +197,9 @@ def generate_bezier(CP):
             result.append(p)
             p = evaluate_bezier(s,t,CP)
             result.append(p)
-            p = evaluate_bezier(s,t+dt,CP)
-            result.append(p)
             p = evaluate_bezier(s+dt,t+dt,CP)
+            result.append(p)
+            p = evaluate_bezier(s,t+dt,CP)
             result.append(p)
             s+=dt
         t+=dt
