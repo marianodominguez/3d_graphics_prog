@@ -46,6 +46,59 @@ m=glm.mat4()
 v=glm.mat4()
 p=glm.mat4()
 vertices = []
+normals = []
+
+def derivativeBezier(u ,x0,x1,x2,x3) :
+    return -3 * (1 - u) * (1 - u) * x0 + (3 * (1 - u) * (1 - u) - 6 * u * (1 - u)) * x1 + (6 * u * (1 - u) - 3 * u * u) * x2 + 3 * u * u * x3
+
+def bezier_2d(C,t):
+    p = glm.vec3(0, 0, 0)
+    b = [ 0 for i in range(4) ]
+    b[0] = (1 - t) * (1 - t) * (1 - t)
+    b[1] = 3 * t * (1 - t) * (1 - t)
+    b[2] = 3 * t * t * (1 - t)
+    b[3] = t * t * t
+
+    for i in range(4):
+        p.x = p.x + b[i] * C[i].x;
+        p.y = p.y + b[i] * C[i].y;
+        p.z = p.z + b[i] * C[i].z;
+    return p
+
+def dUBezier(C,u,v) :
+    P=[ 0 for i in range(4)]
+    vCurve=[ 0 for i in range(4)]
+    r=glm.vec3()
+    for i in range(4):
+       P[0] = C[i]
+       P[1] = C[4 + i]
+       P[2] = C[8 + i]
+       P[3] = C[12 + i]
+       vCurve[i] = bezier_2d(P, v)
+
+    r.x=derivativeBezier(u, vCurve[0].x,vCurve[1].x,vCurve[2].x,vCurve[3].x)
+    r.y=derivativeBezier(u, vCurve[0].y,vCurve[1].y,vCurve[2].y,vCurve[3].y)
+    r.z=derivativeBezier(u, vCurve[0].z,vCurve[1].z,vCurve[2].z,vCurve[3].z)
+    return r
+
+
+def dVBezier(C,u,v):
+    uCurve=[ 0 for i in range(4)]
+    r=glm.vec3()
+    for i in range(4)
+       uCurve[i] = bezier_2d(C + 4 * i, u)
+
+    r.x=derivativeBezier(v, uCurve[0].x,uCurve[1].x,uCurve[2].x,uCurve[3].x)
+    r.y=derivativeBezier(v, uCurve[0].y,uCurve[1].y,uCurve[2].y,uCurve[3].y)
+    r.z=derivativeBezier(v, uCurve[0].z,uCurve[1].z,uCurve[2].z,uCurve[3].z)
+    return r
+
+def bezier_normal(C,u,v):
+    N=glm.vec3()
+    dU = dUBezier(C, u, v);
+    dV = dVBezier(C, u, v);
+    N = glm.normalize(glm.cross(dU,dV));
+    return N;
 
 def createShader(shaderType, shaderFile):
     shader = glCreateShader(shaderType)
@@ -239,9 +292,7 @@ glEnableVertexAttribArray(vpos_location)
 glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
             glm.sizeof(glm.vec3), None)
 glUseProgram(program)
-
-
-glEnable(GL_DEPTH_TEST);
+glEnable(GL_DEPTH_TEST)
 
 #setup camera
 # Camera matrix
