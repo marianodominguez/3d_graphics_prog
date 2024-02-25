@@ -91,12 +91,14 @@ def draw():
 
     glViewport(0, 0, width, height);
     m=glm.identity(glm.mat4)
-    m=glm.scale([2.5, 2.5, 2.5]);
+    m=glm.scale(m, glm.vec3(1.5, 1.5, 1.5))
+    m=glm.rotate(m, glfw.get_time()/7.0, glm.vec3(1,0,0))
+    m=glm.rotate(m, glfw.get_time(),   glm.vec3(0,1,0) )
 
     glClearColor(0.0, 0.0, 0.0, 0.0)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-    p=glm.perspective(math.pi / 2, ratio, 0.1, 50.0)
+    p=glm.perspective(math.pi / 4, ratio, 5, 30.0)
     glUniformMatrix4fv(m_location, 1, GL_FALSE, glm.value_ptr(m))
     glUniformMatrix4fv(v_location, 1, GL_FALSE, glm.value_ptr(v))
     glUniformMatrix4fv(p_location, 1, GL_FALSE, glm.value_ptr(p))
@@ -182,11 +184,11 @@ def evaluate_bezier(s,t,CP):
 
 def generate_bezier(CP):
     result = []
-    s=0.0
     t=0.0
     ndiv=16
     dt = 1.0/ndiv
     for i in range(ndiv):
+        s=0.0
         for j in range(ndiv):
             p = evaluate_bezier(s,t,CP)
             result.append(p)
@@ -207,15 +209,11 @@ def generate_bezier(CP):
 np.set_printoptions(floatmode="maxprec", precision=4)
 
 model=load_model("../models/teapot")
-#patches=model['patches']
-#print(m['vertices'])
-
-#dummy_vertices=[]
 patchlist = generate_patches(model)
 
 for control_points in patchlist:
-    print(control_points)
-    print("-----------------")
+    #print(control_points)
+    #print("-----------------")
     vertices.extend(generate_bezier(control_points))
 
 window=init()
@@ -241,6 +239,9 @@ glEnableVertexAttribArray(vpos_location)
 glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
             glm.sizeof(glm.vec3), None)
 glUseProgram(program)
+
+
+glEnable(GL_DEPTH_TEST);
 
 #setup camera
 # Camera matrix
