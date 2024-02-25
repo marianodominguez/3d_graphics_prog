@@ -102,6 +102,7 @@ def draw():
     glUniformMatrix4fv(p_location, 1, GL_FALSE, glm.value_ptr(p))
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
     glDrawArrays( GL_TRIANGLES, 0, len(vertices) )
+    ##glDrawArrays( GL_TRIANGLES, , 16 )
 
 def resize_cb(window, w, h):
     global vp_size_changed
@@ -135,13 +136,11 @@ def generate_patches(model):
         v=[]
         for i in range(16):
             v.append( model['vertices'][p[i]-1] )
-        
-        m=[]
+        m=[[ 0 for i in range(4)] for j in range(4) ]
         idx=0
         for i in range(4):
-            m.append([])
             for j in range(4):
-                m[i].append(v[idx])
+                m[i][j] = v[idx]
                 idx+=1
         result.append(m)
     return result
@@ -197,9 +196,9 @@ def generate_bezier(CP):
             result.append(p)
             p = evaluate_bezier(s,t,CP)
             result.append(p)
-            p = evaluate_bezier(s+dt,t+dt,CP)
-            result.append(p)
             p = evaluate_bezier(s,t+dt,CP)
+            result.append(p)
+            p = evaluate_bezier(s+dt,t+dt,CP)
             result.append(p)
             s+=dt
         t+=dt
@@ -212,10 +211,11 @@ model=load_model("../models/teapot")
 #print(m['vertices'])
 
 #dummy_vertices=[]
-patchlist = np.array(generate_patches(model))
+patchlist = generate_patches(model)
 
 for control_points in patchlist:
     print(control_points)
+    print("-----------------")
     vertices.extend(generate_bezier(control_points))
 
 window=init()
