@@ -85,7 +85,7 @@ def dUBezier(C,u,v) :
 def dVBezier(C,u,v):
     uCurve=[ 0 for i in range(4)]
     r=glm.vec3()
-    for i in range(4)
+    for i in range(4):
        uCurve[i] = bezier_2d(C + 4 * i, u)
 
     r.x=derivativeBezier(v, uCurve[0].x,uCurve[1].x,uCurve[2].x,uCurve[3].x)
@@ -144,14 +144,14 @@ def draw():
 
     glViewport(0, 0, width, height);
     m=glm.identity(glm.mat4)
-    m=glm.scale(m, glm.vec3(1.5, 1.5, 1.5))
+    m=glm.scale(m, glm.vec3(0.9, 0.9, 1.0))
     m=glm.rotate(m, glfw.get_time()/7.0, glm.vec3(1,0,0))
     m=glm.rotate(m, glfw.get_time(),   glm.vec3(0,1,0) )
 
     glClearColor(0.0, 0.0, 0.0, 0.0)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-    p=glm.perspective(math.pi / 4, ratio, 5, 30.0)
+    p=glm.perspective(math.pi / 8, ratio, 5, 30.0)
     glUniformMatrix4fv(m_location, 1, GL_FALSE, glm.value_ptr(m))
     glUniformMatrix4fv(v_location, 1, GL_FALSE, glm.value_ptr(v))
     glUniformMatrix4fv(p_location, 1, GL_FALSE, glm.value_ptr(p))
@@ -292,6 +292,7 @@ glEnableVertexAttribArray(vpos_location)
 glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
             glm.sizeof(glm.vec3), None)
 glUseProgram(program)
+glEnable(GL_CULL_FACE)
 glEnable(GL_DEPTH_TEST)
 
 #setup camera
