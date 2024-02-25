@@ -10,25 +10,56 @@ import math
 strVertexShader = """
 #version 330 core
 
-in vec3 vpos;
+in vec3 vPos;
+in vec3 vNormal;
+
+out vec3 FragPos;
+out vec3 Normal;
+
 uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
 
+uniform mat3 normal_matrix;
+
 void main()
 {
-    gl_Position = P*V*M*vec4(vpos, 1.0);
+    FragPos =vec3( M * vec4(vPos, 1.0) );
+    Normal = normal_matrix * vNormal;
+    gl_Position = P*V*M*vec4(vPos, 1.0);
 }
 """
 
 # String containing fragment shader program written in GLSL
 strFragmentShader = """
 #version 330 core
+in vec3 Normal;
+in vec3 FragPos;
 
-out vec4 outputColor;
+uniform vec4 lightCamera;
+uniform vec3 viewPos;
+out vec4 FragColor;
+
 void main()
 {
-   outputColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    vec3 ambient = vec3(0.2, 0.2, 0.2);
+    vec3 objColor = vec3(1.0,0.2,1.0);
+
+    float specularStrength = 0.5;
+
+    vec3 norm = normalize(Normal);
+    vec3 lightDir = normalize(vec3(lightCamera) - FragPos);
+    float diff = max(dot(norm, lightDir), 0.0);
+
+    vec3 viewDir = normalize(viewPos - FragPos);
+    vec3 reflectDir = reflect(-lightDir, norm);
+
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+    vec3 specular = specularStrength * spec * vec3(1.0,1.0,1.0);
+
+    vec3 color = (diff+specular+ambient)*objColor;
+
+    FragColor = vec4(color, 1.0);
 }
 """
 
@@ -39,12 +70,21 @@ v_location=None
 m_location=None
 p_location=None
 cp_location=None
+normal_location=None
+camera_location=None
+
+normal_matrix = glm.mat3()
+LightCameraPosition= glm.mat4()
+
+LightPosition = glm.vec4(20.0, 5.0, 40.0, 1.0);
+cameraPosition = glm.vec3(10, 10, 10);
 
 #TODO use model
 nvertices=16*32
 m=glm.mat4()
 v=glm.mat4()
 p=glm.mat4()
+mv=glm.mat4()
 vertices = []
 normals = []
 
@@ -66,14 +106,14 @@ def bezier_2d(C,t):
     return p
 
 def dUBezier(C,u,v) :
-    P=[ 0 for i in range(4)]
-    vCurve=[ 0 for i in range(4)]
+    P=[ 0.0 for i in range(4) ]
+    vCurve=[ 0 for i in range(4) ]
     r=glm.vec3()
     for i in range(4):
-       P[0] = C[i]
-       P[1] = C[4 + i]
-       P[2] = C[8 + i]
-       P[3] = C[12 + i]
+       P[0] = C[0][i]
+       P[1] = C[1][i]
+       P[2] = C[2][i]
+       P[3] = C[3][i]
        vCurve[i] = bezier_2d(P, v)
 
     r.x=derivativeBezier(u, vCurve[0].x,vCurve[1].x,vCurve[2].x,vCurve[3].x)
@@ -86,14 +126,14 @@ def dVBezier(C,u,v):
     uCurve=[ 0 for i in range(4)]
     r=glm.vec3()
     for i in range(4):
-       uCurve[i] = bezier_2d(C + 4 * i, u)
+       uCurve[i] = bezier_2d(C[i], u)
 
     r.x=derivativeBezier(v, uCurve[0].x,uCurve[1].x,uCurve[2].x,uCurve[3].x)
     r.y=derivativeBezier(v, uCurve[0].y,uCurve[1].y,uCurve[2].y,uCurve[3].y)
     r.z=derivativeBezier(v, uCurve[0].z,uCurve[1].z,uCurve[2].z,uCurve[3].z)
     return r
 
-def bezier_normal(C,u,v):
+def bezier_normal(u,v,C):
     N=glm.vec3()
     dU = dUBezier(C, u, v);
     dV = dVBezier(C, u, v);
@@ -137,13 +177,13 @@ def load_model(filename):
     return {"patches":patches,"vertices":vertices};
 
 def draw():
-    #global vertex_buffer,nvertices,program
+    global v,m,mv
     width = glfw.get_framebuffer_size(window)[0]
     height = glfw.get_framebuffer_size(window)[1]
     ratio = width / height;
 
     glViewport(0, 0, width, height);
-    m=glm.identity(glm.mat4)
+    m=glm.mat4(1.0)
     m=glm.scale(m, glm.vec3(0.9, 0.9, 1.0))
     m=glm.rotate(m, glfw.get_time()/7.0, glm.vec3(1,0,0))
     m=glm.rotate(m, glfw.get_time(),   glm.vec3(0,1,0) )
@@ -155,7 +195,20 @@ def draw():
     glUniformMatrix4fv(m_location, 1, GL_FALSE, glm.value_ptr(m))
     glUniformMatrix4fv(v_location, 1, GL_FALSE, glm.value_ptr(v))
     glUniformMatrix4fv(p_location, 1, GL_FALSE, glm.value_ptr(p))
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+
+    mv=v*m
+
+    normal_matrix=glm.mat3(mv)
+    normal_matrix=glm.inverseTranspose(normal_matrix)
+
+    LightCameraPosition=v*LightPosition
+
+    glUniformMatrix3fv(normal_location, 1, GL_FALSE,
+                        glm.value_ptr(normal_matrix))
+    glUniform4fv(light_location, 1, glm.value_ptr(LightCameraPosition))
+    glUniform3fv(camera_location, 1, glm.value_ptr(cameraPosition))
+
+    #glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
     glDrawArrays( GL_TRIANGLES, 0, len(vertices) )
     ##glDrawArrays( GL_TRIANGLES, , 16 )
 
@@ -236,7 +289,7 @@ def evaluate_bezier(s,t,CP):
     return p
 
 def generate_bezier(CP):
-    result = []
+    result = {"control_points": [], "normals":[]}
     t=0.0
     ndiv=16
     dt = 1.0/ndiv
@@ -244,17 +297,29 @@ def generate_bezier(CP):
         s=0.0
         for j in range(ndiv):
             p = evaluate_bezier(s,t,CP)
-            result.append(p)
+            n = bezier_normal(s,t,CP)
+            result["control_points"].append(p)
+            result["normals"].append(n)
             p = evaluate_bezier(s+dt,t,CP)
-            result.append(p)
+            n = bezier_normal(s+dt,t,CP)
+            result["control_points"].append(p)
+            result["normals"].append(n)
             p = evaluate_bezier(s+dt,t+dt,CP)
-            result.append(p)
+            n = bezier_normal(s+dt,t+dt,CP)
+            result["control_points"].append(p)
+            result["normals"].append(n)
             p = evaluate_bezier(s,t,CP)
-            result.append(p)
-            p = evaluate_bezier(s,t+dt,CP)
-            result.append(p)
+            n = bezier_normal(s,t,CP)
+            result["control_points"].append(p)
+            result["normals"].append(n)
             p = evaluate_bezier(s+dt,t+dt,CP)
-            result.append(p)
+            n = bezier_normal(s+dt,t+dt,CP)
+            result["control_points"].append(p)
+            result["normals"].append(n)
+            p = evaluate_bezier(s,t+dt,CP)
+            n = bezier_normal(s,t+dt,CP)
+            result["control_points"].append(p)
+            result["normals"].append(n)
             s+=dt
         t+=dt
     return result
@@ -267,7 +332,9 @@ patchlist = generate_patches(model)
 for control_points in patchlist:
     #print(control_points)
     #print("-----------------")
-    vertices.extend(generate_bezier(control_points))
+    p = generate_bezier(control_points)
+    vertices.extend(p['control_points'])
+    normals.extend(p['normals'])
 
 window=init()
 vertex_attributes=glGenVertexArrays(1)
@@ -278,20 +345,33 @@ glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
 
 glBufferData( # PyOpenGL allows for the omission of the size parameter()
         GL_ARRAY_BUFFER,
+        glm.sizeof(glm.vec3)*(len(vertices)+len(normals)),
         np.array(vertices),
         GL_STATIC_DRAW)
+
+offset = glm.sizeof(glm.vec3)*len(vertices)
+glBufferSubData(GL_ARRAY_BUFFER, offset, np.array(normals) )
 
 program= load_shaders()
 
 m_location = glGetUniformLocation(program, 'M')
 v_location = glGetUniformLocation(program, 'V')
 p_location = glGetUniformLocation(program, 'P')
-vpos_location = glGetAttribLocation(program, "vpos")
+vpos_location = glGetAttribLocation(program, "vPos")
+vnormal_location = glGetAttribLocation(program, "vNormal")
+normal_location = glGetUniformLocation(program, "normal_matrix")
+light_location = glGetUniformLocation(program, "lightCamera")
+camera_location = glGetUniformLocation(program, "viewPos");
+
 glEnableVertexAttribArray(vpos_location)
 
 glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
             glm.sizeof(glm.vec3), None)
+glVertexAttribPointer(vnormal_location, 3, GL_FLOAT, GL_FALSE,
+            glm.sizeof(glm.vec3), ctypes.c_void_p(offset))
+glEnableVertexAttribArray(vnormal_location);
 glUseProgram(program)
+
 glEnable(GL_CULL_FACE)
 glEnable(GL_DEPTH_TEST)
 
