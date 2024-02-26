@@ -168,20 +168,20 @@ def draw():
     glViewport(0, 0, width, height);
 
     m=glm.mat4(1.0)
-    m=glm.scale(m, glm.vec3(2.0, 2.0, 2.0))
+    m=glm.scale(m, glm.vec3(0.9, 0.9, 0.9))
     m=glm.rotate(m, glfw.get_time()/7.0, glm.vec3(1,0,0))
     m=glm.rotate(m, glfw.get_time(),   glm.vec3(0,1,0) )
 
     glClearColor(0.0, 0.0, 0.0, 0.0)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-    p=glm.perspective(math.pi / 4, ratio, 5, 30.0)
+    p=glm.perspective(math.pi / 8, ratio, 5, 30.0)
     glUniformMatrix4fv(m_location, 1, GL_FALSE, glm.value_ptr(m))
     glUniformMatrix4fv(v_location, 1, GL_FALSE, glm.value_ptr(v))
     glUniformMatrix4fv(p_location, 1, GL_FALSE, glm.value_ptr(p))
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
     for i in range(0,len(control_points),16):
-        glDrawArrays( GL_TRIANGLES_ADJACENCY, i, 16)
+        glDrawArrays( GL_TRIANGLE_STRIP_ADJACENCY, i, 16)
 
 def resize_cb(window, w, h):
     global vp_size_changed

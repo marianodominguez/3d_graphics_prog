@@ -180,11 +180,11 @@ int main(void)
     glfwMakeContextCurrent(window);
     glewInit();
     glfwSwapInterval(1);
-    
+
     glEnable(GL_DEPTH_TEST);
-    
+
     glGenVertexArrays( 1, &vpos_location );
-    glBindVertexArray( vpos_location ); 
+    glBindVertexArray( vpos_location );
 
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
@@ -197,7 +197,7 @@ int main(void)
     glAttachShader(program, vertex_shader);
     glAttachShader(program, fragment_shader);
     glLinkProgram(program);
-    
+
 
     m_location = glGetUniformLocation(program, "M");
     v_location = glGetUniformLocation(program, "V");
@@ -205,7 +205,7 @@ int main(void)
     vpos_location = glGetAttribLocation(program, "vPos");
     vnormal_location = glGetAttribLocation(program, "vNormal");
     normal_location = glGetUniformLocation(program, "normal_matrix");
-    light_location = glGetUniformLocation(program, "lightCamera");
+    camera_location = glGetUniformLocation(program, "viewPos");
 
     glEnableVertexAttribArray(vpos_location);
     glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
