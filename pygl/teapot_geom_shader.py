@@ -8,7 +8,7 @@ import glm
 import math
 
 strVertexShader = """
-#version 330 core
+#version 450 core
 
 in vec3 vpos;
 
@@ -18,10 +18,33 @@ void main()
 }
 """
 
-strGeometryShader = """
-#version 330 core
+strGeometryShader= """
+#version 450 core
 
-layout (triangles_adjacency) in;
+layout(vertices=16) out;
+
+uniform float detail;
+
+void main() {
+
+	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
+
+	gl_TessLevelOuter[0] = detail;
+	gl_TessLevelOuter[1] = detail;
+	gl_TessLevelOuter[2] = detail;
+	gl_TessLevelOuter[3] = detail;
+
+	gl_TessLevelInner[0] = detail;
+	gl_TessLevelInner[1] = detail;
+
+}
+
+"""
+
+strTessellateShader = """
+#version 450 core
+
+layout(quads) in;
 layout (triangle_strip, max_vertices = 256) out;
 
 uniform mat4 M;
@@ -219,7 +242,8 @@ def generate_patches(model):
 def load_shaders():
     shaderList = []
     shaderList.append(createShader(GL_VERTEX_SHADER, strVertexShader))
-    shaderList.append(createShader(GL_GEOMETRY_SHADER, strGeometryShader))
+    shaderList.append(createShader(GL_TESS_CONTROL_SHADER, strGeometryShader))
+    shaderList.append(createShader(GL_TESS_EVALUATION_SHADER, strTessellateShader))
     shaderList.append(createShader(GL_FRAGMENT_SHADER, strFragmentShader))
     program = glCreateProgram()
 
