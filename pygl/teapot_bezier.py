@@ -100,9 +100,7 @@ def bezier_2d(C,t):
     b[3] = t * t * t
 
     for i in range(4):
-        p.x = p.x + b[i] * C[i].x;
-        p.y = p.y + b[i] * C[i].y;
-        p.z = p.z + b[i] * C[i].z;
+        p= p+ b[i] * C[i];
     return p
 
 def dUBezier(C,u,v) :
@@ -116,9 +114,7 @@ def dUBezier(C,u,v) :
        P[3] = C[3][i]
        vCurve[i] = bezier_2d(P, v)
 
-    r.x=derivativeBezier(u, vCurve[0].x,vCurve[1].x,vCurve[2].x,vCurve[3].x)
-    r.y=derivativeBezier(u, vCurve[0].y,vCurve[1].y,vCurve[2].y,vCurve[3].y)
-    r.z=derivativeBezier(u, vCurve[0].z,vCurve[1].z,vCurve[2].z,vCurve[3].z)
+    r=derivativeBezier(u, vCurve[0],vCurve[1],vCurve[2],vCurve[3])
     return r
 
 
@@ -128,9 +124,7 @@ def dVBezier(C,u,v):
     for i in range(4):
        uCurve[i] = bezier_2d(C[i], u)
 
-    r.x=derivativeBezier(v, uCurve[0].x,uCurve[1].x,uCurve[2].x,uCurve[3].x)
-    r.y=derivativeBezier(v, uCurve[0].y,uCurve[1].y,uCurve[2].y,uCurve[3].y)
-    r.z=derivativeBezier(v, uCurve[0].z,uCurve[1].z,uCurve[2].z,uCurve[3].z)
+    r=derivativeBezier(v, uCurve[0],uCurve[1],uCurve[2],uCurve[3])
     return r
 
 def bezier_normal(u,v,C):
@@ -182,14 +176,14 @@ def draw():
     height = glfw.get_framebuffer_size(window)[1]
     ratio = width / height;
 
+    glClearColor(0.0, 0.0, 0.0, 0.0)
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
     glViewport(0, 0, width, height);
     m=glm.mat4(1.0)
     m=glm.scale(m, glm.vec3(0.9, 0.9, 1.0))
     m=glm.rotate(m, glfw.get_time()/7.0, glm.vec3(1,0,0))
     m=glm.rotate(m, glfw.get_time(),   glm.vec3(0,1,0) )
-
-    glClearColor(0.0, 0.0, 0.0, 0.0)
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
     p=glm.perspective(math.pi / 8, ratio, 5, 30.0)
     glUniformMatrix4fv(m_location, 1, GL_FALSE, glm.value_ptr(m))
