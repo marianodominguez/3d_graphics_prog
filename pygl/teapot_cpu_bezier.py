@@ -355,7 +355,7 @@ vpos_location = glGetAttribLocation(program, "vPos")
 vnormal_location = glGetAttribLocation(program, "vNormal")
 normal_location = glGetUniformLocation(program, "normal_matrix")
 light_location = glGetUniformLocation(program, "lightCamera")
-camera_location = glGetUniformLocation(program, "viewPos");
+camera_location = glGetUniformLocation(program, "viewPos")
 
 glEnableVertexAttribArray(vpos_location)
 

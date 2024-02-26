@@ -23,7 +23,7 @@ strGeometryShader= """
 
 layout(vertices=16) out;
 
-uniform float detail;
+float detail=16;
 
 void main() {
 
@@ -44,14 +44,30 @@ void main() {
 strTessellateShader = """
 #version 450 core
 
-layout(quads) in;
-layout (triangle_strip, max_vertices = 256) out;
-
 uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
-const int numdiv=8;
+
+layout(quads) in;
+
+out vec4 fragpos;
+out vec3 fragnormal;
+
 vec3 CP[16];
+
+void bezierDerivative(out float[4] b, out float[4] db, float t) {
+	//derivatives
+
+    b[0] = pow(1.0 - t, 3);
+	b[1] = 3.0 * pow(1.0 - t, 2) * t;
+	b[2] = 3.0 * (1.0 - t) * pow(t,2);
+	b[3] = pow(t, 3);
+
+	db[0] = -3.0 * pow(1.0 - t, 2);
+	db[1] = -6.0 * (1.0 - t) * t + 3.0 * pow(1.0 - t,2);
+	db[2] = -3.0 * pow(t, 2) + 6.0 * t * (1.0 - t);
+	db[3] = 3.0 * pow(t, 2);
+}
 
 vec4 evaluateBezier(float s,float t) {
     vec3 p= vec3(0.0, 0.0, 0.0);
@@ -77,10 +93,11 @@ vec4 evaluateBezier(float s,float t) {
 }
 
 void main() {
-    float dt=1.0/float(numdiv);
-    float s=0,t=0;
-    vec4 position;
     int idx=0;
+	float s = gl_TessCoord.x;
+	float t = gl_TessCoord.y;
+
+	float dbu[4],dbv[4],bu[4],bv[4];
 
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
@@ -88,34 +105,31 @@ void main() {
             idx++;
         }
     }
+    fragpos=evaluateBezier(s,t);
+    bezierDerivative(bu,dbu, s);
+    bezierDerivative(bv,dbv, t);
 
-    for (int i=0; i<numdiv ; i++) {
-        s=0.0;
-        for (int j=0; j<numdiv;j++ ) {
-            position=evaluateBezier(s,t);
-            gl_Position = P*V*M*position;
-            EmitVertex();
-            position=evaluateBezier(s,t+dt);
-            gl_Position = P*V*M*position;
-            EmitVertex();
-            position=evaluateBezier(s+dt,t);
-            gl_Position = P*V*M*position;
-            EmitVertex();
-            EndPrimitive();
-            position=evaluateBezier(s,t);
-            gl_Position = P*V*M*position;
-            EmitVertex();
-            position=evaluateBezier(s+dt,t+dt);
-            gl_Position = P*V*M*position;
-            EmitVertex();
-            position=evaluateBezier(s,t+dt);
-            gl_Position = P*V*M*position;
-            EmitVertex();
-            EndPrimitive();
-            s+=dt;
+    vec3 dPos_du=vec3(0,0,0);
+    vec3 dPos_dv=vec3(0,0,0);
+
+    idx=0;
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            dPos_du+=CP[idx]*dbu[i]*bv[j];
+            idx++;
         }
-        t+=dt;
     }
+
+    idx=0;
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            dPos_du+=CP[idx]*dbv[i]*bu[j];
+            idx++;
+        }
+    }
+
+    fragnormal=normalize(cross(dPos_du, dPos_dv));
+    gl_Position = P*V*M*fragpos;
 }
 """
 
@@ -123,10 +137,32 @@ void main() {
 strFragmentShader = """
 #version 330 core
 
-out vec4 outputColor;
+in vec4 fragpos;
+in vec3 fragnormal;
+
+uniform vec4 lightCamera;
+uniform vec3 viewPos;
+out vec4 FragColor;
+
 void main()
 {
-   outputColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    vec3 ambient = vec3(0.2, 0.2, 0.2);
+    vec3 objColor = vec3(1.0,0.2,1.0);
+
+    float specularStrength = 0.5;
+
+    vec3 lightDir = normalize(vec3(lightCamera) - fragpos.xyz);
+    float diff = max(dot(fragnormal, lightDir), 0.0);
+
+    vec3 viewDir = normalize(viewPos - fragpos.xyz);
+    vec3 reflectDir = reflect(-lightDir, fragnormal);
+
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+    vec3 specular = specularStrength * spec * vec3(1.0,1.0,1.0);
+
+    vec3 color = (diff+specular+ambient)*objColor;
+
+    FragColor = vec4(color, 1.0);
 }
 """
 
@@ -137,12 +173,19 @@ v_location=None
 m_location=None
 p_location=None
 cp_location=None
+camera_location=None
 
 #TODO use model
 nvertices=16*32
 m=glm.mat4()
 v=glm.mat4()
 p=glm.mat4()
+
+normal_matrix = glm.mat3()
+LightCameraPosition= glm.mat4()
+
+LightPosition = glm.vec4(20.0, 5.0, 40.0, 1.0);
+cameraPosition = glm.vec3(10, 10, 10);
 
 def createShader(shaderType, shaderFile):
     shader = glCreateShader(shaderType)
@@ -162,6 +205,10 @@ def createShader(shaderType, shaderFile):
             strShaderType = "geometry"
         elif shaderType is GL_FRAGMENT_SHADER:
             strShaderType = "fragment"
+        elif shaderType is GL_TESS_CONTROL_SHADER:
+            strShaderType = "Tesselation Control shader"
+        elif shaderType is GL_TESS_EVALUATION_SHADER:
+            strShaderType = "Tesselation Evaluation shader"
         print("Compilation failure for " + strShaderType + " shader:\n" + strInfoLog)
     return shader
 
@@ -183,7 +230,7 @@ def load_model(filename):
     return {"patches":patches,"vertices":vertices};
 
 def draw():
-    #global vertex_buffer,nvertices,program
+    global v
     width = glfw.get_framebuffer_size(window)[0]
     height = glfw.get_framebuffer_size(window)[1]
     ratio = width / height;
@@ -202,9 +249,14 @@ def draw():
     glUniformMatrix4fv(m_location, 1, GL_FALSE, glm.value_ptr(m))
     glUniformMatrix4fv(v_location, 1, GL_FALSE, glm.value_ptr(v))
     glUniformMatrix4fv(p_location, 1, GL_FALSE, glm.value_ptr(p))
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+
+    LightCameraPosition=v*LightPosition
+
+    glUniform4fv(light_location, 1, glm.value_ptr(LightCameraPosition))
+    glUniform3fv(camera_location, 1, glm.value_ptr(cameraPosition))
+
     for i in range(0,len(control_points),16):
-        glDrawArrays( GL_TRIANGLE_STRIP_ADJACENCY, i, 16)
+        glDrawArrays( GL_PATCHES, i, 16)
 
 def resize_cb(window, w, h):
     global vp_size_changed
@@ -216,9 +268,9 @@ def init():
         sys.exit(1)
     # Create a windowed mode window and its OpenGL context
 
-    glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
-    glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
-    glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, GL_TRUE)
+    glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 4)
+    glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 5)
+    #glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, GL_TRUE)
     glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
     glfw.window_hint(glfw.OPENGL_DEBUG_CONTEXT, GL_TRUE)
 
@@ -284,11 +336,14 @@ m_location = glGetUniformLocation(program, 'M')
 v_location = glGetUniformLocation(program, 'V')
 p_location = glGetUniformLocation(program, 'P')
 vpos_location = glGetAttribLocation(program, "vpos")
+light_location = glGetUniformLocation(program, "lightCamera")
+camera_location = glGetUniformLocation(program, "viewPos")
 glEnableVertexAttribArray(vpos_location)
 
 glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
             glm.sizeof(glm.vec3), None)
 glUseProgram(program)
+glPatchParameteri(GL_PATCH_VERTICES, 16)
 
 #setup camera
 # Camera matrix
