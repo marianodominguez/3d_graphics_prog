@@ -94,8 +94,8 @@ vec4 evaluateBezier(float s,float t) {
 
 void main() {
     int idx=0;
-	float s = gl_TessCoord.x;
-	float t = gl_TessCoord.y;
+	float u = gl_TessCoord.x;
+	float v = gl_TessCoord.y;
 
 	float dbu[4],dbv[4],bu[4],bv[4];
 
@@ -105,9 +105,9 @@ void main() {
             idx++;
         }
     }
-    fragpos=evaluateBezier(s,t);
-    bezierDerivative(bu,dbu, s);
-    bezierDerivative(bv,dbv, t);
+    fragpos = evaluateBezier(u,v);
+    bezierDerivative(bu,dbu, u);
+    bezierDerivative(bv,dbv, v);
 
     vec3 dPos_du=vec3(0,0,0);
     vec3 dPos_dv=vec3(0,0,0);
@@ -123,7 +123,7 @@ void main() {
     idx=0;
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            dPos_dv+=CP[idx]*dbv[i]*bu[j];
+            dPos_dv+=CP[idx]*bu[i]*dbv[j];
             idx++;
         }
     }
@@ -230,7 +230,7 @@ def load_model(filename):
     return {"patches":patches,"vertices":vertices};
 
 def draw():
-    global v
+    global v,p,m
     width = glfw.get_framebuffer_size(window)[0]
     height = glfw.get_framebuffer_size(window)[1]
     ratio = width / height;
@@ -325,10 +325,7 @@ glBindVertexArray(vertex_attributes)
 vertex_buffer = glGenBuffers(1)
 glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
 
-glBufferData( # PyOpenGL allows for the omission of the size parameter()
-        GL_ARRAY_BUFFER,
-        control_points,
-        GL_STATIC_DRAW)
+glBufferData(GL_ARRAY_BUFFER, control_points, GL_STATIC_DRAW)
 
 program= load_shaders()
 
