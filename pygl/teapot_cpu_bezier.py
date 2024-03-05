@@ -79,6 +79,8 @@ LightCameraPosition= glm.mat4()
 LightPosition = glm.vec4(20.0, 5.0, 40.0, 1.0);
 cameraPosition = glm.vec3(10, 10, 10);
 
+NUMBER_OF_DIVISIONS=8
+
 #TODO use model
 nvertices=16*32
 m=glm.mat4()
@@ -89,7 +91,9 @@ vertices = []
 normals = []
 
 def derivativeBezier(u ,x0,x1,x2,x3) :
-    return -3 * (1 - u) * (1 - u) * x0 + (3 * (1 - u) * (1 - u) - 6 * u * (1 - u)) * x1 + (6 * u * (1 - u) - 3 * u * u) * x2 + 3 * u * u * x3
+    return -3 * (1 - u) * (1 - u) * x0 + (3 * (1 - u) *(1 - u) - 6 * u * (1 - u)) \
+            * x1 + (6 * u * (1 - u) - 3 * u * u) \
+            * x2 + 3 * u * u * x3
 
 def bezier_2d(C,t):
     p = glm.vec3(0, 0, 0)
@@ -116,7 +120,6 @@ def dUBezier(C,u,v) :
 
     r=derivativeBezier(u, vCurve[0],vCurve[1],vCurve[2],vCurve[3])
     return r
-
 
 def dVBezier(C,u,v):
     uCurve=[ 0 for i in range(4)]
@@ -203,7 +206,10 @@ def draw():
     glUniform3fv(camera_location, 1, glm.value_ptr(cameraPosition))
 
     #glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
-    glDrawArrays( GL_TRIANGLES, 0, len(vertices) )
+    step=(NUMBER_OF_DIVISIONS*NUMBER_OF_DIVISIONS)*6
+
+    for i in range(0,len(vertices), step):
+        glDrawArrays( GL_TRIANGLES, i,  step)
     ##glDrawArrays( GL_TRIANGLES, , 16 )
 
 def resize_cb(window, w, h):
@@ -285,7 +291,7 @@ def evaluate_bezier(s,t,CP):
 def generate_bezier(CP):
     result = {"control_points": [], "normals":[]}
     t=0.0
-    ndiv=16
+    ndiv=NUMBER_OF_DIVISIONS
     dt = 1.0/ndiv
     for i in range(ndiv):
         s=0.0
