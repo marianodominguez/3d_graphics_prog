@@ -78,7 +78,7 @@ vec4 evaluateBezier(float[4] bu,float[4] bv) {
     int idx =0;
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            p += vec4(bu[i] * bv[j] * CP[idx]);
+            p += vec4(CP[idx] * bu[i] * bv[j] );
             idx++;
         }
     }
@@ -119,7 +119,7 @@ void main() {
         }
     }
 
-    fragnormal=normalize(cross(dPos_du, dPos_dv));
+    fragnormal=normalize(cross(dPos_dv, dPos_du));
     gl_Position = fragpos;
 }
 """
@@ -330,7 +330,7 @@ glEnableVertexAttribArray(vpos_location)
 glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
             glm.sizeof(glm.vec3), None)
 glUseProgram(program)
-glEnable(GL_CULL_FACE)
+#glEnable(GL_CULL_FACE)
 glEnable(GL_DEPTH_TEST)
 glPatchParameteri(GL_PATCH_VERTICES, 16)
 
