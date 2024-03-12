@@ -4,7 +4,7 @@ uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
 
-layout(quads) in;
+layout(quads, equal_spacing, cw) in;
 
 out vec4 fragpos;
 out vec3 fragnormal;
@@ -40,8 +40,8 @@ vec4 evaluateBezier(float[4] bu,float[4] bv) {
 
 void main() {
     int idx=0;
-	float u = gl_TessCoord.y;
-	float v = gl_TessCoord.x;
+	float u = gl_TessCoord.x;
+	float v = gl_TessCoord.y;
 
 	float dbu[4],dbv[4],bu[4],bv[4];
 
