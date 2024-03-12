@@ -7,156 +7,6 @@ from OpenGL.GL import *
 import glm
 import math
 
-strVertexShader = """
-#version 450 core
-
-layout (location = 0) in vec3 vpos;
-uniform mat4 M;
-uniform mat4 V;
-uniform mat4 P;
-
-void main()
-{
-    gl_Position = P*V*M*vec4(vpos, 1.0);
-}
-"""
-
-strGeometryShader= """
-#version 450 core
-
-layout(vertices=16) out;
-
-float detail=16;
-
-void main() {
-
-	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
-
-	gl_TessLevelOuter[0] = detail;
-	gl_TessLevelOuter[1] = detail;
-	gl_TessLevelOuter[2] = detail;
-	gl_TessLevelOuter[3] = detail;
-
-	gl_TessLevelInner[0] = detail;
-	gl_TessLevelInner[1] = detail;
-
-}
-
-"""
-
-strTessellateShader = """
-#version 450 core
-
-uniform mat4 M;
-uniform mat4 V;
-uniform mat4 P;
-
-layout(quads) in;
-
-out vec4 fragpos;
-out vec3 fragnormal;
-
-vec4 CP[16];
-
-void bezierDerivative(out float[4] b, out float[4] db, float t) {
-	//derivatives
-
-    b[0] = pow(1.0 - t, 3);
-	b[1] = 3.0 * pow(1.0 - t, 2) * t;
-	b[2] = 3.0 * (1.0 - t) * pow(t,2);
-	b[3] = pow(t, 3);
-
-	db[0] = -3.0 * pow(1.0 - t, 2);
-	db[1] = -6.0 * (1.0 - t) * t + 3.0 * pow(1.0 - t,2);
-	db[2] = -3.0 * pow(t, 2) + 6.0 * t * (1.0 - t);
-	db[3] = 3.0 * pow(t, 2);
-}
-
-vec4 evaluateBezier(float[4] bu,float[4] bv) {
-    vec4 p= vec4(0.0, 0.0, 0.0, 1.0);
-
-    int idx =0;
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            p += vec4(CP[idx] * bu[i] * bv[j] );
-            idx++;
-        }
-    }
-    return p;
-}
-
-void main() {
-    int idx=0;
-	float u = gl_TessCoord.x;
-	float v = gl_TessCoord.y;
-
-	float dbu[4],dbv[4],bu[4],bv[4];
-
-    for (int i = 0; i < 16; i++) {
-        CP[i]=gl_in[i].gl_Position;
-    }
-
-    bezierDerivative(bu,dbu, u);
-    bezierDerivative(bv,dbv, v);
-    fragpos = evaluateBezier(bu,bv);
-
-    vec3 dPos_du=vec3(0,0,0);
-    vec3 dPos_dv=vec3(0,0,0);
-
-    idx=0;
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            dPos_du+=vec3(CP[idx]*dbu[i]*bv[j]);
-            idx++;
-        }
-    }
-
-    idx=0;
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            dPos_dv+=vec3(CP[idx]*bu[i]*dbv[j]);
-            idx++;
-        }
-    }
-
-    fragnormal=normalize(cross(dPos_dv, dPos_du));
-    gl_Position = fragpos;
-}
-"""
-
-# String containing fragment shader program written in GLSL
-strFragmentShader = """
-#version 330 core
-
-in vec4 fragpos;
-in vec3 fragnormal;
-
-uniform vec4 lightCamera;
-uniform vec3 viewPos;
-out vec4 FragColor;
-
-void main()
-{
-    vec3 ambient = vec3(0.2, 0.2, 0.2);
-    vec3 objColor = vec3(1.0,0.2,1.0);
-
-    float specularStrength = 0.5;
-
-    vec3 lightDir = normalize(vec3(lightCamera) - fragpos.xyz);
-    float diff = max(dot(fragnormal, lightDir), 0.0);
-
-    vec3 viewDir = normalize(viewPos - fragpos.xyz);
-    vec3 reflectDir = reflect(-lightDir, fragnormal);
-
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
-    vec3 specular = specularStrength * spec * vec3(1.0,1.0,1.0);
-
-    vec3 color = (diff+specular+ambient)*objColor;
-
-    FragColor = vec4(color, 1.0);
-}
-"""
-
 program=None
 vertex_buffer=None
 vp_size_changed=False
@@ -283,10 +133,10 @@ def generate_patches(model):
 
 def load_shaders():
     shaderList = []
-    shaderList.append(createShader(GL_VERTEX_SHADER, strVertexShader))
-    shaderList.append(createShader(GL_TESS_CONTROL_SHADER, strGeometryShader))
-    shaderList.append(createShader(GL_TESS_EVALUATION_SHADER, strTessellateShader))
-    shaderList.append(createShader(GL_FRAGMENT_SHADER, strFragmentShader))
+    shaderList.append(createShader(GL_VERTEX_SHADER, open("shaders/vertex_bezier.gsl")))
+    shaderList.append(createShader(GL_TESS_CONTROL_SHADER, open("shaders/tess_ctl.gsl")))
+    shaderList.append(createShader(GL_TESS_EVALUATION_SHADER, open("shaders/tess_eval.gsl")))
+    shaderList.append(createShader(GL_FRAGMENT_SHADER, open("shaders/frag_bezier.gsl")))
     program = glCreateProgram()
 
     for shader in shaderList:
