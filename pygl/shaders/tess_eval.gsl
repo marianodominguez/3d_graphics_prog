@@ -40,8 +40,8 @@ vec4 evaluateBezier(float[4] bu,float[4] bv) {
 
 void main() {
     int idx=0;
-	float u = gl_TessCoord.x;
-	float v = gl_TessCoord.y;
+	float u = gl_TessCoord.y;
+	float v = gl_TessCoord.x;
 
 	float dbu[4],dbv[4],bu[4],bv[4];
 

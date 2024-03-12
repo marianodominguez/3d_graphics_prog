@@ -180,7 +180,7 @@ glEnableVertexAttribArray(vpos_location)
 glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
             glm.sizeof(glm.vec3), None)
 glUseProgram(program)
-#glEnable(GL_CULL_FACE)
+glEnable(GL_CULL_FACE)
 glEnable(GL_DEPTH_TEST)
 glPatchParameteri(GL_PATCH_VERTICES, 16)
 
