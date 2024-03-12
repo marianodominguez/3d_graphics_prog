@@ -10,11 +10,14 @@ import math
 strVertexShader = """
 #version 450 core
 
-in vec3 vpos;
+layout (location = 0) in vec3 vpos;
+uniform mat4 M;
+uniform mat4 V;
+uniform mat4 P;
 
 void main()
 {
-    gl_Position = vec4(vpos, 1.0);
+    gl_Position = P*V*M*vec4(vpos, 1.0);
 }
 """
 
@@ -53,7 +56,7 @@ layout(quads) in;
 out vec4 fragpos;
 out vec3 fragnormal;
 
-vec3 CP[16];
+vec4 CP[16];
 
 void bezierDerivative(out float[4] b, out float[4] db, float t) {
 	//derivatives
@@ -69,27 +72,17 @@ void bezierDerivative(out float[4] b, out float[4] db, float t) {
 	db[3] = 3.0 * pow(t, 2);
 }
 
-vec4 evaluateBezier(float s,float t) {
-    vec3 p= vec3(0.0, 0.0, 0.0);
-    float b[4], c[4];
-    b[0] = (1.0 - t) * (1.0 - t) * (1.0 - t);
-    b[1] = 3.0 * t * (1.0 - t) * (1.0 - t);
-    b[2] = 3.0 * t * t * (1.0 - t);
-    b[3] = t * t * t;
-
-    c[0] = (1.0 - s) * (1.0 - s) * (1.0 - s);
-    c[1] = 3.0 * s * (1.0 - s) * (1.0 - s);
-    c[2] = 3.0 * s * s * (1.0 - s);
-    c[3] = s * s * s;
+vec4 evaluateBezier(float[4] bu,float[4] bv) {
+    vec4 p= vec4(0.0, 0.0, 0.0, 1.0);
 
     int idx =0;
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            p = p+ b[i] * c[j] * CP[idx];
+            p += vec4(bu[i] * bv[j] * CP[idx]);
             idx++;
         }
     }
-    return vec4(p,1.0);
+    return p;
 }
 
 void main() {
@@ -99,15 +92,13 @@ void main() {
 
 	float dbu[4],dbv[4],bu[4],bv[4];
 
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            CP[idx]=gl_in[idx].gl_Position.xyz;
-            idx++;
-        }
+    for (int i = 0; i < 16; i++) {
+        CP[i]=gl_in[i].gl_Position;
     }
-    fragpos = evaluateBezier(u,v);
+
     bezierDerivative(bu,dbu, u);
     bezierDerivative(bv,dbv, v);
+    fragpos = evaluateBezier(bu,bv);
 
     vec3 dPos_du=vec3(0,0,0);
     vec3 dPos_dv=vec3(0,0,0);
@@ -115,7 +106,7 @@ void main() {
     idx=0;
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            dPos_du+=CP[idx]*dbu[i]*bv[j];
+            dPos_du+=vec3(CP[idx]*dbu[i]*bv[j]);
             idx++;
         }
     }
@@ -123,13 +114,13 @@ void main() {
     idx=0;
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            dPos_dv+=CP[idx]*bu[i]*dbv[j];
+            dPos_dv+=vec3(CP[idx]*bu[i]*dbv[j]);
             idx++;
         }
     }
 
     fragnormal=normalize(cross(dPos_du, dPos_dv));
-    gl_Position = P*V*M*fragpos;
+    gl_Position = fragpos;
 }
 """
 
@@ -255,8 +246,7 @@ def draw():
     glUniform4fv(light_location, 1, glm.value_ptr(LightCameraPosition))
     glUniform3fv(camera_location, 1, glm.value_ptr(cameraPosition))
 
-    for i in range(0,len(control_points),16):
-        glDrawArrays( GL_PATCHES, i, 16)
+    glDrawArrays( GL_PATCHES, 0, len(control_points))
 
 def resize_cb(window, w, h):
     global vp_size_changed
