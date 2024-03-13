@@ -95,7 +95,7 @@ def draw():
 
     glUniform4fv(light_location, 1, glm.value_ptr(LightCameraPosition))
     glUniform3fv(camera_location, 1, glm.value_ptr(cameraPosition))
-
+    #glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
     glDrawArrays( GL_PATCHES, 0, len(control_points))
 
 def resize_cb(window, w, h):
@@ -109,8 +109,8 @@ def init():
     # Create a windowed mode window and its OpenGL context
 
     glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 4)
-    glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 5)
-    #glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, GL_TRUE)
+    glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 1)
+    glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, GL_TRUE)
     glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
     glfw.window_hint(glfw.OPENGL_DEBUG_CONTEXT, GL_TRUE)
 
