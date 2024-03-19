@@ -49,6 +49,36 @@ void main() {
         CP[i]=gl_in[i].gl_Position;
     }
 
+    if(u==0 || u=1.0) {
+        if (CP[0]==CP[3]) {
+            bezierDerivative(bu,dbu, u);
+            bezierDerivative(bv,dbv, v);
+            vec4 p1 = evaluateBezier(bu,bv);
+
+            bezierDerivative(bu,dbu, u+0.001);
+            bezierDerivative(bv,dbv, v);
+            vec4 p2 = evaluateBezier(bu,bv);
+            fragnormal=normalize(cross(p1, p2));
+            gl_Position = p1;
+            return;
+        }
+    }
+
+    if(v==0 || v=1.0) {
+        if (CP[0]==CP[1]) {
+            bezierDerivative(bu,dbu, u);
+            bezierDerivative(bv,dbv, v);
+            vec4 p1 = evaluateBezier(bu,bv);
+
+            bezierDerivative(bu,dbu, u);
+            bezierDerivative(bv,dbv, v+0.001);
+            vec4 p2 = evaluateBezier(bu,bv);
+            fragnormal=normalize(cross(p1, p2));
+            gl_Position = p1;
+            return;
+        }
+    }
+
     bezierDerivative(bu,dbu, u);
     bezierDerivative(bv,dbv, v);
     fragpos = evaluateBezier(bu,bv);

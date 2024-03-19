@@ -134,8 +134,8 @@ def generate_patches(model):
 def load_shaders():
     shaderList = []
     shaderList.append(createShader(GL_VERTEX_SHADER, open("shaders/vertex_bezier.gsl")))
-    shaderList.append(createShader(GL_TESS_CONTROL_SHADER, open("shaders/tess_ctl.gsl")))
     shaderList.append(createShader(GL_TESS_EVALUATION_SHADER, open("shaders/tess_eval.gsl")))
+    shaderList.append(createShader(GL_TESS_CONTROL_SHADER, open("shaders/tess_ctl.gsl")))
     shaderList.append(createShader(GL_FRAGMENT_SHADER, open("shaders/frag_bezier.gsl")))
     program = glCreateProgram()
 
