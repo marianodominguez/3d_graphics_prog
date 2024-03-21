@@ -11,7 +11,7 @@ out vec3 fragnormal;
 
 vec4 CP[16];
 
-void bezierDerivative(out float[4] b, out float[4] db, float t) {
+void bezierPoly(out float[4] b, out float[4] db, float t) {
 	//derivatives
 
     b[0] = pow(1.0 - t, 3);
@@ -25,8 +25,20 @@ void bezierDerivative(out float[4] b, out float[4] db, float t) {
 	db[3] = 3.0 * pow(t, 2);
 }
 
-vec4 evaluateBezier(float[4] bu,float[4] bv) {
+vec4 evaluateBezier(float u, float v) {
     vec4 p= vec4(0.0, 0.0, 0.0, 1.0);
+    float[4] bu;
+    float[4] bv;
+
+    bu[0] = pow(1.0 - u, 3);
+	bu[1] = 3.0 * pow(1.0 - u, 2) * u;
+	bu[2] = 3.0 * (1.0 - u) * pow(u,2);
+	bu[3] = pow(u, 3);
+
+    bv[0] = pow(1.0 - v, 3);
+	bv[1] = 3.0 * pow(1.0 - v, 2) * v;
+	bv[2] = 3.0 * (1.0 - v) * pow(v,2);
+	bv[3] = pow(v, 3);
 
     int idx =0;
     for (int i = 0; i < 4; i++) {
@@ -38,20 +50,35 @@ vec4 evaluateBezier(float[4] bu,float[4] bv) {
     return p;
 }
 
+
 void main() {
     int idx=0;
 	float u = gl_TessCoord.x;
 	float v = gl_TessCoord.y;
-
+    float epsilon=0.01;
 	float dbu[4],dbv[4],bu[4],bv[4];
+    vec3 p1,p2,p3;
 
     for (int i = 0; i < 16; i++) {
         CP[i]=gl_in[i].gl_Position;
     }
 
-    bezierDerivative(bu,dbu, u);
-    bezierDerivative(bv,dbv, v);
-    fragpos = evaluateBezier(bu,bv);
+    if( u<=epsilon) {
+        if ( CP[0]==CP[1] || CP[2] == CP[3]) {
+            
+            p1 = evaluateBezier(u,v).xyz;
+            p2 = evaluateBezier(u+epsilon,v).xyz;
+            p3 = evaluateBezier(u,v+epsilon).xyz;
+            //fragnormal=vec3(0.0,0.0,0.4);
+            fragnormal=normalize(cross(p2-p1, p3-p1));
+            gl_Position = evaluateBezier(u,v);
+            return;
+        }
+    }
+
+    bezierPoly(bu,dbu, u);
+    bezierPoly(bv,dbv, v);
+    fragpos = evaluateBezier(u,v);
 
     vec3 dPos_du=vec3(0,0,0);
     vec3 dPos_dv=vec3(0,0,0);
@@ -59,7 +86,7 @@ void main() {
     idx=0;
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            dPos_du+=vec3(CP[idx]*dbu[i]*bv[j]);
+            dPos_dv+=vec3(CP[idx]*dbu[i]*bv[j]);
             idx++;
         }
     }
@@ -67,11 +94,11 @@ void main() {
     idx=0;
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            dPos_dv+=vec3(CP[idx]*bu[i]*dbv[j]);
+            dPos_du+=vec3(CP[idx]*bu[i]*dbv[j]);
             idx++;
         }
     }
 
-    fragnormal=normalize(cross(dPos_dv, dPos_du));
+    fragnormal=normalize(cross(dPos_du, dPos_dv));
     gl_Position = fragpos;
 }
