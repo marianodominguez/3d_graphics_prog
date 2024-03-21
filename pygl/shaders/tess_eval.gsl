@@ -86,7 +86,7 @@ void main() {
     idx=0;
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            dPos_du+=vec3(CP[idx]*dbu[i]*bv[j]);
+            dPos_dv+=vec3(CP[idx]*dbu[i]*bv[j]);
             idx++;
         }
     }
@@ -94,11 +94,11 @@ void main() {
     idx=0;
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            dPos_dv+=vec3(CP[idx]*bu[i]*dbv[j]);
+            dPos_du+=vec3(CP[idx]*bu[i]*dbv[j]);
             idx++;
         }
     }
 
-    fragnormal=normalize(cross(dPos_dv, dPos_du));
+    fragnormal=normalize(cross(dPos_du, dPos_dv));
     gl_Position = fragpos;
 }
