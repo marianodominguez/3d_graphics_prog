@@ -61,12 +61,12 @@ void main() {
         CP[i]=gl_in[i].gl_Position;
     }
 
-    if( u<=epsilon ) {
+    if( u==0 ) {
         if ( CP[0]==CP[1] || CP[2] == CP[3]) {
 
             p1 = evaluateBezier(u,v).xyz;
-            p2 = evaluateBezier(u+epsilon/2,v+epsilon/2).xyz;
-            p3 = evaluateBezier(u+epsilon/2,v-epsilon/2).xyz;
+            p2 = evaluateBezier(u+epsilon,v+epsilon).xyz;
+            p3 = evaluateBezier(u+epsilon/2,v+epsilon/2).xyz;
 
             fragnormal=normalize(cross(p2-p1, p3-p1));
             gl_Position = evaluateBezier(u,v);
