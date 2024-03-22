@@ -8,7 +8,6 @@ layout(quads, equal_spacing, cw) in;
 
 out vec4 fragpos;
 out vec3 fragnormal;
-
 vec4 CP[16];
 
 void bezierPoly(out float[4] b, out float[4] db, float t) {
@@ -54,7 +53,7 @@ void main() {
     int idx=0;
 	float u = gl_TessCoord.x;
 	float v = gl_TessCoord.y;
-    float epsilon=0.005;
+    float epsilon=1.0/64.0;
 	float dbu[4],dbv[4],bu[4],bv[4];
     vec3 p1,p2,p3;
 
@@ -62,7 +61,7 @@ void main() {
         CP[i]=gl_in[i].gl_Position;
     }
 
-    if( u<=epsilon) {
+    if( u<=epsilon ) {
         if ( CP[0]==CP[1] || CP[2] == CP[3]) {
 
             p1 = evaluateBezier(u,v).xyz;
