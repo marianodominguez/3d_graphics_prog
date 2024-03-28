@@ -2,12 +2,13 @@
 
 in vec4 fragpos;
 in vec3 fragnormal;
-in float u;
-in float v;
+in vec2 TexCoord;
+
 uniform vec4 lightCamera;
 uniform vec3 viewPos;
-uniform float time;
 out vec4 FragColor;
+// texture sampler
+uniform sampler2D texture1;
 
 void main()
 {
@@ -22,16 +23,9 @@ void main()
     vec3 viewDir = normalize(viewPos - fragpos.xyz);
     vec3 reflectDir = reflect(-lightDir, fragnormal);
 
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 512);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
     vec3 specular = specularStrength * spec * vec3(1.0,1.0,1.0);
 
-    vec3 color = min((diff+specular+ambient)*objColor, 1.0);
-
-    FragColor = vec4(color, 1.0);
-    float _u=mod(16.0*u,1.0);
-    float _v=mod(16.0*v,1.0);
-    float threshold=0.02;
-    if (_u< threshold || _v < threshold || _u> 1.0 - threshold || _v> 1.0 - threshold || abs(_u-_v)<threshold ) {
-       FragColor = 1.0-FragColor;
-    }    
+    vec3 color = (diff+specular+ambient)*objColor;
+    FragColor = vec4(color, 1.0)*texture(texture1, TexCoord);
 }

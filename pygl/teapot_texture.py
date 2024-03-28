@@ -6,7 +6,7 @@ import sys
 from OpenGL.GL import *
 import glm
 import math
-import time
+from PIL import Image
 
 program=None
 vertex_buffer=None
@@ -29,7 +29,21 @@ LightCameraPosition= glm.mat4()
 LightPosition = glm.vec4(20.0, 5.0, 40.0, 1.0);
 cameraPosition = glm.vec3(10, 10, 10);
 
-start_time= time.time()
+def read_texture(filename):
+    img = Image.open(filename)
+    img_data = np.array(list(img.getdata()), np.int8)
+    textID = glGenTextures(1)
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.size[0], img.size[1], 0, GL_RGB, GL_UNSIGNED_BYTE, img_data)
+    return textID
+
 
 def createShader(shaderType, shaderFile):
     shader = glCreateShader(shaderType)
@@ -84,7 +98,7 @@ def draw():
     m=glm.mat4(1.0)
     m=glm.scale(m, glm.vec3(0.9, 0.9, 0.9))
     m=glm.rotate(m, glfw.get_time()/7.0, glm.vec3(1,0,0))
-    m=glm.rotate(m, glfw.get_time()/2.0,   glm.vec3(0,1,0) )
+    m=glm.rotate(m, glfw.get_time(),   glm.vec3(0,1,0) )
 
     glClearColor(0.0, 0.0, 0.0, 0.0)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -93,15 +107,14 @@ def draw():
     glUniformMatrix4fv(m_location, 1, GL_FALSE, glm.value_ptr(m))
     glUniformMatrix4fv(v_location, 1, GL_FALSE, glm.value_ptr(v))
     glUniformMatrix4fv(p_location, 1, GL_FALSE, glm.value_ptr(p))
-    glUniform1f(time_location, time.time() - start_time  )
-    #print( time.time() - start_time )
+
     LightCameraPosition=v*LightPosition
 
     glUniform4fv(light_location, 1, glm.value_ptr(LightCameraPosition))
     glUniform3fv(camera_location, 1, glm.value_ptr(cameraPosition))
     #glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
     glDrawArrays( GL_PATCHES, 0, len(control_points))
-    
+
 def resize_cb(window, w, h):
     global vp_size_changed
     vp_size_changed = True
@@ -137,10 +150,10 @@ def generate_patches(model):
 
 def load_shaders():
     shaderList = []
-    shaderList.append(createShader(GL_VERTEX_SHADER, open("shaders/vertex_bezier.gsl")))
+    shaderList.append(createShader(GL_VERTEX_SHADER, open("shaders/vertex_texture.gsl")))
     shaderList.append(createShader(GL_TESS_EVALUATION_SHADER, open("shaders/tess_eval.gsl")))
-    shaderList.append(createShader(GL_TESS_CONTROL_SHADER, open("shaders/tess_ctl.gsl")))
-    shaderList.append(createShader(GL_FRAGMENT_SHADER, open("shaders/frag_bezier.gsl")))
+    shaderList.append(createShader(GL_TESS_CONTROL_SHADER, open("shaders/tess_ctl_texture.gsl")))
+    shaderList.append(createShader(GL_FRAGMENT_SHADER, open("shaders/frag_texture.gsl")))
     program = glCreateProgram()
 
     for shader in shaderList:
@@ -179,15 +192,22 @@ p_location = glGetUniformLocation(program, 'P')
 vpos_location = glGetAttribLocation(program, "vpos")
 light_location = glGetUniformLocation(program, "lightCamera")
 camera_location = glGetUniformLocation(program, "viewPos")
-time_location = glGetUniformLocation(program, "time")
+texture_location = glGetAttribLocation(program, "aTextCoord");
+
 glEnableVertexAttribArray(vpos_location)
+glEnableVertexAttribArray(texture_location);
 
 glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
             glm.sizeof(glm.vec3), None)
+offset = glm.sizeof(glm.vec3)*len(control_points)
+glVertexAttribPointer(texture_location, 2, GL_FLOAT, GL_FALSE,
+                          glm.sizeof(glm.vec3), ctypes.c_void_p(offset))
 glUseProgram(program)
 glEnable(GL_CULL_FACE)
 glEnable(GL_DEPTH_TEST)
 glPatchParameteri(GL_PATCH_VERTICES, 16)
+texture_id = read_texture('../textures/marble.jpg')
+glBindTexture(GL_TEXTURE_2D, texture_id)
 
 #setup camera
 # Camera matrix

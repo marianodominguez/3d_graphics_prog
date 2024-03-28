@@ -2,11 +2,13 @@
 
 layout(vertices=16) out;
 
-float detail=16;
+float detail=4;
 
+out vec2 TexCoord_in[];
 void main() {
 
 	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
+	TexCoord_in[gl_InvocationID] = TexCoord_in[gl_InvocationID];
 
 	gl_TessLevelOuter[0] = detail;
 	gl_TessLevelOuter[1] = detail;
