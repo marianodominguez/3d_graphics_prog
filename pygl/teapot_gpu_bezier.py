@@ -16,6 +16,8 @@ p_location=None
 cp_location=None
 camera_location=None
 
+BEZIER_SUBDIV_DETAIL=16.0
+
 #TODO use model
 nvertices=16*32
 m=glm.mat4()
@@ -182,7 +184,7 @@ glEnableVertexAttribArray(vpos_location)
 glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
             glm.sizeof(glm.vec3), None)
 glUseProgram(program)
-glUniform1f(detail_location,32.0)
+glUniform1f(detail_location, BEZIER_SUBDIV_DETAIL)
 glEnable(GL_CULL_FACE)
 glEnable(GL_DEPTH_TEST)
 glPatchParameteri(GL_PATCH_VERTICES, 16)
