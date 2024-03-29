@@ -175,11 +175,14 @@ p_location = glGetUniformLocation(program, 'P')
 vpos_location = glGetAttribLocation(program, "vpos")
 light_location = glGetUniformLocation(program, "lightCamera")
 camera_location = glGetUniformLocation(program, "viewPos")
+detail_location = glGetUniformLocation(program, "detail")
+
 glEnableVertexAttribArray(vpos_location)
 
 glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
             glm.sizeof(glm.vec3), None)
 glUseProgram(program)
+glUniform1f(detail_location,32.0)
 glEnable(GL_CULL_FACE)
 glEnable(GL_DEPTH_TEST)
 glPatchParameteri(GL_PATCH_VERTICES, 16)
