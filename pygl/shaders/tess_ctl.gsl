@@ -2,7 +2,7 @@
 
 layout(vertices=16) out;
 
-float detail=32;
+uniform float detail;
 
 void main() {
 
