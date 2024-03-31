@@ -16,6 +16,7 @@ m_location=None
 p_location=None
 cp_location=None
 camera_location=None
+texture_location=None
 
 #TODO use model
 nvertices=16*32
@@ -43,7 +44,6 @@ def read_texture(filename):
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.size[0], img.size[1], 0, GL_RGB, GL_UNSIGNED_BYTE, img_data)
     return textID
-
 
 def createShader(shaderType, shaderFile):
     shader = glCreateShader(shaderType)
@@ -192,7 +192,7 @@ p_location = glGetUniformLocation(program, 'P')
 vpos_location = glGetAttribLocation(program, "vpos")
 light_location = glGetUniformLocation(program, "lightCamera")
 camera_location = glGetUniformLocation(program, "viewPos")
-texture_location = glGetAttribLocation(program, "aTextCoord");
+texture_location = glGetAttribLocation(program, "aTextCoord")
 
 glEnableVertexAttribArray(vpos_location)
 glEnableVertexAttribArray(texture_location);
