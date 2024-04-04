@@ -6,9 +6,10 @@ uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
 
-out vec2 TexCoord;
+out vec2 TexCoord_in;
 
 void main()
 {
     gl_Position = P*V*M*vec4(vpos, 1.0);
+    TexCoord_in = aTextCoord;
 }

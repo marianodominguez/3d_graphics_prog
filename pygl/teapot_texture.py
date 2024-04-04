@@ -17,6 +17,7 @@ p_location=None
 cp_location=None
 camera_location=None
 texture_location=None
+texture_id=0
 
 #TODO use model
 nvertices=16*32
@@ -35,13 +36,13 @@ def read_texture(filename):
     img_data = np.array(list(img.getdata()), np.int8)
     textID = glGenTextures(1)
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP)
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP)
+    #glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP)
+    #glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
+    #glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.size[0], img.size[1], 0, GL_RGB, GL_UNSIGNED_BYTE, img_data)
     return textID
 
@@ -99,7 +100,7 @@ def draw():
     m=glm.scale(m, glm.vec3(0.9, 0.9, 0.9))
     m=glm.rotate(m, glfw.get_time()/7.0, glm.vec3(1,0,0))
     m=glm.rotate(m, glfw.get_time(),   glm.vec3(0,1,0) )
-
+    glBindTexture(GL_TEXTURE_2D, texture_id)
     glClearColor(0.0, 0.0, 0.0, 0.0)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
@@ -151,7 +152,7 @@ def generate_patches(model):
 def load_shaders():
     shaderList = []
     shaderList.append(createShader(GL_VERTEX_SHADER, open("shaders/vertex_texture.gsl")))
-    shaderList.append(createShader(GL_TESS_EVALUATION_SHADER, open("shaders/tess_eval.gsl")))
+    shaderList.append(createShader(GL_TESS_EVALUATION_SHADER, open("shaders/tess_eval_texture.gsl")))
     shaderList.append(createShader(GL_TESS_CONTROL_SHADER, open("shaders/tess_ctl_texture.gsl")))
     shaderList.append(createShader(GL_FRAGMENT_SHADER, open("shaders/frag_texture.gsl")))
     program = glCreateProgram()
