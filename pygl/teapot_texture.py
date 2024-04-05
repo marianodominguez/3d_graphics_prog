@@ -16,7 +16,7 @@ m_location=None
 p_location=None
 cp_location=None
 camera_location=None
-texture_location=None
+# texture_location=None
 texture_id=0
 
 #TODO use model
@@ -38,12 +38,14 @@ def read_texture(filename):
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
     #glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP)
     #glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP)
+    glBindTexture(GL_TEXTURE_2D, textID)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
     #glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.size[0], img.size[1], 0, GL_RGB, GL_UNSIGNED_BYTE, img_data)
+    glBindTexture(GL_TEXTURE_2D, 0)
     return textID
 
 def createShader(shaderType, shaderFile):
@@ -89,7 +91,7 @@ def load_model(filename):
     return {"patches":patches,"vertices":vertices};
 
 def draw():
-    global v,p,m
+    global v,p,m,texture_id
     width = glfw.get_framebuffer_size(window)[0]
     height = glfw.get_framebuffer_size(window)[1]
     ratio = width / height;
@@ -195,14 +197,15 @@ light_location = glGetUniformLocation(program, "lightCamera")
 camera_location = glGetUniformLocation(program, "viewPos")
 texture_location = glGetAttribLocation(program, "aTextCoord")
 
-glEnableVertexAttribArray(vpos_location)
-glEnableVertexAttribArray(texture_location);
-
 glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
             glm.sizeof(glm.vec3), None)
+glEnableVertexAttribArray(vpos_location)
+
 offset = glm.sizeof(glm.vec3)*len(control_points)
 glVertexAttribPointer(texture_location, 2, GL_FLOAT, GL_FALSE,
-                          glm.sizeof(glm.vec3), ctypes.c_void_p(offset))
+                          glm.sizeof(glm.vec2), ctypes.c_void_p(offset))
+glEnableVertexAttribArray(texture_location)
+
 glUseProgram(program)
 glEnable(GL_CULL_FACE)
 glEnable(GL_DEPTH_TEST)
