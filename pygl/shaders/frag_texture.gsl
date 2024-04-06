@@ -2,7 +2,7 @@
 
 in vec4 fragpos;
 in vec3 fragnormal;
-in vec2 TexCoord;
+in vec2 texCoord;
 
 uniform vec4 lightCamera;
 uniform vec3 viewPos;
@@ -27,6 +27,5 @@ void main()
 
     vec3 color = (diff+specular+ambient)*objColor;
 
-    //FragColor = vec4(0.5, 0.1, 1.0, 1.0);
-    FragColor = vec4(color, 1.0)*texture(texture1, TexCoord);
+    FragColor = vec4(color, 1.0)*texture(texture1, texCoord);
 }
