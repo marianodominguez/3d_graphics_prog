@@ -33,17 +33,16 @@ cameraPosition = glm.vec3(10, 10, 10);
 
 def read_texture(filename):
     img = Image.open(filename)
-    img_data = np.array(list(img.getdata()), np.int8)
+    img_data = np.array(list(img.getdata()), np.uint8)
     textID = glGenTextures(1)
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
-    #glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP)
-    #glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP)
+
     glBindTexture(GL_TEXTURE_2D, textID)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-    #glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
+
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.size[0], img.size[1], 0, GL_RGB, GL_UNSIGNED_BYTE, img_data)
     glBindTexture(GL_TEXTURE_2D, 0)
     return textID
