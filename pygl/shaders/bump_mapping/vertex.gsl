@@ -1,0 +1,19 @@
+#version 410 core
+
+layout (location = 0) in vec3 vpos;
+layout (location = 1) in vec2 aTextCoord;
+layout (location = 2) in vec2 aMapCoord;
+
+uniform mat4 M;
+uniform mat4 V;
+uniform mat4 P;
+
+out vec2 TexCoord;
+out vec2 MapCoord;
+
+void main()
+{
+    gl_Position = P*V*M*vec4(vpos, 1.0);
+    TexCoord = aTextCoord;
+    MapCoord = aMapCoord;
+}

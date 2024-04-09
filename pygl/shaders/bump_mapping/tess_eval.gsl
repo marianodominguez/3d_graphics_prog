@@ -1,0 +1,66 @@
+#version 410 core
+
+uniform mat4 M;
+uniform mat4 V;
+uniform mat4 P;
+
+uniform float detail;
+
+layout(quads, equal_spacing, cw) in;
+
+out vec4 fragpos;
+out vec3 fragnormal;
+vec4 CP[16];
+in vec2 TextureCoord[];
+out vec2 texCoord;
+in vec2 mapCoord[];
+out vec2 normalMapCoord;
+
+vec4 evaluateBezier(vec4 CP[16], float u, float v) {
+    vec4 p= vec4(0.0, 0.0, 0.0, 0.0);
+    float[4] bu;
+    float[4] bv;
+
+    bu[0] = pow(1.0 - u, 3);
+	bu[1] = 3.0 * pow(1.0 - u, 2) * u;
+	bu[2] = 3.0 * (1.0 - u) * pow(u,2);
+	bu[3] = pow(u, 3);
+
+    bv[0] = pow(1.0 - v, 3);
+	bv[1] = 3.0 * pow(1.0 - v, 2) * v;
+	bv[2] = 3.0 * (1.0 - v) * pow(v,2);
+	bv[3] = pow(v, 3);
+
+    int idx =0;
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            p += vec4(CP[idx] * bu[i] * bv[j] );
+            idx++;
+        }
+    }
+    return p;
+}
+
+
+void main() {
+    int idx=0;
+	float u = gl_TessCoord.x;
+	float v = gl_TessCoord.y;
+    float epsilon=1.0/(detail*2.0);
+    vec3 p1,p2,p3;
+
+    for (int i = 0; i < 16; i++) {
+        CP[i]=gl_in[i].gl_Position;
+    }
+
+    p1 = evaluateBezier(CP, u,v).xyz;
+    p2 = evaluateBezier(CP, u+epsilon,v+epsilon).xyz;
+    p3 = evaluateBezier(CP, u+epsilon,v).xyz;
+
+    texCoord = vec2(u,v);
+    normalMapCoord = vec2(u,v);
+
+    fragnormal=normalize(cross(p2-p1, p3-p1));
+    gl_Position = evaluateBezier(CP,u,v);
+    return;
+}
