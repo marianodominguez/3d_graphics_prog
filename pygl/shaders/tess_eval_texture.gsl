@@ -54,13 +54,13 @@ void main() {
     p2 = evaluateBezier(u+epsilon,v+epsilon).xyz;
     p3 = evaluateBezier(u+epsilon,v).xyz;
 
-    // retrieve control point texture coordinates
+    //retrieve control point texture coordinates
     vec2 t00 = TextureCoord[0];
     vec2 t01 = TextureCoord[1];
     vec2 t10 = TextureCoord[2];
     vec2 t11 = TextureCoord[3];
 
-    // bilinearly interpolate texture coordinate across patch
+    //bilinearly interpolate texture coordinate across patch
     vec2 t0 = (t01 - t00) * u + t00;
     vec2 t1 = (t11 - t10) * u + t10;
     texCoord = (t1 - t0) * v + t0;
