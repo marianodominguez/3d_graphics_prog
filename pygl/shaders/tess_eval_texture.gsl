@@ -14,7 +14,7 @@ vec4 CP[16];
 in vec2 TextureCoord[];
 out vec2 texCoord;
 
-vec4 evaluateBezier(float u, float v) {
+vec4 evaluateBezier(vec4 CP[16], float u, float v) {
     vec4 p= vec4(0.0, 0.0, 0.0, 0.0);
     float[4] bu;
     float[4] bv;
@@ -39,6 +39,7 @@ vec4 evaluateBezier(float u, float v) {
     return p;
 }
 
+
 void main() {
     int idx=0;
 	float u = gl_TessCoord.x;
@@ -50,22 +51,13 @@ void main() {
         CP[i]=gl_in[i].gl_Position;
     }
 
-    p1 = evaluateBezier(u,v).xyz;
-    p2 = evaluateBezier(u+epsilon,v+epsilon).xyz;
-    p3 = evaluateBezier(u+epsilon,v).xyz;
+    p1 = evaluateBezier(CP, u,v).xyz;
+    p2 = evaluateBezier(CP, u+epsilon,v+epsilon).xyz;
+    p3 = evaluateBezier(CP, u+epsilon,v).xyz;
 
-    //retrieve control point texture coordinates
-    vec2 t00 = TextureCoord[0];
-    vec2 t01 = TextureCoord[1];
-    vec2 t10 = TextureCoord[2];
-    vec2 t11 = TextureCoord[3];
-
-    //bilinearly interpolate texture coordinate across patch
-    vec2 t0 = (t01 - t00) * u + t00;
-    vec2 t1 = (t11 - t10) * u + t10;
-    texCoord = (t1 - t0) * v + t0;
+    texCoord = vec2(u,v);
 
     fragnormal=normalize(cross(p2-p1, p3-p1));
-    gl_Position = P*V*M*evaluateBezier(u,v);
+    gl_Position = evaluateBezier(CP,u,v);
     return;
 }

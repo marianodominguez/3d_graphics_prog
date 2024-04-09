@@ -16,6 +16,9 @@ m_location=None
 p_location=None
 cp_location=None
 camera_location=None
+
+BEZIER_SUBDIV_DETAIL=16.0
+
 # texture_location=None
 texture_id=0
 
@@ -194,6 +197,7 @@ vpos_location = glGetAttribLocation(program, "vpos")
 light_location = glGetUniformLocation(program, "lightCamera")
 camera_location = glGetUniformLocation(program, "viewPos")
 texture_location = glGetAttribLocation(program, "aTextCoord")
+detail_location = glGetUniformLocation(program, "detail")
 
 glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
             glm.sizeof(glm.vec3), None)
@@ -205,10 +209,12 @@ glVertexAttribPointer(texture_location, 2, GL_FLOAT, GL_FALSE,
 glEnableVertexAttribArray(texture_location)
 
 glUseProgram(program)
+glUniform1f(detail_location, BEZIER_SUBDIV_DETAIL)
 glEnable(GL_CULL_FACE)
 glEnable(GL_DEPTH_TEST)
 glPatchParameteri(GL_PATCH_VERTICES, 16)
-texture_id = read_texture('../textures/marble.jpg')
+texture_id = read_texture('../textures/ceramic.jpg')
+#texture_id = read_texture('../textures/squares.jpg')
 glBindTexture(GL_TEXTURE_2D, texture_id)
 
 #setup camera
