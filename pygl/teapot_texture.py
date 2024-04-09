@@ -215,6 +215,7 @@ glEnable(GL_DEPTH_TEST)
 glPatchParameteri(GL_PATCH_VERTICES, 16)
 texture_id = read_texture('../textures/ceramic.jpg')
 #texture_id = read_texture('../textures/squares.jpg')
+#texture_id = read_texture('../textures/grid_3_3.jpg')
 glBindTexture(GL_TEXTURE_2D, texture_id)
 
 #setup camera
