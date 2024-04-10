@@ -21,6 +21,7 @@ BEZIER_SUBDIV_DETAIL=16.0
 
 # texture_location=None
 texture_id=0
+bump_id=1
 
 #TODO use model
 nvertices=16*32
@@ -92,7 +93,7 @@ def load_model(filename):
     return {"patches":patches,"vertices":vertices};
 
 def draw():
-    global v,p,m,texture_id
+    global v,p,m,texture_id,bump_id
     width = glfw.get_framebuffer_size(window)[0]
     height = glfw.get_framebuffer_size(window)[1]
     ratio = width / height;
@@ -103,7 +104,6 @@ def draw():
     m=glm.scale(m, glm.vec3(0.9, 0.9, 0.9))
     m=glm.rotate(m, glfw.get_time()/7.0, glm.vec3(1,0,0))
     m=glm.rotate(m, glfw.get_time(),   glm.vec3(0,1,0) )
-    glBindTexture(GL_TEXTURE_2D, texture_id)
     glClearColor(0.0, 0.0, 0.0, 0.0)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
@@ -205,23 +205,17 @@ glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
 glEnableVertexAttribArray(vpos_location)
 
 offset = glm.sizeof(glm.vec3)*len(control_points)
-glVertexAttribPointer(texture_location, 2, GL_FLOAT, GL_FALSE,
-                          glm.sizeof(glm.vec2), ctypes.c_void_p(offset))
-glEnableVertexAttribArray(texture_location)
-offsetNormals = offset + glm.sizeof(glm.vec2)*100
-glVertexAttribPointer(texture_location, 2, GL_FLOAT, GL_FALSE,
-                           glm.sizeof(glm.vec2), ctypes.c_void_p(offsetNormals))
-glEnableVertexAttribArray(map_location)
 
 glUseProgram(program)
 glUniform1f(detail_location, BEZIER_SUBDIV_DETAIL)
 glEnable(GL_CULL_FACE)
 glEnable(GL_DEPTH_TEST)
 glPatchParameteri(GL_PATCH_VERTICES, 16)
-texture_id = read_texture('../textures/ceramic.jpg')
+
+#texture_id = read_texture('../textures/ceramic.jpg')
 #texture_id = read_texture('../textures/squares.jpg')
 #texture_id = read_texture('../textures/grid_3_3.jpg')
-glBindTexture(GL_TEXTURE_2D, texture_id)
+#glBindTexture(GL_TEXTURE_2D, texture_id)
 
 bump_id=read_texture('../textures/bubble_normal.jpg')
 glBindTexture(GL_TEXTURE_2D, bump_id)

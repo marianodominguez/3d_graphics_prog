@@ -9,7 +9,6 @@ uniform vec4 lightCamera;
 uniform vec3 viewPos;
 out vec4 FragColor;
 uniform sampler2D texture1;
-uniform sampler2D texture2;
 
 void main()
 {
@@ -18,7 +17,9 @@ void main()
 
     float specularStrength = 0.5;
 
-    vec3 normal = normalize(fragnormal + texture(texture2, normalMapCoord).rgb );
+    vec3 normal = fragnormal + texture(texture1, normalMapCoord*0.5).rgb;
+    normal = normal * 2.0 - 1.0;
+    normal = normalize(normal);
 
     vec3 lightDir = normalize(vec3(lightCamera) - fragpos.xyz);
     float diff = max(dot(normal, lightDir), 0.0);
@@ -31,9 +32,7 @@ void main()
 
     vec3 color = (diff+specular+ambient)*objColor;
 
-    //FragColor = vec4(color, 1.0);
-    //FragColor = vec4(color, 1.0)*texture(texture1, texCoord);
-    //FragColor = texture(texture1, texCoord);
-    FragColor = texture(texture2, normalMapCoord);
+    FragColor = vec4(color, 1.0);
+
     //FragColor = mix(vec4(color, 1.0),texture(texture1, texCoord), 0.5);
 }

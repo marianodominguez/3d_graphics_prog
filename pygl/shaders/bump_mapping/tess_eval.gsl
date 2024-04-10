@@ -41,7 +41,6 @@ vec4 evaluateBezier(vec4 CP[16], float u, float v) {
     return p;
 }
 
-
 void main() {
     int idx=0;
 	float u = gl_TessCoord.x;
