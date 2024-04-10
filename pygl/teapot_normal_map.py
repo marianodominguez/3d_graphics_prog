@@ -42,10 +42,10 @@ def read_texture(filename, active_texture):
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
     glActiveTexture(active_texture)
     glBindTexture(GL_TEXTURE_2D, textID)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.size[0], img.size[1], 0, GL_RGB, GL_UNSIGNED_BYTE, img_data)
     return textID
@@ -212,15 +212,16 @@ glEnable(GL_CULL_FACE)
 glEnable(GL_DEPTH_TEST)
 glPatchParameteri(GL_PATCH_VERTICES, 16)
 
-texture_id = read_texture('../textures/ceramic.jpg',  GL_TEXTURE0 )
+texture_id = read_texture('../textures/stone.jpg',  GL_TEXTURE0 )
 #texture_id = read_texture('../textures/squares.jpg', GL_TEXTURE0 )
 #texture_id = read_texture('../textures/grid_3_3.jpg',GL_TEXTURE0 )
 #texture_id = read_texture('../textures/ceramic_sm.jpg',  GL_TEXTURE0 )
 #texture_id = read_texture('../textures/marble.jpg',  GL_TEXTURE0 )
 
 #glBindTexture(GL_TEXTURE_2D, texture_id)
-bump_id = read_texture('../textures/bricks_normal.png', GL_TEXTURE1 )
+#bump_id = read_texture('../textures/bricks_normal.png', GL_TEXTURE1 )
 #bump_id = read_texture('../textures/bubble_normal.jpg', GL_TEXTURE1 )
+bump_id = read_texture('../textures/material_normal.jpg', GL_TEXTURE1 )
 
 #setup camera
 # Camera matrix

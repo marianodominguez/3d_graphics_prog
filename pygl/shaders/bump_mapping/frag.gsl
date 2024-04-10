@@ -35,5 +35,5 @@ void main()
     vec3 color = (diff+specular+ambient)*objColor;
 
     //FragColor = vec4(color, 1.0);
-    FragColor = mix(vec4(color, 1.0),texture(texture1, texCoord), 0.6);
+    FragColor = mix(vec4(color, 1.0),texture(texture1, texCoord*2.7), 0.6);
 }
