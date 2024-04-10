@@ -35,12 +35,12 @@ LightCameraPosition= glm.mat4()
 LightPosition = glm.vec4(20.0, 5.0, 40.0, 1.0);
 cameraPosition = glm.vec3(10, 10, 10);
 
-def read_texture(filename):
+def read_texture(filename, active_texture):
     img = Image.open(filename)
     img_data = np.array(list(img.getdata()), np.uint8)
     textID = glGenTextures(1)
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
-
+    glActiveTexture(active_texture)
     glBindTexture(GL_TEXTURE_2D, textID)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
@@ -190,15 +190,15 @@ glBufferData(GL_ARRAY_BUFFER, control_points, GL_STATIC_DRAW)
 
 program= load_shaders()
 
-m_location = glGetUniformLocation(program, 'M')
-v_location = glGetUniformLocation(program, 'V')
-p_location = glGetUniformLocation(program, 'P')
-vpos_location = glGetAttribLocation(program, "vpos")
-light_location = glGetUniformLocation(program, "lightCamera")
-camera_location = glGetUniformLocation(program, "viewPos")
-texture_location = glGetAttribLocation(program, "aTextCoord")
-detail_location = glGetUniformLocation(program, "detail")
-map_location = glGetAttribLocation(program, "aMapCoord")
+m_location          = glGetUniformLocation(program, 'M')
+v_location          = glGetUniformLocation(program, 'V')
+p_location          = glGetUniformLocation(program, 'P')
+vpos_location       = glGetAttribLocation(program, "vpos")
+light_location      = glGetUniformLocation(program, "lightCamera")
+camera_location     = glGetUniformLocation(program, "viewPos")
+texture_location    = glGetAttribLocation(program, "aTextCoord")
+detail_location     = glGetUniformLocation(program, "detail")
+map_location        = glGetAttribLocation(program, "aMapCoord")
 
 glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
             glm.sizeof(glm.vec3), None)
@@ -212,13 +212,13 @@ glEnable(GL_CULL_FACE)
 glEnable(GL_DEPTH_TEST)
 glPatchParameteri(GL_PATCH_VERTICES, 16)
 
-#texture_id = read_texture('../textures/ceramic.jpg')
-#texture_id = read_texture('../textures/squares.jpg')
-#texture_id = read_texture('../textures/grid_3_3.jpg')
-#glBindTexture(GL_TEXTURE_2D, texture_id)
+texture_id = read_texture('../textures/ceramic.jpg',  GL_TEXTURE0 )
+#texture_id = read_texture('../textures/squares.jpg', GL_TEXTURE0 )
+#texture_id = read_texture('../textures/grid_3_3.jpg',GL_TEXTURE0 )
 
-bump_id=read_texture('../textures/bubble_normal.jpg')
-glBindTexture(GL_TEXTURE_2D, bump_id)
+#glBindTexture(GL_TEXTURE_2D, texture_id)
+bump_id = read_texture('../textures/bricks_normal.png', GL_TEXTURE1 )
+#bump_id = read_texture('../textures/bubble_normal.jpg', GL_TEXTURE1 )
 
 #setup camera
 # Camera matrix
