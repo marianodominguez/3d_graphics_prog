@@ -203,18 +203,13 @@ glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
             glm.sizeof(glm.vec3), None)
 glEnableVertexAttribArray(vpos_location)
 
-offset = glm.sizeof(glm.vec3)*len(control_points)
-glVertexAttribPointer(texture_location, 2, GL_FLOAT, GL_FALSE,
-                          glm.sizeof(glm.vec2), ctypes.c_void_p(offset))
-glEnableVertexAttribArray(texture_location)
-
 glUseProgram(program)
 glUniform1f(detail_location, BEZIER_SUBDIV_DETAIL)
 glEnable(GL_CULL_FACE)
 glEnable(GL_DEPTH_TEST)
 glPatchParameteri(GL_PATCH_VERTICES, 16)
-texture_id = read_texture('../textures/ceramic.jpg')
-#texture_id = read_texture('../textures/squares.jpg')
+#texture_id = read_texture('../textures/ceramic.jpg')
+texture_id = read_texture('../textures/squares.jpg')
 #texture_id = read_texture('../textures/grid_3_3.jpg')
 glBindTexture(GL_TEXTURE_2D, texture_id)
 

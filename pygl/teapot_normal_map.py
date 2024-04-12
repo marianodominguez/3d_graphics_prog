@@ -212,16 +212,17 @@ glEnable(GL_CULL_FACE)
 glEnable(GL_DEPTH_TEST)
 glPatchParameteri(GL_PATCH_VERTICES, 16)
 
-texture_id = read_texture('../textures/stone.jpg',  GL_TEXTURE0 )
+#texture_id = read_texture('../textures/stone.jpg',  GL_TEXTURE0 )
 #texture_id = read_texture('../textures/squares.jpg', GL_TEXTURE0 )
 #texture_id = read_texture('../textures/grid_3_3.jpg',GL_TEXTURE0 )
 #texture_id = read_texture('../textures/ceramic_sm.jpg',  GL_TEXTURE0 )
+texture_id = read_texture('../textures/ceramic.jpg',  GL_TEXTURE0 )
 #texture_id = read_texture('../textures/marble.jpg',  GL_TEXTURE0 )
 
 #glBindTexture(GL_TEXTURE_2D, texture_id)
 #bump_id = read_texture('../textures/bricks_normal.png', GL_TEXTURE1 )
-#bump_id = read_texture('../textures/bubble_normal.jpg', GL_TEXTURE1 )
-bump_id = read_texture('../textures/material_normal.jpg', GL_TEXTURE1 )
+bump_id = read_texture('../textures/bubble_normal.jpg', GL_TEXTURE1 )
+#bump_id = read_texture('../textures/material_normal.jpg', GL_TEXTURE1 )
 
 #setup camera
 # Camera matrix

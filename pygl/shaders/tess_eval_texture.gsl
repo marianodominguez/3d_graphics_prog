@@ -14,7 +14,7 @@ vec4 CP[16];
 in vec2 TextureCoord[];
 out vec2 texCoord;
 
-vec4 evaluateBezier(vec4 CP[16], float u, float v) {
+vec4 evaluateBezier(vec4 C[16], float u, float v) {
     vec4 p= vec4(0.0, 0.0, 0.0, 0.0);
     float[4] bu;
     float[4] bv;
@@ -32,7 +32,7 @@ vec4 evaluateBezier(vec4 CP[16], float u, float v) {
     int idx =0;
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            p += vec4(CP[idx] * bu[i] * bv[j] );
+            p += vec4(C[idx] * bu[i] * bv[j] );
             idx++;
         }
     }
