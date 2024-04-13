@@ -19,7 +19,7 @@ void main()
 
     float specularStrength = 0.5;
 
-    vec3 normal = fragnormal + texture(texture2, normalMapCoord).rgb;
+    vec3 normal = fragnormal + texture(texture2, normalMapCoord*0.2).rgb;
     normal = normal * 2.0 - 1.0;
     normal = normalize(normal);
 
