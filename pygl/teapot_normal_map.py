@@ -196,9 +196,7 @@ p_location          = glGetUniformLocation(program, 'P')
 vpos_location       = glGetAttribLocation(program, "vpos")
 light_location      = glGetUniformLocation(program, "lightCamera")
 camera_location     = glGetUniformLocation(program, "viewPos")
-texture_location    = glGetAttribLocation(program, "aTextCoord")
 detail_location     = glGetUniformLocation(program, "detail")
-map_location        = glGetAttribLocation(program, "aMapCoord")
 
 glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
             glm.sizeof(glm.vec3), None)

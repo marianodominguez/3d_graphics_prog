@@ -11,9 +11,8 @@ layout(quads, equal_spacing, cw) in;
 out vec4 fragpos;
 out vec3 fragnormal;
 vec4 CP[16];
-in vec2 TextureCoord[];
+
 out vec2 texCoord;
-in vec2 mapCoord[];
 out vec2 normalMapCoord;
 
 vec4 evaluateBezier(vec4 CP[16], float u, float v) {
