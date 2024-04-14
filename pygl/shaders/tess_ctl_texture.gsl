@@ -3,12 +3,10 @@
 layout(vertices=16) out;
 
 uniform float detail;
-out vec2 TextureCoord[];
-in vec2 TexCoord[];
+
 void main() {
 
 	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
-	TextureCoord[gl_InvocationID] = TexCoord[gl_InvocationID];
 	if (gl_InvocationID == 0)
     {
 		gl_TessLevelOuter[0] = detail;
