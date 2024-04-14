@@ -19,7 +19,7 @@ void main()
 
     float specularStrength = 0.5;
 
-    vec3 normal = fragnormal + texture(texture2, normalMapCoord*0.2).rgb;
+    vec3 normal = fragnormal + texture(texture2, normalMapCoord*0.5).rgb;
     normal = normal * 2.0 - 1.0;
     normal = normalize(normal);
 
@@ -35,5 +35,5 @@ void main()
     vec3 color = (diff+specular+ambient)*objColor;
 
     //FragColor = vec4(color, 1.0);
-    FragColor = mix(vec4(color, 1.0),texture(texture1, texCoord*2.7), 0.6);
+    FragColor = mix(vec4(color, 1.0),texture(texture1, texCoord*1.5), 0.6);
 }
