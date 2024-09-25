@@ -16,7 +16,7 @@ GLFWwindow *window;
 GLuint vertex_buffer, normal_buffer, vertex_shader, fragment_shader,
     program;
 GLint p_location, v_location, m_location, vpos_location, vnormal_location,
-    light_location, normal_location;
+    light_location, normal_location, camera_location;
 float ratio;
 int width, height;
 
@@ -27,7 +27,8 @@ vec4 LightCameraPosition;
 static vec3 vertices[nvertices];
 static vec3 normals[nvertices];
 
-vec4 LightPosition = (vec4){40.0f, 20.0f, 40.0f, 1.0f};
+vec4 LightPosition = (vec4){20.0f, 5.0f, 40.0f, 1.0f};
+vec3 cameraPosition = (vec3){10, 10, 10};
 
 static void error_callback(int error, const char *description) {
     fprintf(stderr, "Error: %s\n", description);
@@ -130,12 +131,12 @@ void drawScene() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glm_mat4_identity(m);
-    glm_scale(m, (vec3){2.5, 2.5, 2.5});
+    glm_scale(m, (vec3){1.5, 1.5, 1.5});
     //glm_rotate_x(m, (float)glfwGetTime()/7.0, m);
     glm_rotate_y(m, (float) glfwGetTime(),m);
     //glm_rotate_z(m, (float)glfwGetTime()/5.0, m);
 
-    glm_perspective(M_PI / 2, (float)width / (float)height, 0.1f, 50.0f, p);
+    glm_perspective(M_PI / 4, (float)width / (float)height, 5.0f, 50.0f, p);
 
     glm_mat4_mul(v, m, mv);
 
@@ -151,6 +152,7 @@ void drawScene() {
     glUniformMatrix3fv(normal_location, 1, GL_TRUE,
                         (const GLfloat *)normal_matrix);
     glUniform4fv(light_location, 1, (const GLfloat *)LightCameraPosition);
+    glUniform3fv(camera_location, 1, (const GLfloat *)cameraPosition);
     glDrawArrays(GL_TRIANGLES, 0, nvertices);
 
     glfwSwapBuffers(window);

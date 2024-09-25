@@ -49,14 +49,15 @@ teapot_08:
 triangle_color:
 	$(CXX) $(COMPILER_FLAGS) -o bin/test_triangle_color basic/src/test_triangle_color.c teapot/src/auxiliar.c $(INCLUDE) $(LIBS)
 
-all: clean teapot_01 teapot_02 teapot_03 teapot_04 teapot_05 teapot_06 teapot_07 teapot_08 cube teapot triangle_color
+all: clean teapot_01 teapot_02 teapot_03 teapot_04 teapot_05 teapot_06 teapot_07 teapot_08 cube teapot triangle_color gl
 	$(CXX) $(COMPILER_FLAGS) -o bin/polar_curves basic/src/polar_curves.c $(INCLUDE) $(LIBS)
 	$(CXX) $(COMPILER_FLAGS) -o bin/test_bezier basic/src/test_bezier.c $(INCLUDE) $(LIBS)
 	$(CXX) $(COMPILER_FLAGS) -o bin/test_triangle basic/src/test_triangle.c teapot/src/auxiliar.c $(INCLUDE) $(LIBS)
 	$(CXX) $(COMPILER_FLAGS) -o bin/test_lines basic/src/test_lines.c teapot/src/auxiliar.c $(INCLUDE) $(LIBS)
+gl: gl_cube gl_teapot gl_teapot_diffuse gl_teapot_specular gl_teapot_texture
 
 gl_teapot:
-	$(CXX) $(COMPILER_FLAGS) -o bin/$@ gl/src/teapot.c $(INCLUDE) $(GL_LIBS)
+	$(CXX) $(COMPILER_FLAGS) -o bin/$@ gl/src/gl_teapot.c $(INCLUDE) $(GL_LIBS)
 
 gl_teapot_diffuse:
 	$(CXX) $(COMPILER_FLAGS) -o bin/$@ gl/src/teapot_diffuse.c $(INCLUDE) $(GL_LIBS)
