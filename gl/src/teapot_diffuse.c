@@ -134,7 +134,7 @@ void drawScene() {
     glm_scale(m, (vec3){1.5, 1.5, 1.5});
     //glm_rotate_x(m, (float)glfwGetTime()/7.0, m);
     glm_rotate_y(m, (float) glfwGetTime(),m);
-    //glm_rotate_z(m, (float)glfwGetTime()/5.0, m);
+    glm_rotate_z(m, (float)glfwGetTime()/5.0, m);
 
     glm_perspective(M_PI / 4, (float)width / (float)height, 5.0f, 50.0f, p);
 
