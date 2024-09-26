@@ -1,0 +1,20 @@
+#version 150 core
+
+in vec3 vNormal;
+in vec3 vPos;
+
+out vec3 FragPos;
+out vec3 Normal;
+
+uniform mat4 M;
+uniform mat4 V;
+uniform mat4 P;
+uniform mat3 normal_matrix;
+
+void main()
+{
+    FragPos =vec3( M * vec4(vPos, 1.0) );
+    Normal = normal_matrix * vNormal;
+    gl_Position = P*V*M*vec4(vPos, 1.0);
+}
+

@@ -194,12 +194,11 @@ int main(void)
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices), sizeof(normals), normals);
 
     program = glCreateProgram();
-    vertex_shader   =   load_shader("gl/src/vertex_shader.gsl", GL_VERTEX_SHADER);
+    vertex_shader   =   load_shader("gl/src/vertex_shader_diff.gsl", GL_VERTEX_SHADER);
     fragment_shader =   load_shader("gl/src/fragment_shader_diff.gsl", GL_FRAGMENT_SHADER);
     glAttachShader(program, vertex_shader);
     glAttachShader(program, fragment_shader);
     glLinkProgram(program);
-
 
     m_location = glGetUniformLocation(program, "M");
     v_location = glGetUniformLocation(program, "V");
@@ -207,6 +206,7 @@ int main(void)
     vpos_location = glGetAttribLocation(program, "vPos");
     vnormal_location = glGetAttribLocation(program, "vNormal");
     normal_location = glGetUniformLocation(program, "normal_matrix");
+    light_location = glGetUniformLocation(program, "lightCamera");
     camera_location = glGetUniformLocation(program, "viewPos");
 
     glEnableVertexAttribArray(vpos_location);
@@ -218,7 +218,7 @@ int main(void)
     glUseProgram(program);
 
     // Camera matrix
-    glm_lookat((vec3){10, 10, 10},  // Camera in World Space
+    glm_lookat( cameraPosition,  // Camera in World Space
                (vec3){0, 0, 0},  // and looks at the origin
                (vec3){0, 1, 0}
                // Head is up (set to 0,-1,0 to look upside-down)
