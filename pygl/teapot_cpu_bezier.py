@@ -107,35 +107,33 @@ def bezier_2d(C,t):
         p= p+ b[i] * C[i];
     return p
 
-def dUBezier(C,u,v) :
-    P=[ 0.0 for i in range(4) ]
-    vCurve=[ 0 for i in range(4) ]
-    r=glm.vec3()
+def dUBezier(C, u, v):
+    P = [glm.vec3() for _ in range(4)]
+    vCurve = [glm.vec3() for _ in range(4)]
     for i in range(4):
-       P[0] = C[0][i]
-       P[1] = C[1][i]
-       P[2] = C[2][i]
-       P[3] = C[3][i]
-       vCurve[i] = bezier_2d(P, v)
-
-    r=derivativeBezier(u, vCurve[0],vCurve[1],vCurve[2],vCurve[3])
+        P[0] = C[0][i]
+        P[1] = C[1][i]
+        P[2] = C[2][i]
+        P[3] = C[3][i]
+        vCurve[i] = bezier_2d(P, v)
+    r = derivativeBezier(u, vCurve[0], vCurve[1], vCurve[2], vCurve[3])
     return r
 
-def dVBezier(C,u,v):
-    uCurve=[ 0 for i in range(4)]
-    r=glm.vec3()
+def dVBezier(C, u, v):
+    uCurve = [glm.vec3() for _ in range(4)]
     for i in range(4):
-       uCurve[i] = bezier_2d(C[i], u)
-
-    r=derivativeBezier(v, uCurve[0],uCurve[1],uCurve[2],uCurve[3])
+        uCurve[i] = bezier_2d(C[i], u)
+    r = derivativeBezier(v, uCurve[0], uCurve[1], uCurve[2], uCurve[3])
     return r
 
-def bezier_normal(u,v,C):
-    N=glm.vec3()
-    dU = dUBezier(C, u, v);
-    dV = dVBezier(C, u, v);
-    N = glm.normalize(glm.cross(dU,dV));
-    return N;
+def bezier_normal(u, v, C):
+    dU = dUBezier(C, u, v)
+    dV = dVBezier(C, u, v)
+    N = glm.cross(dU, dV)
+    if glm.length(N) ==  0:
+        # fallback normal if degenerate
+        return glm.vec3(0, 0, -1)
+    return glm.normalize(N);
 
 def createShader(shaderType, shaderFile):
     shader = glCreateShader(shaderType)

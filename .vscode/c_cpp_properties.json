@@ -21,9 +21,11 @@
                 "${workspaceFolder}/include",
                 "/usr/local/include"
             ],
-            "defines": [],
+            "defines": [
+                "_USE_MATH_DEFINES"
+            ],
             "compilerPath": "/usr/bin/gcc",
-            "cStandard": "c17",
+            "cStandard": "gnu99",
             "cppStandard": "c++17",
             "configurationProvider": "ms-vscode.makefile-tools"
         }
