@@ -1,95 +1,106 @@
-# 3dc Graphics implementation
+# 3D Graphics Programming Projects
 
-## (Almost) from scratch
+This repository contains several 3D graphics projects, including classic Gouraud renderings and OpenGL-based demos.
 
-Although the only external library required is put_pixel, I'm using allegro for creating windows and taking care of double buffering. this can be replaced by any other implementation.
+## Requirements
 
-This is a progression of writing a basic rendering pipeline, it should work in a PC or raspberry PI
+- GCC (or compatible C compiler)
+- Allegro libraries
+- OpenGL, GLFW, GLEW (for GL projects)
+- Make
 
-## Installing libraries and requirements
+## Installing Build Libraries
 
-## ubuntu/raspbian
+### On Debian-based Linux (Ubuntu, etc.)
 
-Most of them are already installed: a c compiler, makefile and basic libraries,
-this should cover it.
+Install the required packages using:
 
-
-```
- sudo apt install build-essential
- sudo apt install liballegro5
-```
-
-## OSX
-
-```
-brew install allegro
+```sh
+sudo apt update
+sudo apt install build-essential liballegro5-dev libglfw3-dev libglew-dev libgl1-mesa-dev
 ```
 
-## Runing the program with makefiles
+### On macOS (using Homebrew)
 
-Pass the program name, e.g.
+First, install [Homebrew](https://brew.sh/) if you haven't already. Then run:
 
+```sh
+brew install allegro glew glfw
 ```
 
-make teapot_01
+> **Note:** The Makefile uses `-framework OpenGL` and Homebrew include/library paths on macOS.
 
-# or 'make all' to create all binaries
+---
 
-bin/teapot_01
+## Building the Projects
+
+To build basic projects, simply run:
+
+```sh
+make basic
 ```
 
-## Contents
+This will clean the `bin/` directory and build all targets.
 
-- /basic/src/polar_curves
+---
 
-Demo of graphic library, it shopuld display a spyrograph pattern
+## Teapot Projects
 
-- /basic/src/test_bezier
+These projects use Allegro and are located in the `teapot/` and `basic/` directories.
 
-Draws and rotates a bezier patch, interpolating 10 points
+### Build Individual Teapot Targets
 
-- /teapot/cube
+- `make teapot` — Build the main teapot demo.
+- `make teapot_01` to `make teapot_08` — Build teapot variants.
+- `make cube` — Build the cube demo.
+- `make triangle_color` — Build the colored triangle demo.
+- `make test_bezier` — Build the Bezier curve test.
+- `make test_triangle` — Build the triangle test.
+- `make test_lines` — Build the lines test.
+- `make polar_curves` — Build the polar curves demo.
 
-Minimal 3D example, a rotating wireframe cube
+Binaries are placed in the `bin/` directory.
 
-- /teapot/teapot_01
+---
 
-Wireframe model, projection, translation and rotation
+## OpenGL (GL) Projects
 
-- /teapot/teapot_02
+These projects use OpenGL, GLFW, and GLEW, and are located in the `gl/` directory.
 
-Testing a naive linear interpolation, it does not generate proper polygons.
+### Build All GL Projects
 
-- /teapot/teapot_03
+```sh
+make gl
+```
 
-Wireframe interpolation with Bezier patches
+This will build all OpenGL-based demos:
 
-- /teapot/teapot_04
+- `make gl_cube` — Build the OpenGL cube demo.
+- `make gl_teapot` — Build the OpenGL teapot demo.
+- `make gl_teapot_diffuse` — Build the teapot with diffuse shading.
+- `make gl_teapot_specular` — Build the teapot with specular shading.
+- `make gl_teapot_texture` — Build the teapot with texture mapping.
 
-Backface culling, using normals
+Binaries are placed in the `bin/` directory.
 
-- /teapot/teapot_05
+---
 
-Triangle filling and rasterization algorithm
+## Cleaning
 
-- /teapot/teapot_06
+To remove all built binaries:
 
-Flat shading
+```sh
+make clean
+```
 
-- /teapot/teapot_07
+---
 
-Smooth shading, Gouraud algorithm, use derivatives to calculate normals.
+## Notes
 
-- /teapot/teapot_08
+- Ensure all required libraries are installed on your system.
+- On macOS, the Makefile uses `-framework OpenGL` and Homebrew include/library paths.
+- On Linux, the Makefile uses `-lGL` and standard include/library paths.
 
-Z-Buffer, hiding surfaces.
-
-# References
-
-1. https://www.gabrielgambetta.com/computer-graphics-from-scratch/
-
-1. https://cs.brown.edu/people/jhughes/papers/vanDam-CGP-1995/main.htm
-
-1. https://www.scratchapixel.com/lessons/geometry/bezier-curve-rendering-utah-teapot/bezier-patch-normal.html
+See the Makefile for further customization.
 
 
