@@ -49,29 +49,25 @@ def read_texture(filename):
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.size[0], img.size[1], 0, GL_RGB, GL_UNSIGNED_BYTE, img_data)
     return textID
 
-def createShader(shaderType, shaderFile):
+def createShader(shaderType, shaderFilePath):
+    with open(shaderFilePath, 'r') as f:
+        shaderSource = f.read()
     shader = glCreateShader(shaderType)
-    glShaderSource(shader, shaderFile) # note that this is a simpler function call than in C
+    glShaderSource(shader, shaderSource)
     glCompileShader(shader)
 
-    status = None
-    glGetShaderiv(shader, GL_COMPILE_STATUS, status)
-    if status == GL_FALSE:
-        # Note that getting the error log is much simpler in Python than in C/C++
-        # and does not require explicit handling of the string buffer
-        strInfoLog = glGetShaderInfoLog(shader)
-        strShaderType = ""
-        if shaderType is GL_VERTEX_SHADER:
-            strShaderType = "vertex"
-        elif shaderType is GL_GEOMETRY_SHADER:
-            strShaderType = "geometry"
-        elif shaderType is GL_FRAGMENT_SHADER:
-            strShaderType = "fragment"
-        elif shaderType is GL_TESS_CONTROL_SHADER:
-            strShaderType = "Tesselation Control shader"
-        elif shaderType is GL_TESS_EVALUATION_SHADER:
-            strShaderType = "Tesselation Evaluation shader"
-        print("Compilation failure for " + strShaderType + " shader:\n" + strInfoLog)
+    status = glGetShaderiv(shader, GL_COMPILE_STATUS)
+    if not status:
+        strInfoLog = glGetShaderInfoLog(shader).decode()
+        strShaderType = {
+            GL_VERTEX_SHADER: "vertex",
+            GL_GEOMETRY_SHADER: "geometry",
+            GL_FRAGMENT_SHADER: "fragment",
+            GL_TESS_CONTROL_SHADER: "Tessellation Control",
+            GL_TESS_EVALUATION_SHADER: "Tessellation Evaluation"
+        }.get(shaderType, "unknown")
+        print(f"Compilation failure for {strShaderType} shader:\n{strInfoLog}")
+        raise RuntimeError(strInfoLog)
     return shader
 
 def load_model(filename):
@@ -153,19 +149,21 @@ def generate_patches(model):
     return result
 
 def load_shaders():
-    shaderList = []
-    shaderList.append(createShader(GL_VERTEX_SHADER, open("shaders/vertex_texture.gsl")))
-    shaderList.append(createShader(GL_TESS_EVALUATION_SHADER, open("shaders/tess_eval_texture.gsl")))
-    shaderList.append(createShader(GL_TESS_CONTROL_SHADER, open("shaders/tess_ctl_texture.gsl")))
-    shaderList.append(createShader(GL_FRAGMENT_SHADER, open("shaders/frag_texture.gsl")))
+    shaderList = [
+        createShader(GL_VERTEX_SHADER, "shaders/vertex_texture.gsl"),
+        createShader(GL_TESS_EVALUATION_SHADER, "shaders/tess_eval_texture.gsl"),
+        createShader(GL_TESS_CONTROL_SHADER, "shaders/tess_ctl_texture.gsl"),
+        createShader(GL_FRAGMENT_SHADER, "shaders/frag_texture.gsl"),
+    ]
     program = glCreateProgram()
-
     for shader in shaderList:
         glAttachShader(program, shader)
-        glLinkProgram(program)
-        if not glGetProgramiv( program, GL_LINK_STATUS ):
-            print( 'link error:' )
-            print( glGetProgramInfoLog( program ) )
+    glLinkProgram(program)
+    if not glGetProgramiv(program, GL_LINK_STATUS):
+        print('link error:')
+        print(glGetProgramInfoLog(program).decode())
+        raise RuntimeError("Shader program link failed")
+    for shader in shaderList:
         glDeleteShader(shader)
     return program
 
@@ -188,7 +186,8 @@ glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
 
 glBufferData(GL_ARRAY_BUFFER, control_points, GL_STATIC_DRAW)
 
-program= load_shaders()
+program = load_shaders()
+glUseProgram(program)  # <-- Use program before querying locations
 
 m_location = glGetUniformLocation(program, 'M')
 v_location = glGetUniformLocation(program, 'V')

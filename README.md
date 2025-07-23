@@ -1,6 +1,6 @@
 # 3D Graphics Programming Projects
 
-This repository contains several 3D graphics projects, including classic Gouraud renderings and OpenGL-based demos.
+This repository contains several 3D graphics projects, including classic Gouraud renderings, OpenGL-based demos, and Python OpenGL examples.
 
 ## Requirements
 
@@ -82,6 +82,38 @@ This will build all OpenGL-based demos:
 - `make gl_teapot_texture` — Build the teapot with texture mapping.
 
 Binaries are placed in the `bin/` directory.
+
+---
+
+## Python OpenGL (pygl) Projects
+
+The `pygl/` directory contains Python examples using OpenGL, GLFW, and related libraries. These scripts demonstrate rendering techniques such as Bezier surfaces, normal mapping, and texture mapping using Python.
+
+### Setting Up and Running pygl Examples
+
+It is recommended to use a Python virtual environment for these examples.
+
+1. **Create and activate a virtual environment:**
+
+    ```sh
+    cd pygl
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
+
+2. **Install the required Python packages:**
+
+    ```sh
+    pip install -r requirements.txt
+    ```
+
+3. **Run an example:**
+
+    ```sh
+    python teapot_texture.py
+    ```
+
+    Replace `teapot_texture.py` with any other example script you wish to run.
 
 ---
 

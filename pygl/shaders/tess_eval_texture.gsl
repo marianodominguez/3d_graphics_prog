@@ -57,6 +57,7 @@ void main() {
     texCoord = vec2(u,v);
 
     fragnormal=normalize(cross(p2-p1, p3-p1));
-    gl_Position = evaluateBezier(CP,u,v);
+    fragpos = evaluateBezier(CP, u, v);
+    gl_Position = fragpos;
     return;
 }
