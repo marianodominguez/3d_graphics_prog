@@ -4,17 +4,22 @@ default: teapot ;
 ############
 MACHINE= $(shell uname -s)
 GL_LIBS= -lglfw -lGLEW -lm -framework OpenGL
+OSX_INCLUDE=-I /opt/homebrew/include
+LIBS= -lallegro -lallegro_font -lallegro_primitives -lallegro_main -lm  -L /opt/homebrew/lib
+CXX=gcc
+
 ifeq ($(MACHINE),Linux)
-	GL_LIBS=-lglfw -lGLEW -lm -lGL
+	GL_LIBS=-lglfw -lGLEW  -lm -lGL
+	OSX_INCLUDE=""
+	LIBS= -lallegro_font -lallegro -lm -lallegro_primitives -lallegro_main
 endif
 
 # object files have corresponding source files
 OBJS= main.o
-CXX=gcc
+
 COMPILER_FLAGS= -g -O0 -Wno-parentheses-equality
 #INCLUDE= -I/usr/include/aarch64-linux-gnu
-INCLUDE=-I include -I /usr/local/include
-LIBS= -lallegro_font -lallegro -lm -lallegro_primitives -lallegro_main -lcglm
+INCLUDE=-I include -I /usr/local/include $(OSX_INCLUDE)
 
 cube:
 	$(CXX) $(COMPILER_FLAGS) -o bin/$@ teapot/src/cube.c $(INCLUDE) $(LIBS)
