@@ -14,7 +14,7 @@ void main()
     vec3 ambient = vec3(0.2, 0.2, 0.2);
     vec3 objColor = vec3(1.0,0.2,1.0);
 
-    float specularStrength = 0.5;
+    float specularStrength = 0.9;
 
     vec3 lightDir = normalize(vec3(lightCamera) - fragpos.xyz);
     float diff = max(dot(fragnormal, lightDir), 0.0);

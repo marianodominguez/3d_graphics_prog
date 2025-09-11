@@ -219,8 +219,8 @@ texture_id = read_texture('../textures/stone.jpg',  GL_TEXTURE0 )
 
 #glBindTexture(GL_TEXTURE_2D, texture_id)
 #bump_id = read_texture('../textures/bricks_normal.png', GL_TEXTURE1 )
-#bump_id = read_texture('../textures/bubble_normal.jpg', GL_TEXTURE1 )
-bump_id = read_texture('../textures/material_normal.jpg', GL_TEXTURE1 )
+bump_id = read_texture('../textures/bubble_normal.jpg', GL_TEXTURE1 )
+#bump_id = read_texture('../textures/material_normal.jpg', GL_TEXTURE1 )
 
 #setup camera
 # Camera matrix
